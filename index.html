@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Escape del Sótano - Multijugador v3</title>
+<title>Escape del Sótano - Multijugador v4</title>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
@@ -19,19 +19,22 @@
   #roomId { font-size:24px; color:#00ff00; background:#000; padding:12px 20px; border:2px dashed #00ff00; margin:10px; text-shadow:0 0 10px #00ff00; text-align: center; word-break: break-all; }
   #playersList { margin:15px; padding:15px; background:rgba(0,0,0,0.8); border:2px solid #555; min-width:320px; border-radius: 10px; }
   .playerItem { padding:6px; color:#ffcc00; border-bottom:1px solid #333; }
-  
+
   canvas { display:block; cursor:crosshair; margin:auto; touch-action: none; image-rendering: pixelated; }
-  
+
   #hud { position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.85); padding:12px; border:2px solid #ffcc00; z-index:5; min-width:180px; box-shadow:0 0 20px rgba(255,204,0,0.3); border-radius: 10px; pointer-events: none; }
   .lifeRow { margin:4px 0; color:#fff; font-size:14px; }
   .heart { color:#ff3333; text-shadow:0 0 5px #ff0000; }
   #dialog { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:linear-gradient(135deg, #1a0a0a, #000); border:4px solid #ffcc00; padding:25px; z-index:20; display:none; min-width:450px; text-align:center; box-shadow:0 0 40px rgba(255,204,0,0.5); border-radius: 15px; }
   #dialog h3 { color:#ff6666; margin-bottom:15px; font-size:22px; text-shadow:0 0 10px #ff0000; }
+  #dialog h3.secuaz { color:#a020f0; text-shadow:0 0 12px #8b00ff; }
   #dialog input { width:100%; font-size: 18px; text-align: center; }
   #votePanel { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:linear-gradient(135deg, #0a1a0a, #000); border:4px solid #00ff00; padding:25px; z-index:20; display:none; text-align:center; box-shadow:0 0 40px rgba(0,255,0,0.5); border-radius: 15px; }
   #msgBox { position:absolute; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.95); color:#ffcc00; padding:12px 24px; border:2px solid #ffcc00; z-index:15; display:none; font-size:18px; text-shadow:0 0 10px #ffcc00; box-shadow:0 0 20px rgba(255,204,0,0.5); border-radius: 10px; pointer-events: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
   #timer { position:absolute; top:10px; left:10px; color:#ff3333; font-size:22px; background:rgba(0,0,0,0.85); padding:10px 15px; border:2px solid #ff3333; z-index:5; text-shadow:0 0 10px #ff0000; box-shadow:0 0 15px rgba(255,0,0,0.3); border-radius: 10px; pointer-events: none; }
   #weaponInfo { position:absolute; top:65px; left:10px; color:#00ff00; font-size:16px; background:rgba(0,0,0,0.85); padding:10px 15px; border:2px solid #00ff00; z-index:5; display:none; text-shadow:0 0 10px #00ff00; border-radius: 10px; pointer-events: none; }
+  #secuazInfo { position:absolute; top:10px; left:50%; transform:translateX(-50%); color:#d080ff; font-size:14px; background:rgba(0,0,0,0.9); padding:8px 18px; border:2px solid #8b00ff; z-index:5; display:none; text-shadow:0 0 10px #a020f0; box-shadow:0 0 15px rgba(139,0,255,0.4); border-radius: 10px; pointer-events: none; }
+  #secuazInfo b { color:#ffcc00; }
   #sitBtn { position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,0.85); color:#ffcc00; padding:10px 15px; border:2px solid #ffcc00; z-index:5; font-size:16px; cursor:pointer; font-weight: bold; }
   #sitBtn:hover { background:#ffcc00; color:#000; }
   #soundToggle { position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.85); color:#ffcc00; padding:8px 12px; border:2px solid #ffcc00; z-index:5; cursor:pointer; font-size: 20px; }
@@ -46,6 +49,7 @@
     #hud { bottom: 65px; left: 5px; right: auto; min-width: 140px; padding: 8px; }
     #timer { font-size: 16px; padding: 8px; }
     #weaponInfo { top: 50px; font-size: 14px; padding: 8px; }
+    #secuazInfo { font-size: 12px; padding: 6px 10px; top: 5px; }
     #dialog { width: 95%; min-width: 0; top: 35%; padding: 15px; } /* Más arriba para que no lo tape el teclado */
     #votePanel { width: 95%; min-width: 0; padding: 15px; }
     #sitBtn { bottom: 5px; left: 5px; width: calc(100% - 10px); padding: 15px; text-align: center; font-size: 18px; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
@@ -83,12 +87,13 @@
   <canvas id="canvas"></canvas>
   <div id="timer">🦉 Duolingo: <span id="timeLeft">5:00</span></div>
   <div id="weaponInfo">🔫 <span id="weaponName">Ninguna</span></div>
+  <div id="secuazInfo">👹 Secuaces: <b><span id="secuazCount">0</span>/5</b> &nbsp;|&nbsp; Próximos: <b><span id="secuazTimer">60</span>s</b></div>
   <div id="hud"></div>
   <div id="msgBox"></div>
   <button id="sitBtn" onclick="toggleSit()">🪑 Sentarse</button>
   <button id="soundToggle" onclick="toggleSound()">🔊</button>
   <div id="dialog">
-    <h3>🦉 DUOLINGO PREGUNTA:</h3>
+    <h3 id="dialogTitle">🦉 DUOLINGO PREGUNTA:</h3>
     <p id="question" style="font-size:20px; color:#fff; margin:15px 0;"></p>
     <input type="text" id="answer" placeholder="Tu respuesta...">
     <button onclick="submitAnswer()">Responder</button>
@@ -138,7 +143,7 @@ function playSound(type) {
   const t = audioCtx.currentTime;
   const g = audioCtx.createGain();
   g.connect(audioCtx.destination);
-  
+
   if (type === 'step') {
     const o = audioCtx.createOscillator();
     o.type = 'square'; o.frequency.value = 80 + Math.random()*40;
@@ -163,6 +168,31 @@ function playSound(type) {
     o.type = 'sawtooth'; o.frequency.setValueAtTime(100, t); o.frequency.exponentialRampToValueAtTime(400, t+0.8);
     g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.001, t+1);
     o.connect(g); o.start(t); o.stop(t+1);
+  } else if (type === 'secuaz_spawn') {
+    // Sonido más "demoníaco" para los secuaces
+    const o = audioCtx.createOscillator();
+    o.type = 'square'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(80, t+0.3);
+    g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.4);
+    o.connect(g); o.start(t); o.stop(t+0.4);
+    // Segundo tono superpuesto
+    const o2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    o2.type = 'sawtooth'; o2.frequency.setValueAtTime(220, t+0.1); o2.frequency.exponentialRampToValueAtTime(110, t+0.5);
+    g2.gain.setValueAtTime(0.1, t+0.1); g2.gain.exponentialRampToValueAtTime(0.001, t+0.6);
+    o2.connect(g2); g2.connect(audioCtx.destination);
+    o2.start(t+0.1); o2.stop(t+0.6);
+  } else if (type === 'secuaz_correct') {
+    // Sonido místico cuando un secuaz se va
+    const o = audioCtx.createOscillator();
+    o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(800, t+0.4);
+    g.gain.setValueAtTime(0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.5);
+    o.connect(g); o.start(t); o.stop(t+0.5);
+  } else if (type === 'secuaz_wrong') {
+    // Sonido terrorífico cuando alguien falla
+    const o = audioCtx.createOscillator();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(250, t); o.frequency.exponentialRampToValueAtTime(40, t+0.6);
+    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.7);
+    o.connect(g); o.start(t); o.stop(t+0.7);
   } else if (type === 'shoot') {
     const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.2, audioCtx.sampleRate);
     const data = buf.getChannelData(0);
@@ -238,6 +268,11 @@ let particles = [];
 let screenShake = 0;
 let lastStepTime = 0;
 
+// === NUEVO: Sistema de Secuaces ===
+let secuaces = [];
+let secuazSpawnTimer = 60; // Cuenta regresiva de 60s para spawn
+let currentSecuaz = null; // Cuál secuaz está respondiendo el jugador local
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const WORLD_W = 1200;
@@ -258,6 +293,50 @@ const QUESTIONS = [
   {q: "¿Cómo se dice 'escuela'?", a: "school"},
   {q: "Traduce: 'I love you'", a: "te amo"},
   {q: "¿Cómo se dice 'noche'?", a: "night"}
+];
+
+// === NUEVO: Banco de preguntas para los Secuaces (en INGLÉS) ===
+const SECUAZ_QUESTIONS = [
+  {q: "How do you say 'perro' in English?", a: "dog"},
+  {q: "How do you say 'gato' in English?", a: "cat"},
+  {q: "How do you say 'casa' in English?", a: "house"},
+  {q: "How do you say 'agua' in English?", a: "water"},
+  {q: "How do you say 'libro' in English?", a: "book"},
+  {q: "How do you say 'rojo' in English?", a: "red"},
+  {q: "How do you say 'amigo' in English?", a: "friend"},
+  {q: "How do you say 'feliz' in English?", a: "happy"},
+  {q: "How do you say 'noche' in English?", a: "night"},
+  {q: "How do you say 'escuela' in English?", a: "school"},
+  {q: "How do you say 'sí' in English?", a: "yes"},
+  {q: "How do you say 'hola' in English?", a: "hello"},
+  {q: "How do you say 'gracias' in English?", a: "thank you"},
+  {q: "How do you say 'por favor' in English?", a: "please"},
+  {q: "How do you say 'hoy' in English?", a: "today"},
+  {q: "How do you say 'mañana' in English?", a: "tomorrow"},
+  {q: "How do you say 'sol' in English?", a: "sun"},
+  {q: "How do you say 'luna' in English?", a: "moon"},
+  {q: "How do you say 'ciudad' in English?", a: "city"},
+  {q: "How do you say 'blanco' in English?", a: "white"},
+  {q: "How do you say 'negro' in English?", a: "black"},
+  {q: "How do you say 'verde' in English?", a: "green"},
+  {q: "How do you say 'azul' in English?", a: "blue"},
+  {q: "How do you say 'grande' in English?", a: "big"},
+  {q: "How do you say 'pequeño' in English?", a: "small"},
+  {q: "How do you say 'bueno' in English?", a: "good"},
+  {q: "How do you say 'malo' in English?", a: "bad"},
+  {q: "How do you say 'rápido' in English?", a: "fast"},
+  {q: "How do you say 'lento' in English?", a: "slow"},
+  {q: "How do you say 'caliente' in English?", a: "hot"},
+  {q: "How do you say 'frío' in English?", a: "cold"},
+  {q: "How do you say 'nuevo' in English?", a: "new"},
+  {q: "How do you say 'viejo' in English?", a: "old"},
+  {q: "How do you say 'alto' in English?", a: "tall"},
+  {q: "How do you say 'bajo' in English?", a: "short"},
+  {q: "How do you say 'uno' in English?", a: "one"},
+  {q: "How do you say 'dos' in English?", a: "two"},
+  {q: "How do you say 'tres' in English?", a: "three"},
+  {q: "How do you say 'cuatro' in English?", a: "four"},
+  {q: "How do you say 'cinco' in English?", a: "five"}
 ];
 
 const WEAPONS = ['Pistola', 'Rifle', 'Bate', 'Cuchillo', 'Escopeta'];
@@ -287,11 +366,11 @@ function createRoom() {
   if (!myName) { alert('Escribe tu nombre'); return; }
   isHost = true;
   roomId = 'sala-' + Math.random().toString(36).substr(2, 6);
-  
+
   document.getElementById('status').textContent = 'Creando servidor...';
-  
+
   peer = new Peer(roomId, peerConfig);
-  
+
   peer.on('open', (id) => {
     myId = id;
     document.getElementById('menu').style.display = 'none';
@@ -299,10 +378,10 @@ function createRoom() {
     document.getElementById('roomId').textContent = 'ID: ' + roomId;
     document.getElementById('hostControls').style.display = 'block';
     document.getElementById('status').textContent = 'Servidor listo. Esperando jugadores...';
-    
+
     players[myId] = {
-      name: myName, x: 200, y: 400, targetX: 200, targetY: 400, 
-      lives: 2, weapon: null, alive: true, color: PLAYER_COLORS[0], 
+      name: myName, x: 200, y: 400, targetX: 200, targetY: 400,
+      lives: 2, weapon: null, alive: true, color: PLAYER_COLORS[0],
       sitting: false, frame: 0, facing: 1
     };
     updatePlayersList();
@@ -310,15 +389,15 @@ function createRoom() {
 
   peer.on('connection', (c) => {
     const setupConn = () => {
-      if (Object.keys(players).length >= 4) { 
-        c.send({type:'full'}); setTimeout(() => c.close(), 100); return; 
+      if (Object.keys(players).length >= 4) {
+        c.send({type:'full'}); setTimeout(() => c.close(), 100); return;
       }
       if (!connections.includes(c)) connections.push(c);
       c.on('data', (data) => handleMsg(data, c));
     };
 
     if (c.open) setupConn(); else c.on('open', setupConn);
-    
+
     c.on('close', () => {
       const playerId = c.peer;
       if (players[playerId]) {
@@ -329,7 +408,7 @@ function createRoom() {
       connections = connections.filter(conn => conn !== c);
     });
   });
-  
+
   peer.on('error', (err) => { alert('Error al crear sala: ' + err.type); });
 }
 
@@ -338,14 +417,14 @@ function joinRoom() {
   myName = document.getElementById('playerName').value.trim();
   roomId = document.getElementById('joinId').value.trim();
   if (!myName || !roomId) { alert('Completa los campos'); return; }
-  
+
   document.getElementById('status').textContent = 'Buscando sala...';
   peer = new Peer(peerConfig);
-  
+
   peer.on('open', (id) => {
     myId = id;
     conn = peer.connect(roomId, { metadata: { name: myName } });
-    
+
     const setupConn = () => {
       document.getElementById('menu').style.display = 'none';
       document.getElementById('lobby').style.display = 'flex';
@@ -359,7 +438,7 @@ function joinRoom() {
     conn.on('error', (err) => { alert('Error de conexión: ' + err); location.reload(); });
     conn.on('close', () => { alert('Conexión perdida con el host'); location.reload(); });
   });
-  
+
   peer.on('error', (err) => { alert('Error al conectar: ' + err.type); });
 }
 
@@ -370,23 +449,28 @@ function broadcast(data, excludeConn = null) {
 // ============ MENSAJERÍA ============
 function handleMsg(data, senderConn = null) {
   if (data.type === 'full') { alert('Sala llena'); location.reload(); return; }
-  
+
   if (data.type === 'join') {
     if (!isHost) return;
     if (Object.keys(players).length >= 4) { if (senderConn) senderConn.send({type:'full'}); return; }
     const colorIdx = Object.keys(players).length;
     players[data.id] = {
-      name: data.name, x: 200 + colorIdx*50, y: 400, targetX: 200+colorIdx*50, targetY: 400, 
-      lives: 2, weapon: null, alive: true, color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length], 
+      name: data.name, x: 200 + colorIdx*50, y: 400, targetX: 200+colorIdx*50, targetY: 400,
+      lives: 2, weapon: null, alive: true, color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length],
       sitting: false, frame: 0, facing: 1
     };
     updatePlayersList();
     if (senderConn) {
-      senderConn.send({ type:'sync', players: players, chairs: chairs, boxes: boxes, duolingoTimer: duolingoTimer, gameStarted: gameStarted, duolingo: duolingo, voting: voting, fightMode: fightMode });
+      senderConn.send({
+        type:'sync', players: players, chairs: chairs, boxes: boxes,
+        duolingoTimer: duolingoTimer, gameStarted: gameStarted, duolingo: duolingo,
+        voting: voting, fightMode: fightMode,
+        secuaces: secuaces, secuazSpawnTimer: secuazSpawnTimer
+      });
     }
     broadcast({type:'sync', players: players});
   }
-  
+
   if (data.type === 'sync') {
     players = data.players;
     if (data.chairs) chairs = data.chairs;
@@ -395,6 +479,9 @@ function handleMsg(data, senderConn = null) {
     if (data.duolingo !== undefined) duolingo = data.duolingo;
     if (data.voting !== undefined) voting = data.voting;
     if (data.fightMode !== undefined) fightMode = data.fightMode;
+    // === NUEVO: Sincronizar secuaces ===
+    if (data.secuaces !== undefined) secuaces = data.secuaces;
+    if (data.secuazSpawnTimer !== undefined) secuazSpawnTimer = data.secuazSpawnTimer;
     if (data.gameStarted && !gameStarted) {
       gameStarted = true;
       document.getElementById('lobby').style.display = 'none';
@@ -403,48 +490,52 @@ function handleMsg(data, senderConn = null) {
     }
     updatePlayersList();
   }
-  
+
   if (data.type === 'move') {
     if (players[data.id]) { players[data.id].targetX = data.x; players[data.id].targetY = data.y; }
     if (isHost) broadcast(data, senderConn);
   }
-  
+
   if (data.type === 'sit') {
     if (players[data.id]) {
       players[data.id].sitting = data.sitting;
       if (data.sitting && data.chairIdx !== undefined) {
         const chair = chairs[data.chairIdx];
-        if (chair) { 
-          players[data.id].x = chair.x; players[data.id].y = chair.y; 
+        if (chair) {
+          players[data.id].x = chair.x; players[data.id].y = chair.y;
           players[data.id].targetX = chair.x; players[data.id].targetY = chair.y;
         }
       }
     }
     if (isHost) broadcast(data, senderConn);
   }
-  
+
   if (data.type === 'start') {
     gameStarted = true; players = data.players; boxes = data.boxes; chairs = data.chairs;
+    if (data.secuaces) secuaces = data.secuaces;
+    if (data.secuazSpawnTimer !== undefined) secuazSpawnTimer = data.secuazSpawnTimer;
     document.getElementById('lobby').style.display = 'none';
     document.getElementById('game').style.display = 'block';
     resizeCanvas(); gameLoop(); startTimer();
   }
-  
+
   if (data.type === 'duolingo_spawn') {
     duolingo = data.duolingo; playSound('duo_spawn'); showMsg('🦉 ¡DUOLINGO HA LLEGADO!'); screenShake = 20;
   }
-  
+
   if (data.type === 'duolingo_move') { duolingo = data.duolingo; }
-  
+
   if (data.type === 'question') {
     if (players[myId] && players[myId].sitting) { showMsg('🪑 Estás sentado, Duolingo te ignora...'); return; }
     currentQuestion = data.question;
+    currentSecuaz = null; // Asegurar que no estamos en modo secuaz
+    document.getElementById('dialogTitle').textContent = '🦉 DUOLINGO PREGUNTA:';
+    document.getElementById('dialogTitle').classList.remove('secuaz');
     document.getElementById('question').textContent = currentQuestion.q;
     document.getElementById('dialog').style.display = 'block';
     document.getElementById('answer').value = '';
-    // En móviles, hacer focus despliega el teclado molesto de golpe, lo removemos como auto-focus
   }
-  
+
   if (data.type === 'submit_answer') { if (isHost) checkAnswer(data.id, data.answer); }
 
   if (data.type === 'answer_result') {
@@ -456,7 +547,7 @@ function handleMsg(data, senderConn = null) {
       if (data.id === myId) { showMsg('❌ ¡Incorrecto! Pierdes una vida'); screenShake = 15; }
       else { showMsg(`❌ ¡${players[data.id]?.name} se equivocó!`); }
       if (players[data.id]) {
-        players[data.id].lives--;
+        players[data.id].lives = Math.max(0, players[data.id].lives - 1);
         if (players[data.id].lives <= 0) {
           players[data.id].alive = false;
           if (data.id === myId) playSound('death');
@@ -488,14 +579,14 @@ function handleMsg(data, senderConn = null) {
       }
     }
   }
-  
+
   if (data.type === 'boxes_respawn') { boxes = data.boxes; showMsg('📦 ¡Las cajas han reaparecido!'); playSound('box'); }
-  
+
   if (data.type === 'vote_start') {
     voting = true; votes = {};
     document.getElementById('votePanel').style.display = 'block'; updateVoteCount();
   }
-  
+
   if (data.type === 'vote') {
     votes[data.id] = data.vote; updateVoteCount();
     if (isHost) {
@@ -503,13 +594,13 @@ function handleMsg(data, senderConn = null) {
       if (Object.keys(votes).length === Object.keys(players).filter(id => players[id].alive).length) { resolveVote(); }
     }
   }
-  
+
   if (data.type === 'vote_result') {
     document.getElementById('votePanel').style.display = 'none'; voting = false;
     if (data.fight) { fightMode = true; showMsg('⚔️ ¡MODO COMBATE!'); }
     else { showMsg('🏃 Duolingo hace su pregunta...'); }
   }
-  
+
   if (data.type === 'fight_attack') {
     if (duolingo) {
       duolingo.hp -= data.damage; duolingo.hitFlash = 10; playSound('hit'); screenShake = 8;
@@ -521,12 +612,92 @@ function handleMsg(data, senderConn = null) {
     }
     if (isHost) broadcast(data, senderConn);
   }
-  
+
   if (data.type === 'player_died') {
     if (players[data.id]) {
       players[data.id].lives = 0; players[data.id].alive = false;
       if (data.id === myId) playSound('death');
       showMsg('💀 ' + data.name + ' ha muerto');
+    }
+  }
+
+  // ============ NUEVO: Mensajes de Secuaces ============
+  if (data.type === 'secuaz_spawn') {
+    secuaces = data.secuaces;
+    playSound('secuaz_spawn');
+    showMsg('👹 ¡5 SECUACES HAN APARECIDO! Te preguntarán en inglés');
+    screenShake = 12;
+  }
+
+  if (data.type === 'secuaz_request') {
+    if (isHost) {
+      const s = secuaces.find(x => x.id === data.secuazId);
+      if (s && !s.answeredBy) {
+        // Marcar como "siendo respondido" para evitar duplicados
+        s.answeredBy = data.playerId;
+        // Enviar la pregunta SOLO al jugador que la pidió
+        const targetConn = connections.find(c => c.peer === data.playerId);
+        if (targetConn) targetConn.send({type: 'secuaz_question', secuaz: s});
+      }
+    }
+  }
+
+  if (data.type === 'secuaz_question') {
+    currentSecuaz = data.secuaz;
+    currentQuestion = null; // No es pregunta de Duolingo
+    document.getElementById('dialogTitle').textContent = '👹 SECUAZ PREGUNTA (English):';
+    document.getElementById('dialogTitle').classList.add('secuaz');
+    document.getElementById('question').textContent = data.secuaz.question;
+    document.getElementById('dialog').style.display = 'block';
+    document.getElementById('answer').value = '';
+  }
+
+  if (data.type === 'secuaz_answer') {
+    if (isHost) {
+      const s = secuaces.find(x => x.id === data.secuazId);
+      if (s) checkSecuazAnswer(s, data.playerId, data.answer);
+    }
+  }
+
+  if (data.type === 'secuaz_result') {
+    // Quitar al secuaz de la lista (en todos los clientes)
+    const removed = secuaces.find(s => s.id === data.secuazId);
+    if (removed) {
+      secuaces = secuaces.filter(s => s.id !== data.secuazId);
+      // Partículas de "desaparición"
+      for (let i = 0; i < 25; i++) {
+        particles.push({
+          x: removed.x + 15, y: removed.y + 20,
+          vx: (Math.random()-0.5) * 7, vy: (Math.random()-0.5) * 7 - 2,
+          life: 55, color: data.correct ? '#a020f0' : '#ff3333'
+        });
+      }
+    }
+
+    if (data.correct) {
+      playSound('secuaz_correct');
+      showMsg('✅ ¡' + data.playerName + ' ahuyentó a un secuaz!');
+    } else {
+      playSound('secuaz_wrong');
+      showMsg('❌ ¡' + data.playerName + ' falló! TODOS pierden ½ corazón');
+      screenShake = 18;
+      // === CLAVE: Todos los jugadores vivos pierden 0.5 corazón ===
+      Object.keys(players).forEach(id => {
+        if (players[id].alive) {
+          players[id].lives = Math.max(0, players[id].lives - 0.5);
+          if (players[id].lives <= 0) {
+            players[id].alive = false;
+            if (id === myId) playSound('death');
+          }
+        }
+      });
+    }
+
+    // Si era el secuaz que el jugador local estaba respondiendo, limpiar
+    if (currentSecuaz && currentSecuaz.id === data.secuazId) {
+      currentSecuaz = null;
+      document.getElementById('dialog').style.display = 'none';
+      document.getElementById('dialogTitle').classList.remove('secuaz');
     }
   }
 }
@@ -552,7 +723,12 @@ function startGame() {
     {x: 150, y: 200, idx: 0}, {x: WORLD_W - 150, y: 200, idx: 1},
     {x: 150, y: WORLD_H - 200, idx: 2}, {x: WORLD_W - 150, y: WORLD_H - 200, idx: 3}
   ];
-  const startData = {type:'start', players: players, boxes: boxes, chairs: chairs};
+  // === NUEVO: Resetear estado de secuaces al iniciar ===
+  secuaces = [];
+  secuazSpawnTimer = 60;
+  currentSecuaz = null;
+
+  const startData = {type:'start', players: players, boxes: boxes, chairs: chairs, secuaces: secuaces, secuazSpawnTimer: secuazSpawnTimer};
   broadcast(startData); handleMsg(startData);
 }
 
@@ -560,12 +736,12 @@ function startGame() {
 function resizeCanvas() {
   const scale = Math.min(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
   const dpr = window.devicePixelRatio || 1; // Para que se vea en HD en celulares
-  
+
   canvas.width = WORLD_W * scale * dpr;
   canvas.height = WORLD_H * scale * dpr;
   canvas.style.width = (WORLD_W * scale) + 'px';
   canvas.style.height = (WORLD_H * scale) + 'px';
-  
+
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(scale * dpr, scale * dpr);
   ctx.imageSmoothingEnabled = false;
@@ -576,47 +752,87 @@ window.addEventListener('resize', () => { if (gameStarted) resizeCanvas(); });
 canvas.addEventListener('pointerdown', e => {
   initAudio();
   if (!gameStarted || !players[myId] || !players[myId].alive) return;
-  if (players[myId].sitting) return;
-  
+
   const rect = canvas.getBoundingClientRect();
   const scale = rect.width / WORLD_W;
   const x = (e.clientX - rect.left) / scale;
   const y = (e.clientY - rect.top) / scale;
-  
-  let satOnChair = false;
-  chairs.forEach((chair, idx) => {
-    const dist = Math.hypot(x - chair.x, y - chair.y);
-    if (dist < 60) { // ZONA DE TOQUE MÁS AMPLIA PARA CELULARES
-      const myDist = Math.hypot(players[myId].x - chair.x, players[myId].y - chair.y);
-      if (myDist < 120) {
-        players[myId].sitting = true; players[myId].x = chair.x; players[myId].y = chair.y;
-        players[myId].targetX = chair.x; players[myId].targetY = chair.y; satOnChair = true; playSound('sit');
-        const data = {type:'sit', id: myId, sitting: true, chairIdx: idx};
-        if (isHost) broadcast(data); else conn.send(data);
+
+  // === Sillas (solo si NO está sentado) ===
+  if (!players[myId].sitting) {
+    let satOnChair = false;
+    chairs.forEach((chair, idx) => {
+      const dist = Math.hypot(x - chair.x, y - chair.y);
+      if (dist < 60) { // ZONA DE TOQUE MÁS AMPLIA PARA CELULARES
+        const myDist = Math.hypot(players[myId].x - chair.x, players[myId].y - chair.y);
+        if (myDist < 120) {
+          players[myId].sitting = true; players[myId].x = chair.x; players[myId].y = chair.y;
+          players[myId].targetX = chair.x; players[myId].targetY = chair.y; satOnChair = true; playSound('sit');
+          const data = {type:'sit', id: myId, sitting: true, chairIdx: idx};
+          if (isHost) broadcast(data); else conn.send(data);
+        }
       }
-    }
-  });
-  
-  if (satOnChair) return;
-  
-  players[myId].targetX = x; players[myId].targetY = y;
-  if (isHost) broadcast({type:'move', id: myId, x: x, y: y}); else conn.send({type:'move', id: myId, x: x, y: y});
-  
-  boxes.forEach(box => {
-    if (!box.opened && x > box.x-10 && x < box.x + box.w + 10 && y > box.y-10 && y < box.y + box.h + 10) {
-      const dist = Math.hypot(players[myId].x - (box.x+25), players[myId].y - (box.y+25));
+    });
+    if (satOnChair) return;
+
+    // === Cajas (solo si NO está sentado) ===
+    let openedBox = false;
+    boxes.forEach(box => {
+      if (!box.opened && x > box.x-10 && x < box.x + box.w + 10 && y > box.y-10 && y < box.y + box.h + 10) {
+        const dist = Math.hypot(players[myId].x - (box.x+25), players[myId].y - (box.y+25));
+        if (dist < 100) {
+          if (isHost) openBox(box, myId); else conn.send({type:'open_box_req', boxId: box.id, playerId: myId});
+          openedBox = true;
+        }
+      }
+    });
+    if (openedBox) return;
+
+    // === Pelea contra Duolingo (solo si NO está sentado) ===
+    if (fightMode && duolingo && players[myId].weapon) {
+      const dist = Math.hypot(players[myId].x - duolingo.x, players[myId].y - duolingo.y);
       if (dist < 100) {
-        if (isHost) openBox(box, myId); else conn.send({type:'open_box_req', boxId: box.id, playerId: myId});
+        playSound('shoot'); const data = {type:'fight_attack', damage: getWeaponDamage(players[myId].weapon)};
+        if (isHost) handleMsg(data); else conn.send(data);
+        return;
       }
     }
-  });
-  
-  if (fightMode && duolingo && players[myId].weapon) {
-    const dist = Math.hypot(players[myId].x - duolingo.x, players[myId].y - duolingo.y);
-    if (dist < 100) {
-      playSound('shoot'); const data = {type:'fight_attack', damage: getWeaponDamage(players[myId].weapon)};
-      if (isHost) handleMsg(data); else conn.send(data);
+  }
+
+  // === NUEVO: Secuaces (funciona INCLUSO sentado, el secuaz te encuentra) ===
+  let clickedSecuaz = false;
+  for (let i = 0; i < secuaces.length; i++) {
+    const s = secuaces[i];
+    if (s.answeredBy) continue; // Ya está siendo respondido
+    // Hitbox generosa
+    if (x > s.x - 10 && x < s.x + 40 && y > s.y - 15 && y < s.y + 55) {
+      const dist = Math.hypot(players[myId].x - (s.x+15), players[myId].y - (s.y+20));
+      if (dist < 120) {
+        if (isHost) {
+          // El host se responde a sí mismo
+          s.answeredBy = myId;
+          currentSecuaz = s;
+          currentQuestion = null;
+          document.getElementById('dialogTitle').textContent = '👹 SECUAZ PREGUNTA (English):';
+          document.getElementById('dialogTitle').classList.add('secuaz');
+          document.getElementById('question').textContent = s.question;
+          document.getElementById('dialog').style.display = 'block';
+          document.getElementById('answer').value = '';
+        } else {
+          // Cliente pide la pregunta al host
+          conn.send({type: 'secuaz_request', secuazId: s.id, playerId: myId});
+        }
+        clickedSecuaz = true;
+        break;
+      }
     }
+  }
+  if (clickedSecuaz) return;
+
+  // === Movimiento (solo si NO está sentado) ===
+  if (!players[myId].sitting) {
+    players[myId].targetX = x; players[myId].targetY = y;
+    if (isHost) broadcast({type:'move', id: myId, x: x, y: y}); else conn.send({type:'move', id: myId, x: x, y: y});
   }
 });
 
@@ -649,12 +865,67 @@ function openBox(box, playerId) {
   broadcast(data); handleMsg(data);
 }
 
+// ============ NUEVO: Spawn de Secuaces ============
+function spawnSecuaces() {
+  const newSecuaces = [];
+  const blocked = [
+    ...chairs.map(c => ({x: c.x, y: c.y})),
+    ...boxes.map(b => ({x: b.x + 25, y: b.y + 25}))
+  ];
+
+  for (let i = 0; i < 5; i++) {
+    let x, y, attempts = 0;
+    do {
+      x = 90 + Math.random() * (WORLD_W - 180);
+      y = 140 + Math.random() * (WORLD_H - 270);
+      attempts++;
+    } while (attempts < 40 && (
+      blocked.some(p => Math.hypot(p.x - x, p.y - y) < 110) ||
+      newSecuaces.some(p => Math.hypot(p.x - x, p.y - y) < 160)
+    ));
+
+    // Elegir pregunta aleatoria
+    const q = SECUAZ_QUESTIONS[Math.floor(Math.random() * SECUAZ_QUESTIONS.length)];
+    newSecuaces.push({
+      id: 'sec_' + Date.now() + '_' + i,
+      x: x, y: y,
+      question: q.q, answer: q.a,
+      answeredBy: null,
+      seed: Math.random() * 1000 // Para que cada uno se mueva diferente
+    });
+  }
+
+  secuaces = newSecuaces;
+
+  if (isHost) {
+    broadcast({type: 'secuaz_spawn', secuaces: secuaces});
+  }
+  // El host también dispara el efecto local (en handleMsg se hace para clientes,
+  // pero acá el host no recibe su propio broadcast, así que lo hacemos directo)
+  playSound('secuaz_spawn');
+  showMsg('👹 ¡5 SECUACES HAN APARECIDO! Te preguntarán en inglés');
+  screenShake = 12;
+}
+
+function checkSecuazAnswer(s, playerId, ans) {
+  const correct = ans === s.answer.toLowerCase();
+  const data = {
+    type: 'secuaz_result',
+    secuazId: s.id,
+    playerId: playerId,
+    playerName: players[playerId]?.name || 'Alguien',
+    correct: correct
+  };
+  broadcast(data);
+  handleMsg(data);
+}
+
 // ============ DIBUJO ============
 function drawBackground() {
   const grad = ctx.createRadialGradient(WORLD_W/2, WORLD_H/2, 100, WORLD_W/2, WORLD_H/2, 700);
   grad.addColorStop(0, '#4a3020'); grad.addColorStop(1, '#1a0808');
   ctx.fillStyle = grad; ctx.fillRect(0, 0, WORLD_W, WORLD_H);
-  
+
   for (let y = 0; y < WORLD_H; y += 40) {
     for (let x = 0; x < WORLD_W; x += 80) {
       const offset = (y / 40) % 2 === 0 ? 0 : 40; const shade = 30 + ((x*7 + y*13) % 20);
@@ -666,7 +937,7 @@ function drawBackground() {
 
 function drawChair(chair) {
   const x = chair.x, y = chair.y;
-  
+
   // QoL: Resaltar silla si estamos cerca y vivos
   let canSit = false;
   if (players[myId] && !players[myId].sitting && players[myId].alive) {
@@ -688,7 +959,7 @@ function drawBox(box) {
   const t = Date.now() - (box.openTime || 0);
   const shake = box.opened && t < 300 ? Math.sin(t/20) * 2 : 0;
   const x = box.x + shake, y = box.y;
-  
+
   // QoL: Resaltar caja si estamos cerca para tocarla
   let canOpen = false;
   if (players[myId] && !box.opened && players[myId].alive && !players[myId].sitting) {
@@ -698,7 +969,7 @@ function drawBox(box) {
      ctx.strokeStyle = `rgba(0, 255, 0, ${0.5 + Math.sin(Date.now()/150)*0.5})`; ctx.lineWidth = 3;
      ctx.strokeRect(x-3, y-3, box.w+6, box.h+6);
   }
-  
+
   ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.ellipse(box.x+25, box.y+box.h+3, 25, 6, 0, 0, Math.PI*2); ctx.fill();
   if (box.opened) {
     ctx.fillStyle = '#4a2a08'; ctx.fillRect(x, y+20, box.w, box.h-20);
@@ -714,13 +985,131 @@ function drawBox(box) {
   }
 }
 
+// ============ NUEVO: Dibujo de Secuaces ============
+function drawSecuaz(s) {
+  const x = s.x, y = s.y;
+  const seed = s.seed || 0;
+  const bob = Math.sin(Date.now()/200 + seed) * 2;
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.beginPath(); ctx.ellipse(x+15, y+42, 14, 4, 0, 0, Math.PI*2); ctx.fill();
+
+  // Aura maléfico (respiración)
+  const aura = 0.15 + Math.sin(Date.now()/180 + seed) * 0.1;
+  ctx.fillStyle = `rgba(139, 0, 255, ${aura})`;
+  ctx.beginPath(); ctx.arc(x+15, y+18, 38, 0, Math.PI*2); ctx.fill();
+
+  // Resaltar si estamos cerca y vivos
+  let canAnswer = false;
+  if (players[myId] && players[myId].alive) {
+    if (Math.hypot(players[myId].x - (x+15), players[myId].y - (y+20)) < 120) {
+      canAnswer = true;
+    }
+  }
+  if (canAnswer) {
+    ctx.strokeStyle = `rgba(255, 204, 0, ${0.5 + Math.sin(Date.now()/120)*0.5})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeRect(x-6, y-18+bob-3, 42, 68);
+    ctx.setLineDash([]);
+  }
+
+  // === Cuerpo (túnica morada) ===
+  ctx.fillStyle = '#3a0050';
+  ctx.fillRect(x, y+12+bob, 30, 26);
+  ctx.fillStyle = '#6a00b3';
+  ctx.fillRect(x+2, y+14+bob, 26, 22);
+
+  // Cinturón
+  ctx.fillStyle = '#1a0030';
+  ctx.fillRect(x, y+28+bob, 30, 4);
+  ctx.fillStyle = '#ffcc00';
+  ctx.fillRect(x+13, y+27+bob, 4, 6);
+
+  // === Cabeza (calavera/demonio) ===
+  ctx.fillStyle = '#a020f0';
+  ctx.fillRect(x+5, y-8+bob, 20, 22);
+  // Sombras
+  ctx.fillStyle = '#6a00b3';
+  ctx.fillRect(x+5, y+10+bob, 20, 4);
+
+  // Cuernos
+  ctx.fillStyle = '#1a0030';
+  ctx.beginPath();
+  ctx.moveTo(x+4, y-5+bob); ctx.lineTo(x, y-18+bob); ctx.lineTo(x+6, y-8+bob); ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x+26, y-5+bob); ctx.lineTo(x+30, y-18+bob); ctx.lineTo(x+24, y-8+bob); ctx.closePath();
+  ctx.fill();
+
+  // === Ojos (rojos brillantes) ===
+  const eyeGlow = Math.sin(Date.now()/100 + seed) * 0.3 + 0.7;
+  // Cuencas oscuras
+  ctx.fillStyle = '#1a0030';
+  ctx.fillRect(x+7, y-3+bob, 6, 6);
+  ctx.fillRect(x+17, y-3+bob, 6, 6);
+  // Brillo rojo
+  ctx.fillStyle = `rgba(255, ${Math.floor(50*eyeGlow)}, 0, ${eyeGlow})`;
+  ctx.fillRect(x+9, y-2+bob, 3, 4);
+  ctx.fillRect(x+19, y-2+bob, 3, 4);
+  // Pupila brillante
+  ctx.fillStyle = '#ffff00';
+  ctx.fillRect(x+10, y-1+bob, 1, 2);
+  ctx.fillRect(x+20, y-1+bob, 1, 2);
+
+  // === Boca (sonrisa maléfica) ===
+  ctx.fillStyle = '#1a0030';
+  ctx.fillRect(x+10, y+5+bob, 10, 3);
+  // Dientes
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x+11, y+5+bob, 1, 2);
+  ctx.fillRect(x+13, y+5+bob, 1, 2);
+  ctx.fillRect(x+15, y+5+bob, 1, 2);
+  ctx.fillRect(x+17, y+5+bob, 1, 2);
+  ctx.fillRect(x+19, y+5+bob, 1, 2);
+
+  // === Brazos ===
+  ctx.fillStyle = '#6a00b3';
+  ctx.fillRect(x-4, y+14+bob, 4, 14);
+  ctx.fillRect(x+30, y+14+bob, 4, 14);
+  // Manos
+  ctx.fillStyle = '#a020f0';
+  ctx.fillRect(x-5, y+26+bob, 6, 5);
+  ctx.fillRect(x+29, y+26+bob, 6, 5);
+
+  // === Piernas ===
+  ctx.fillStyle = '#3a0050';
+  ctx.fillRect(x+5, y+38+bob, 8, 8);
+  ctx.fillRect(x+17, y+38+bob, 8, 8);
+
+  // === Signo "?" flotante ===
+  const qBob = Math.sin(Date.now()/150 + seed) * 4;
+  ctx.font = 'bold 24px Courier New';
+  ctx.textAlign = 'center';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#000';
+  ctx.strokeText('?', x+15, y-22+bob+qBob);
+  ctx.fillStyle = '#ffcc00';
+  ctx.fillText('?', x+15, y-22+bob+qBob);
+
+  // Marca de "siendo respondido" (candado)
+  if (s.answeredBy) {
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+    ctx.beginPath(); ctx.arc(x+15, y-35+bob, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px Courier New';
+    ctx.fillText('!', x+15, y-32+bob);
+  }
+}
+
 function drawPlayer(p) {
   if (!p.alive) {
     ctx.fillStyle = '#ddd'; ctx.beginPath(); ctx.arc(p.x, p.y, 10, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = '#000'; ctx.fillRect(p.x-5, p.y-3, 3, 3); ctx.fillRect(p.x+2, p.y-3, 3, 3); return;
   }
   const x = p.x, y = p.y, bob = p.sitting ? 0 : Math.sin(Date.now()/150) * 1, f = p.facing;
-  
+
   ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.ellipse(x, y+22, 12, 4, 0, 0, Math.PI*2); ctx.fill();
   if (p.sitting) {
     ctx.fillStyle = '#222'; ctx.fillRect(x-8, y+5, 16, 6); ctx.fillStyle = p.color; ctx.fillRect(x-10, y-12, 20, 18);
@@ -736,7 +1125,7 @@ function drawPlayer(p) {
     ctx.fillStyle = p.color; ctx.fillRect(x-13, y-6+bob, 4, 12); ctx.fillRect(x+9, y-6+bob, 4, 12);
     if (p.weapon) { ctx.fillStyle = '#444'; ctx.fillRect(x+11*f, y-3+bob, 18*f, 4); ctx.fillStyle = '#222'; ctx.fillRect(x+11*f, y-1+bob, 18*f, 2); }
   }
-  
+
   ctx.font = 'bold 12px Courier New'; ctx.textAlign = 'center';
   const nameY = p.sitting ? y-32 : y-30+bob; const tw = ctx.measureText(p.name).width;
   ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(x-tw/2-3, nameY-10, tw+6, 14); ctx.fillStyle = '#fff'; ctx.fillText(p.name, x, nameY);
@@ -752,16 +1141,16 @@ function drawDuolingo() {
   ctx.fillStyle = flash ? '#fff' : '#45a802'; ctx.fillRect(x-25, y+15+bob, 50, 10);
   ctx.fillStyle = flash ? '#fff' : '#ffffff'; ctx.fillRect(x-15, y-5+bob, 30, 25);
   ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x-10, y-18+bob, 9, 0, Math.PI*2); ctx.arc(x+10, y-18+bob, 9, 0, Math.PI*2); ctx.fill();
-  
+
   let targetX = x, targetY = y;
   Object.values(players).forEach(p => { if (p.alive && !p.sitting) { targetX = p.x; targetY = p.y; } });
   const dx = targetX - x, dy = targetY - y, d = Math.hypot(dx, dy) || 1, px = (dx/d) * 3, py = (dy/d) * 3;
   ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(x-10+px, y-18+bob+py, 4, 0, Math.PI*2); ctx.arc(x+10+px, y-18+bob+py, 4, 0, Math.PI*2); ctx.fill();
-  
+
   ctx.fillStyle = flash ? '#fff' : '#ff9600'; ctx.beginPath(); ctx.moveTo(x-6, y-5+bob); ctx.lineTo(x+6, y-5+bob); ctx.lineTo(x, y+5+bob); ctx.closePath(); ctx.fill();
   ctx.fillStyle = flash ? '#fff' : '#ff9600'; ctx.fillRect(x-18, y+25+bob, 10, 8); ctx.fillRect(x+8, y+25+bob, 10, 8);
   ctx.fillStyle = flash ? '#fff' : '#3a8a02'; ctx.fillRect(x-28, y-10+bob, 8, 25); ctx.fillRect(x+20, y-10+bob, 8, 25);
-  
+
   if (duolingo.hp < duolingo.maxHp) {
     ctx.fillStyle = '#000'; ctx.fillRect(x-30, y-45+bob, 60, 8);
     ctx.fillStyle = '#ff0000'; ctx.fillRect(x-29, y-44+bob, 58 * (duolingo.hp/duolingo.maxHp), 6);
@@ -779,7 +1168,7 @@ function drawLighting() {
   const grad = ctx.createRadialGradient(WORLD_W/2, WORLD_H/2, 200, WORLD_W/2, WORLD_H/2, 700);
   grad.addColorStop(0, 'rgba(0,0,0,0)'); grad.addColorStop(1, 'rgba(0,0,0,0.7)');
   ctx.fillStyle = grad; ctx.fillRect(0, 0, WORLD_W, WORLD_H);
-  
+
   const flicker = Math.sin(Date.now()/100) * 0.1 + 0.9;
   [[100, 100], [WORLD_W-100, 100], [100, WORLD_H-100], [WORLD_W-100, WORLD_H-100]].forEach(([x,y]) => {
     const lg = ctx.createRadialGradient(x, y, 0, x, y, 100);
@@ -793,16 +1182,16 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const scale = canvas.width / (WORLD_W * (window.devicePixelRatio || 1));
   ctx.save();
-  
+
   if (screenShake > 0) {
     ctx.translate((Math.random()-0.5)*screenShake, (Math.random()-0.5)*screenShake);
     screenShake *= 0.9; if (screenShake < 0.5) screenShake = 0;
   }
-  
+
   ctx.scale(scale * (window.devicePixelRatio || 1), scale * (window.devicePixelRatio || 1));
-  
+
   drawBackground();
-  
+
   // QoL: Dibujar Indicador de target (Movimiento)
   if (players[myId] && !players[myId].sitting && players[myId].alive) {
     const p = players[myId];
@@ -816,14 +1205,20 @@ function draw() {
   }
 
   chairs.forEach(drawChair); boxes.forEach(drawBox);
-  
+
+  // === Ordenar entidades por Y para profundidad correcta ===
   const allEntities = [
     ...Object.values(players).map(p => ({type:'player', data:p, y:p.y})),
-    ...(duolingo ? [{type:'duo', data:duolingo, y:duolingo.y}] : [])
+    ...(duolingo ? [{type:'duo', data:duolingo, y:duolingo.y}] : []),
+    ...secuaces.map(s => ({type:'secuaz', data:s, y:s.y + 20})) // === NUEVO ===
   ].sort((a,b) => a.y - b.y);
-  
-  allEntities.forEach(e => { if (e.type === 'player') drawPlayer(e.data); else drawDuolingo(); });
-  
+
+  allEntities.forEach(e => {
+    if (e.type === 'player') drawPlayer(e.data);
+    else if (e.type === 'duo') drawDuolingo();
+    else if (e.type === 'secuaz') drawSecuaz(e.data); // === NUEVO ===
+  });
+
   drawParticles(); drawLighting(); ctx.restore();
 }
 
@@ -852,12 +1247,12 @@ function updateDuolingo() {
     const d = Math.hypot(p.x - duolingo.x, p.y - duolingo.y);
     if (d < minDist) { minDist = d; target = p; }
   });
-  
+
   if (target) {
     const dx = target.x - duolingo.x, dy = target.y - duolingo.y, d = Math.hypot(dx, dy);
     if (d > 5) { duolingo.x += (dx/d) * 1.5; duolingo.y += (dy/d) * 1.5; }
     if (isHost) broadcast({type:'duolingo_move', duolingo: duolingo});
-    
+
     if (d < 60 && !fightMode && !currentQuestion && !voting) {
       if (isHost) {
         const q = QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)];
@@ -889,6 +1284,15 @@ function startTimer() {
         boxes.forEach(b => { b.opened = false; b.x = 100 + Math.random()*(WORLD_W-200); b.y = 150 + Math.random()*(WORLD_H-300); });
         broadcast({type:'boxes_respawn', boxes: boxes}); handleMsg({type:'boxes_respawn', boxes: boxes});
         boxRespawnTimer = 30;
+      }
+
+      // === NUEVO: Spawn de Secuaces cada 1 minuto ===
+      if (secuaces.length === 0) {
+        secuazSpawnTimer--;
+        if (secuazSpawnTimer <= 0) {
+          spawnSecuaces();
+          secuazSpawnTimer = 60; // Reiniciar a 1 minuto
+        }
       }
     }
   }, 1000);
@@ -936,7 +1340,21 @@ function checkAnswer(playerId, ans) {
 function submitAnswer() {
   const ans = document.getElementById('answer').value.trim().toLowerCase();
   document.getElementById('dialog').style.display = 'none';
-  if (isHost) checkAnswer(myId, ans); else conn.send({type:'submit_answer', id: myId, answer: ans});
+  // Resetear el título del diálogo siempre
+  document.getElementById('dialogTitle').classList.remove('secuaz');
+
+  if (currentSecuaz) {
+    // === NUEVO: Responder a un secuaz ===
+    if (isHost) {
+      checkSecuazAnswer(currentSecuaz, myId, ans);
+    } else {
+      conn.send({type: 'secuaz_answer', secuazId: currentSecuaz.id, playerId: myId, answer: ans});
+    }
+    currentSecuaz = null;
+  } else {
+    // Pregunta normal de Duolingo
+    if (isHost) checkAnswer(myId, ans); else conn.send({type:'submit_answer', id: myId, answer: ans});
+  }
 }
 
 // ============ HUD ============
@@ -944,16 +1362,33 @@ function updateHUD() {
   const hud = document.getElementById('hud');
   let html = '<h3 style="color:#ffcc00; text-align:center;">VIDAS</h3>';
   Object.values(players).forEach(p => {
-    const hearts = '❤'.repeat(Math.max(0,p.lives)) + '🖤'.repeat(Math.max(0,2-p.lives));
+    // === NUEVO: Renderizar medios corazones ===
+    let heartsStr = '';
+    const lives = Math.max(0, p.lives);
+    for (let i = 0; i < 2; i++) {
+      if (lives >= i + 1) heartsStr += '♥';          // Lleno
+      else if (lives >= i + 0.5) heartsStr += '💔';  // Medio
+      else heartsStr += '🖤';                        // Vacío
+    }
     const status = p.alive ? (p.sitting ? ' 🪑' : '') : ' 💀';
-    html += '<div class="lifeRow">' + p.name + status + ': <span class="heart">' + hearts + '</span></div>';
+    html += '<div class="lifeRow">' + p.name + status + ': <span class="heart">' + heartsStr + '</span></div>';
   });
   hud.innerHTML = html;
-  
+
   const wi = document.getElementById('weaponInfo');
-  if (players[myId] && players[myId].weapon) { wi.style.display = 'block'; document.getElementById('weaponName').textContent = players[myId].weapon; } 
+  if (players[myId] && players[myId].weapon) { wi.style.display = 'block'; document.getElementById('weaponName').textContent = players[myId].weapon; }
   else { wi.style.display = 'none'; }
-  
+
+  // === NUEVO: HUD de Secuaces ===
+  const si = document.getElementById('secuazInfo');
+  if (gameStarted) {
+    si.style.display = 'block';
+    document.getElementById('secuazCount').textContent = secuaces.length;
+    document.getElementById('secuazTimer').textContent = Math.max(0, secuazSpawnTimer);
+  } else {
+    si.style.display = 'none';
+  }
+
   // QoL: Actualizar texto botón dinámicamente
   const sitBtn = document.getElementById('sitBtn');
   if (players[myId]) {
@@ -967,7 +1402,7 @@ function showMsg(text) {
   const box = document.getElementById('msgBox');
   box.textContent = text;
   box.style.display = 'block';
-  
+
   setTimeout(() => box.style.opacity = '1', 10);
   if (msgTimeout) clearTimeout(msgTimeout);
   msgTimeout = setTimeout(() => {
