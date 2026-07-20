@@ -1,125 +1,1008 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Duelo Matemático 2 Jugadores</title>
-  <style>
-    body{font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh}
-    .card{background:#111827;padding:24px;border-radius:16px;max-width:720px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    h1{text-align:center;margin-top:0}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .player{flex:1;min-width:260px;background:#1f2937;padding:16px;border-radius:12px}
-    button,input{font-size:16px;border:none;border-radius:10px;padding:12px}
-    input{width:calc(100% - 24px);margin:10px 0;background:#0b1220;color:#fff}
-    button{background:#38bdf8;color:#00111a;font-weight:bold;cursor:pointer}
-    button:hover{opacity:.92}
-    .q{font-size:20px;font-weight:bold;margin:12px 0}
-    .score{margin-top:10px}
-    .center{text-align:center;margin:16px 0}
-    .hidden{display:none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duelo Matemático - 2 Jugadores</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* Pantalla de inicio */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .players-setup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .player-card.p1 {
+            border-color: #00d4ff;
+        }
+
+        .player-card.p2 {
+            border-color: #ff6b6b;
+        }
+
+        .player-card h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .player-card.p1 h3 { color: #00d4ff; }
+        .player-card.p2 h3 { color: #ff6b6b; }
+
+        .player-card input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .player-card input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .player-card input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .difficulty-selector {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .difficulty-selector h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .diff-btn {
+            padding: 10px 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .diff-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .diff-btn.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-start {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Pantalla de juego */
+        .game-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .score-display.p1-score {
+            border: 2px solid #00d4ff;
+        }
+
+        .score-display.p2-score {
+            border: 2px solid #ff6b6b;
+        }
+
+        .score-display .name {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .score-display .score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .score-display.p1-score .score { color: #00d4ff; }
+        .score-display.p2-score .score { color: #ff6b6b; }
+
+        .round-info {
+            text-align: center;
+            color: #fff;
+        }
+
+        .round-info .round-num {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .round-info .turn-indicator {
+            font-size: 0.9em;
+            margin-top: 5px;
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .turn-p1 {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+
+        .turn-p2 {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .question-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            font-size: 2em;
+            color: #fff;
+            margin-bottom: 10px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .question-category {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .answer-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .answer-input {
+            padding: 15px 25px;
+            font-size: 1.3em;
+            width: 200px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-answer {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-answer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.3em;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback.correct {
+            color: #00ff88;
+            animation: pulse 0.5s ease;
+        }
+
+        .feedback.incorrect {
+            color: #ff4444;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        .timer-fill.warning {
+            background: linear-gradient(90deg, #ff6b6b, #ff4444);
+        }
+
+        /* Pantalla de resultados */
+        .results-area {
+            text-align: center;
+        }
+
+        .winner-announcement {
+            font-size: 2em;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .final-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .final-score-card {
+            padding: 30px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .final-score-card.winner {
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .final-score-card h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .final-score-card .final-score {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .final-score-card.p1 .final-score { color: #00d4ff; }
+        .final-score-card.p2 .final-score { color: #ff6b6b; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-item .stat-label {
+            color: #aaa;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .stat-item .stat-value {
+            color: #fff;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .btn-restart {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(0, 212, 255, 0.5);
+        }
+
+        .trophy {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @media (max-width: 600px) {
+            .players-setup {
+                grid-template-columns: 1fr;
+            }
+
+            .game-header {
+                grid-template-columns: 1fr;
+            }
+
+            .question-text {
+                font-size: 1.4em;
+            }
+
+            .answer-area {
+                flex-direction: column;
+            }
+
+            .final-scores {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Duelo Matemático</h1>
-    <p class="center">Responde una pregunta por turno. El primer jugador en llegar a 5 puntos gana.</p>
-    <div class="center">
-      <button onclick="startGame()">Empezar</button>
-      <button onclick="resetGame()">Reiniciar</button>
-    </div>
+    <div class="container">
+        <h1>⚡ Duelo Matemático ⚡</h1>
+        <p class="subtitle">¡Compite con tu amigo en una batalla de cálculo mental!</p>
 
-    <div id="game" class="hidden">
-      <div class="row">
-        <div class="player">
-          <h2>Jugador 1</h2>
-          <div id="q1" class="q"></div>
-          <input id="a1" type="number" placeholder="Tu respuesta" />
-          <button onclick="checkAnswer(1)">Responder</button>
-          <div class="score">Puntos: <span id="s1">0</span></div>
+        <!-- Pantalla de configuración -->
+        <div class="screen active" id="setupScreen">
+            <div class="players-setup">
+                <div class="player-card p1">
+                    <h3>🎮 Jugador 1</h3>
+                    <input type="text" id="player1Name" placeholder="Nombre del jugador 1" maxlength="15">
+                </div>
+                <div class="player-card p2">
+                    <h3>🎮 Jugador 2</h3>
+                    <input type="text" id="player2Name" placeholder="Nombre del jugador 2" maxlength="15">
+                </div>
+            </div>
+
+            <div class="difficulty-selector">
+                <h3>Dificultad</h3>
+                <div class="difficulty-buttons">
+                    <button class="diff-btn" data-diff="easy" onclick="selectDifficulty('easy')">🟢 Fácil</button>
+                    <button class="diff-btn selected" data-diff="medium" onclick="selectDifficulty('medium')">🟡 Medio</button>
+                    <button class="diff-btn" data-diff="hard" onclick="selectDifficulty('hard')">🔴 Difícil</button>
+                    <button class="diff-btn" data-diff="extreme" onclick="selectDifficulty('extreme')">💀 Extremo</button>
+                </div>
+            </div>
+
+            <button class="btn-start" onclick="startGame()">🚀 ¡Comenzar Duelo!</button>
         </div>
 
-        <div class="player">
-          <h2>Jugador 2</h2>
-          <div id="q2" class="q"></div>
-          <input id="a2" type="number" placeholder="Tu respuesta" />
-          <button onclick="checkAnswer(2)">Responder</button>
-          <div class="score">Puntos: <span id="s2">0</span></div>
+        <!-- Pantalla de juego -->
+        <div class="screen" id="gameScreen">
+            <div class="game-header">
+                <div class="score-display p1-score">
+                    <div class="name" id="p1NameDisplay">Jugador 1</div>
+                    <div class="score" id="p1Score">0</div>
+                </div>
+                <div class="round-info">
+                    <div class="round-num">Ronda <span id="roundNum">1</span>/10</div>
+                    <div class="turn-indicator" id="turnIndicator">Turno: Jugador 1</div>
+                </div>
+                <div class="score-display p2-score">
+                    <div class="name" id="p2NameDisplay">Jugador 2</div>
+                    <div class="score" id="p2Score">0</div>
+                </div>
+            </div>
+
+            <div class="timer-bar">
+                <div class="timer-fill" id="timerFill"></div>
+            </div>
+
+            <div class="question-area">
+                <div class="question-category" id="questionCategory">Potencias</div>
+                <div class="question-text" id="questionText">8³ = ?</div>
+            </div>
+
+            <div class="answer-area">
+                <input type="number" class="answer-input" id="answerInput" placeholder="Respuesta" onkeypress="handleKeyPress(event)">
+                <button class="btn-answer" onclick="submitAnswer()">✓</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
         </div>
-      </div>
 
-      <div class="center"><div id="msg"></div></div>
+        <!-- Pantalla de resultados -->
+        <div class="screen" id="resultsScreen">
+            <div class="results-area">
+                <div class="trophy" id="trophyIcon">🏆</div>
+                <div class="winner-announcement" id="winnerText">¡Jugador 1 Gana!</div>
+                
+                <div class="final-scores">
+                    <div class="final-score-card p1" id="finalCard1">
+                        <h3 id="finalName1">Jugador 1</h3>
+                        <div class="final-score" id="finalScore1">0</div>
+                    </div>
+                    <div class="final-score-card p2" id="finalCard2">
+                        <h3 id="finalName2">Jugador 2</h3>
+                        <div class="final-score" id="finalScore2">0</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Preguntas totales</div>
+                        <div class="stat-value" id="totalQuestions">20</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Mejor racha</div>
+                        <div class="stat-value" id="bestStreak">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Respuestas correctas</div>
+                        <div class="stat-value" id="totalCorrect">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Tiempo promedio</div>
+                        <div class="stat-value" id="avgTime">0s</div>
+                    </div>
+                </div>
+
+                <button class="btn-restart" onclick="restartGame()">🔄 Jugar de Nuevo</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    let score1 = 0, score2 = 0;
-    let current1 = 0, current2 = 0;
-    const ops = ['+', '-', '*'];
+    <script>
+        // Variables del juego
+        let gameState = {
+            difficulty: 'medium',
+            player1: { name: 'Jugador 1', score: 0, correct: 0, streak: 0, bestStreak: 0, times: [] },
+            player2: { name: 'Jugador 2', score: 0, correct: 0, streak: 0, bestStreak: 0, times: [] },
+            currentTurn: 1,
+            round: 1,
+            totalRounds: 10,
+            currentQuestion: null,
+            correctAnswer: null,
+            timerInterval: null,
+            timeLeft: 0,
+            maxTime: 15,
+            questionStartTime: 0,
+            totalCorrect: 0
+        };
 
-    function randInt(min, max){
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+        // Selección de dificultad
+        function selectDifficulty(diff) {
+            gameState.difficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`[data-diff="${diff}"]`).classList.add('selected');
 
-    function makeQuestion(){
-      const op = ops[randInt(0, ops.length - 1)];
-      let a = randInt(1, 12), b = randInt(1, 12), answer = 0;
+            switch(diff) {
+                case 'easy': gameState.maxTime = 20; break;
+                case 'medium': gameState.maxTime = 15; break;
+                case 'hard': gameState.maxTime = 10; break;
+                case 'extreme': gameState.maxTime = 7; break;
+            }
+        }
 
-      if(op === '+') answer = a + b;
-      if(op === '-') {
-        if(b > a) [a, b] = [b, a];
-        answer = a - b;
-      }
-      if(op === '*') answer = a * b;
+        // Generar pregunta según dificultad
+        function generateQuestion() {
+            let question = '';
+            let answer = 0;
+            let category = '';
+            const diff = gameState.difficulty;
 
-      return { text: `${a} ${op} ${b} = ?`, answer };
-    }
+            const types = ['power', 'multiply', 'add', 'subtract', 'mixed'];
+            const type = types[Math.floor(Math.random() * types.length)];
 
-    function updateUI(){
-      document.getElementById('s1').textContent = score1;
-      document.getElementById('s2').textContent = score2;
-      document.getElementById('q1').textContent = current1.text;
-      document.getElementById('q2').textContent = current2.text;
-    }
+            switch(type) {
+                case 'power':
+                    category = '⚡ Potencias';
+                    if (diff === 'easy') {
+                        const base = Math.floor(Math.random() * 5) + 2;
+                        const exp = Math.floor(Math.random() * 2) + 2;
+                        question = `${base}^${exp} = ?`;
+                        answer = Math.pow(base, exp);
+                    } else if (diff === 'medium') {
+                        const base = Math.floor(Math.random() * 8) + 2;
+                        const exp = Math.floor(Math.random() * 3) + 2;
+                        question = `${base}^${exp} = ?`;
+                        answer = Math.pow(base, exp);
+                    } else if (diff === 'hard') {
+                        const base = Math.floor(Math.random() * 10) + 2;
+                        const exp = Math.floor(Math.random() * 3) + 3;
+                        question = `${base}^${exp} = ?`;
+                        answer = Math.pow(base, exp);
+                    } else {
+                        const base = Math.floor(Math.random() * 12) + 3;
+                        const exp = Math.floor(Math.random() * 3) + 3;
+                        question = `${base}^${exp} = ?`;
+                        answer = Math.pow(base, exp);
+                    }
+                    break;
 
-    function startGame(){
-      document.getElementById('game').classList.remove('hidden');
-      resetGame();
-    }
+                case 'multiply':
+                    category = '✖️ Multiplicación';
+                    if (diff === 'easy') {
+                        const a = Math.floor(Math.random() * 10) + 2;
+                        const b = Math.floor(Math.random() * 10) + 2;
+                        question = `${a} × ${b} = ?`;
+                        answer = a * b;
+                    } else if (diff === 'medium') {
+                        const a = Math.floor(Math.random() * 20) + 5;
+                        const b = Math.floor(Math.random() * 15) + 3;
+                        question = `${a} × ${b} = ?`;
+                        answer = a * b;
+                    } else if (diff === 'hard') {
+                        const a = Math.floor(Math.random() * 50) + 10;
+                        const b = Math.floor(Math.random() * 20) + 5;
+                        question = `${a} × ${b} = ?`;
+                        answer = a * b;
+                    } else {
+                        const a = Math.floor(Math.random() * 100) + 20;
+                        const b = Math.floor(Math.random() * 30) + 10;
+                        question = `${a} × ${b} = ?`;
+                        answer = a * b;
+                    }
+                    break;
 
-    function resetGame(){
-      score1 = 0;
-      score2 = 0;
-      current1 = makeQuestion();
-      current2 = makeQuestion();
-      document.getElementById('a1').value = '';
-      document.getElementById('a2').value = '';
-      document.getElementById('msg').textContent = '¡Listo!';
-      updateUI();
-    }
+                case 'add':
+                    category = '➕ Suma';
+                    if (diff === 'easy') {
+                        const a = Math.floor(Math.random() * 50) + 10;
+                        const b = Math.floor(Math.random() * 50) + 10;
+                        question = `${a} + ${b} = ?`;
+                        answer = a + b;
+                    } else if (diff === 'medium') {
+                        const a = Math.floor(Math.random() * 200) + 50;
+                        const b = Math.floor(Math.random() * 200) + 50;
+                        question = `${a} + ${b} = ?`;
+                        answer = a + b;
+                    } else if (diff === 'hard') {
+                        const a = Math.floor(Math.random() * 500) + 100;
+                        const b = Math.floor(Math.random() * 500) + 100;
+                        question = `${a} + ${b} = ?`;
+                        answer = a + b;
+                    } else {
+                        const a = Math.floor(Math.random() * 1000) + 200;
+                        const b = Math.floor(Math.random() * 1000) + 200;
+                        question = `${a} + ${b} = ?`;
+                        answer = a + b;
+                    }
+                    break;
 
-    function checkAnswer(player){
-      const input = document.getElementById(player === 1 ? 'a1' : 'a2');
-      const val = Number(input.value);
-      const current = player === 1 ? current1 : current2;
+                case 'subtract':
+                    category = '➖ Resta';
+                    if (diff === 'easy') {
+                        const a = Math.floor(Math.random() * 50) + 20;
+                        const b = Math.floor(Math.random() * 20) + 1;
+                        question = `${a} - ${b} = ?`;
+                        answer = a - b;
+                    } else if (diff === 'medium') {
+                        const a = Math.floor(Math.random() * 200) + 100;
+                        const b = Math.floor(Math.random() * 100) + 10;
+                        question = `${a} - ${b} = ?`;
+                        answer = a - b;
+                    } else if (diff === 'hard') {
+                        const a = Math.floor(Math.random() * 500) + 200;
+                        const b = Math.floor(Math.random() * 300) + 50;
+                        question = `${a} - ${b} = ?`;
+                        answer = a - b;
+                    } else {
+                        const a = Math.floor(Math.random() * 1000) + 500;
+                        const b = Math.floor(Math.random() * 500) + 100;
+                        question = `${a} - ${b} = ?`;
+                        answer = a - b;
+                    }
+                    break;
 
-      if(val === current.answer){
-        if(player === 1) score1++;
-        else score2++;
-        document.getElementById('msg').textContent = `Jugador ${player} acertó.`;
-      } else {
-        document.getElementById('msg').textContent = `Jugador ${player} falló. La respuesta era ${current.answer}.`;
-      }
+                case 'mixed':
+                    category = '🔀 Operación Mixta';
+                    if (diff === 'easy') {
+                        const a = Math.floor(Math.random() * 5) + 2;
+                        const b = Math.floor(Math.random() * 5) + 2;
+                        const c = Math.floor(Math.random() * 10) + 1;
+                        question = `${a} × ${b} + ${c} = ?`;
+                        answer = (a * b) + c;
+                    } else if (diff === 'medium') {
+                        const a = Math.floor(Math.random() * 5) + 2;
+                        const exp = 2;
+                        const b = Math.floor(Math.random() * 20) + 5;
+                        question = `${a}^${exp} + ${b} = ?`;
+                        answer = Math.pow(a, exp) + b;
+                    } else if (diff === 'hard') {
+                        const a = Math.floor(Math.random() * 5) + 2;
+                        const exp = 3;
+                        const b = Math.floor(Math.random() * 50) + 10;
+                        question = `${a}^${exp} + ${b} = ?`;
+                        answer = Math.pow(a, exp) + b;
+                    } else {
+                        const a = Math.floor(Math.random() * 8) + 3;
+                        const exp = 3;
+                        const b = Math.floor(Math.random() * 100) + 50;
+                        const c = Math.floor(Math.random() * 20) + 5;
+                        question = `${a}^${exp} + ${b} × ${c} = ?`;
+                        answer = Math.pow(a, exp) + (b * c);
+                    }
+                    break;
+            }
 
-      if(player === 1) current1 = makeQuestion();
-      else current2 = makeQuestion();
+            return { question, answer, category };
+        }
 
-      input.value = '';
-      updateUI();
+        // Iniciar juego
+        function startGame() {
+            const name1 = document.getElementById('player1Name').value.trim() || 'Jugador 1';
+            const name2 = document.getElementById('player2Name').value.trim() || 'Jugador 2';
 
-      if(score1 >= 5) document.getElementById('msg').textContent = 'Jugador 1 ganó la competencia.';
-      if(score2 >= 5) document.getElementById('msg').textContent = 'Jugador 2 ganó la competencia.';
-    }
-  </script>
+            gameState.player1.name = name1;
+            gameState.player2.name = name2;
+            gameState.player1.score = 0;
+            gameState.player2.score = 0;
+            gameState.player1.correct = 0;
+            gameState.player2.correct = 0;
+            gameState.player1.streak = 0;
+            gameState.player2.streak = 0;
+            gameState.player1.bestStreak = 0;
+            gameState.player2.bestStreak = 0;
+            gameState.player1.times = [];
+            gameState.player2.times = [];
+            gameState.currentTurn = 1;
+            gameState.round = 1;
+            gameState.totalCorrect = 0;
+
+            document.getElementById('p1NameDisplay').textContent = name1;
+            document.getElementById('p2NameDisplay').textContent = name2;
+
+            showScreen('gameScreen');
+            nextQuestion();
+        }
+
+        // Siguiente pregunta
+        function nextQuestion() {
+            const q = generateQuestion();
+            gameState.currentQuestion = q.question;
+            gameState.correctAnswer = q.answer;
+            gameState.questionStartTime = Date.now();
+
+            document.getElementById('questionText').textContent = q.question;
+            document.getElementById('questionCategory').textContent = q.category;
+            document.getElementById('roundNum').textContent = gameState.round;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerInput').focus();
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+
+            // Actualizar turno
+            const turnIndicator = document.getElementById('turnIndicator');
+            if (gameState.currentTurn === 1) {
+                turnIndicator.textContent = `Turno: ${gameState.player1.name}`;
+                turnIndicator.className = 'turn-indicator turn-p1';
+            } else {
+                turnIndicator.textContent = `Turno: ${gameState.player2.name}`;
+                turnIndicator.className = 'turn-indicator turn-p2';
+            }
+
+            // Iniciar timer
+            startTimer();
+        }
+
+        // Timer
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            gameState.timeLeft = gameState.maxTime;
+            const timerFill = document.getElementById('timerFill');
+            timerFill.style.width = '100%';
+            timerFill.classList.remove('warning');
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLeft -= 0.1;
+                const percentage = (gameState.timeLeft / gameState.maxTime) * 100;
+                timerFill.style.width = percentage + '%';
+
+                if (percentage < 30) {
+                    timerFill.classList.add('warning');
+                }
+
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    timeOut();
+                }
+            }, 100);
+        }
+
+        // Timeout
+        function timeOut() {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = `⏰ ¡Tiempo! La respuesta era: ${gameState.correctAnswer}`;
+            feedback.className = 'feedback incorrect';
+
+            // Reset streak
+            if (gameState.currentTurn === 1) {
+                gameState.player1.streak = 0;
+            } else {
+                gameState.player2.streak = 0;
+            }
+
+            setTimeout(() => advanceTurn(), 2000);
+        }
+
+        // Enviar respuesta
+        function submitAnswer() {
+            const input = document.getElementById('answerInput');
+            const userAnswer = parseInt(input.value);
+
+            if (isNaN(userAnswer)) {
+                input.style.borderColor = '#ff4444';
+                setTimeout(() => input.style.borderColor = 'rgba(255, 255, 255, 0.2)', 500);
+                return;
+            }
+
+            clearInterval(gameState.timerInterval);
+            const timeTaken = (Date.now() - gameState.questionStartTime) / 1000;
+            const feedback = document.getElementById('feedback');
+
+            if (userAnswer === gameState.correctAnswer) {
+                // Correcto
+                feedback.textContent = '✅ ¡Correcto! +10 puntos';
+                feedback.className = 'feedback correct';
+
+                const bonusTime = Math.max(0, Math.floor((gameState.timeLeft / gameState.maxTime) * 5));
+                const points = 10 + bonusTime;
+
+                if (gameState.currentTurn === 1) {
+                    gameState.player1.score += points;
+                    gameState.player1.correct++;
+                    gameState.player1.streak++;
+                    gameState.player1.bestStreak = Math.max(gameState.player1.bestStreak, gameState.player1.streak);
+                    gameState.player1.times.push(timeTaken);
+                    document.getElementById('p1Score').textContent = gameState.player1.score;
+                } else {
+                    gameState.player2.score += points;
+                    gameState.player2.correct++;
+                    gameState.player2.streak++;
+                    gameState.player2.bestStreak = Math.max(gameState.player2.bestStreak, gameState.player2.streak);
+                    gameState.player2.times.push(timeTaken);
+                    document.getElementById('p2Score').textContent = gameState.player2.score;
+                }
+                gameState.totalCorrect++;
+            } else {
+                // Incorrecto
+                feedback.textContent = `❌ Incorrecto. Era: ${gameState.correctAnswer}`;
+                feedback.className = 'feedback incorrect';
+
+                if (gameState.currentTurn === 1) {
+                    gameState.player1.streak = 0;
+                    gameState.player1.times.push(timeTaken);
+                } else {
+                    gameState.player2.streak = 0;
+                    gameState.player2.times.push(timeTaken);
+                }
+            }
+
+            setTimeout(() => advanceTurn(), 1800);
+        }
+
+        // Avanzar turno
+        function advanceTurn() {
+            if (gameState.currentTurn === 1) {
+                gameState.currentTurn = 2;
+                nextQuestion();
+            } else {
+                gameState.currentTurn = 1;
+                gameState.round++;
+
+                if (gameState.round > gameState.totalRounds) {
+                    endGame();
+                } else {
+                    nextQuestion();
+                }
+            }
+        }
+
+        // Handle Enter key
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                submitAnswer();
+            }
+        }
+
+        // Fin del juego
+        function endGame() {
+            clearInterval(gameState.timerInterval);
+
+            const p1 = gameState.player1;
+            const p2 = gameState.player2;
+
+            document.getElementById('finalName1').textContent = p1.name;
+            document.getElementById('finalName2').textContent = p2.name;
+            document.getElementById('finalScore1').textContent = p1.score;
+            document.getElementById('finalScore2').textContent = p2.score;
+
+            const card1 = document.getElementById('finalCard1');
+            const card2 = document.getElementById('finalCard2');
+            card1.classList.remove('winner');
+            card2.classList.remove('winner');
+
+            const winnerText = document.getElementById('winnerText');
+            const trophyIcon = document.getElementById('trophyIcon');
+
+            if (p1.score > p2.score) {
+                winnerText.textContent = `🎉 ¡${p1.name} Gana! 🎉`;
+                card1.classList.add('winner');
+                trophyIcon.textContent = '🏆';
+            } else if (p2.score > p1.score) {
+                winnerText.textContent = `🎉 ¡${p2.name} Gana! 🎉`;
+                card2.classList.add('winner');
+                trophyIcon.textContent = '🏆';
+            } else {
+                winnerText.textContent = '🤝 ¡Empate! 🤝';
+                trophyIcon.textContent = '🤝';
+            }
+
+            // Stats
+            const totalQ = gameState.totalRounds * 2;
+            document.getElementById('totalQuestions').textContent = totalQ;
+            document.getElementById('totalCorrect').textContent = gameState.totalCorrect;
+
+            const bestStreak = Math.max(p1.bestStreak, p2.bestStreak);
+            document.getElementById('bestStreak').textContent = bestStreak;
+
+            const allTimes = [...p1.times, ...p2.times];
+            const avgTime = allTimes.length > 0 ? (allTimes.reduce((a, b) => a + b, 0) / allTimes.length).toFixed(1) : 0;
+            document.getElementById('avgTime').textContent = avgTime + 's';
+
+            showScreen('resultsScreen');
+        }
+
+        // Reiniciar
+        function restartGame() {
+            showScreen('setupScreen');
+        }
+
+        // Cambiar pantalla
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+    </script>
 </body>
 </html>
