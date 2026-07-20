@@ -112,7 +112,7 @@
   .action-btn { background:var(--primary); color:#001014; }
   .action-btn:hover:not(:disabled) { background:#50f2ff; box-shadow:0 0 20px var(--primary); transform:translateY(-2px); }
   .action-btn:active:not(:disabled) { transform:translateY(0) scale(.97); }
-  .action-btn:disabled { background:#333; color:#666; cursor:allowed; }
+  .action-btn:disabled { background:#333; color:#666; cursor:not-allowed; }
   .admin-btn-action { background:linear-gradient(45deg,#b8860b,#ffd700); color:#000; }
   .admin-btn-action:hover { box-shadow:0 0 20px rgba(255,215,0,.8); }
   .close-btn { background:var(--danger); color:#fff; }
@@ -172,7 +172,7 @@
   .ability-btn { position:relative; min-height:80px; padding:12px 8px; border:none; border-radius:8px; cursor:pointer; font-weight:900; font-size:13px; transition:transform .15s,border-color .15s,box-shadow .15s; background:linear-gradient(135deg,#2a2c3d,#42465b); color:#fff; border:1px solid #666d88; overflow-wrap:anywhere; text-transform:uppercase; font-family:var(--display); letter-spacing:.3px; }
   .ability-btn:hover:not(:disabled) { transform:translateY(-4px); border-color:var(--primary); box-shadow:0 5px 15px rgba(0,229,255,.3); }
   .ability-btn:active:not(:disabled) { transform:translateY(-1px) scale(.97); }
-  .ability-btn:disabled { opacity:.4; cursor:allowed; filter:grayscale(50%); }
+  .ability-btn:disabled { opacity:.4; cursor:not-allowed; filter:grayscale(50%); }
   .ability-btn.burn-effect { border-color:#00ff44 !important; box-shadow:0 0 15px rgba(0,255,68,.5) !important; }
   .ability-btn.dodge-active { border-color:#fff !important; box-shadow:0 0 15px rgba(255,255,255,.6) !important; animation:pulseDodge 1s infinite; }
   @keyframes pulseDodge { 0%,100%{box-shadow:0 0 15px rgba(255,255,255,.6);} 50%{box-shadow:0 0 25px rgba(255,0,0,.8);} }
@@ -226,7 +226,7 @@
   .sys-note { color:#6fb9d8; text-align:center; font-size:15px; letter-spacing:1px; margin:8px 0 20px; }
   .sys-confirm { background:linear-gradient(45deg,#0e6ba8,#7fd8ff); color:#04121f; border:none; padding:16px 40px; border-radius:8px; font-family:var(--display); font-size:18px; font-weight:900; letter-spacing:2px; cursor:pointer; transition:.2s; }
   .sys-confirm:hover:not(:disabled) { box-shadow:0 0 25px rgba(127,216,255,.8); transform:translateY(-2px); }
-  .sys-confirm:disabled { background:#1c3a52; color:#557; cursor:allowed; }
+  .sys-confirm:disabled { background:#1c3a52; color:#557; cursor:not-allowed; }
   .sys-cancel { background:transparent; border:1px solid #557; color:#889; padding:16px 28px; border-radius:8px; font-family:var(--display); font-size:16px; cursor:pointer; margin-left:12px; }
   .sys-cancel:hover { border-color:#ff6b6b; color:#ff6b6b; }
   .sys-msgtxt { color:#fff; font-size:26px; text-align:center; letter-spacing:2px; margin:22px 0 26px; line-height:1.5; text-shadow:0 0 15px rgba(127,216,255,.6); }
@@ -470,7 +470,7 @@ function connLog(msg,type){
 }
 function setRS(txt,color){const rs=document.getElementById("roomStatus");if(rs){rs.textContent=txt;rs.style.color=color;}const d=document.getElementById("statusDot");if(d)d.style.background=color;}
 
-// ============ PERSONAJES (con cooldowns y efectos visuales mejorados) ============
+// ============ PERSONAJES (con cooldowns) ============
 const characters=[
   {id:"tanjiro",name:"Tanjiro",emoji:"🌊",price:100,power:15,category:"basic",abilities:[{name:"Corte de Agua",vfx:"slash_water",color:"#00aaff",dmg:20,cooldown:0,desc:"Tajo fluido de agua que corta al enemigo."},{name:"Hinokami",vfx:"slash_fire",color:"#ff3b1f",dmg:35,cooldown:1,desc:"Danza del fuego solar que quema al objetivo."}]},
   {id:"deku",name:"Deku",emoji:"🥦",price:150,power:20,category:"basic",abilities:[{name:"Smash 5%",vfx:"punch_green",color:"#00ffaa",dmg:30,cooldown:0,desc:"Golpe con el 5% del One For All."},{name:"Detroit Smash",vfx:"punch_heavy",color:"#7cffd2",dmg:45,cooldown:1,desc:"Puño devastador de viento y fuerza."}]},
@@ -491,11 +491,7 @@ const characters=[
     {name:"Mejoras del Sistema",vfx:"sys_window",color:"#7fd8ff",dmg:0,special:"sysmenu",cooldown:5,desc:"Abre el menú celeste [SISTEMA]: reparte 2 puntos (+50% c/u) entre Daño o Vida."},
     {name:"Ataques de Cuchillas",vfx:"jinwoo_blades",color:"#4dc3ff",dmg:26000,cooldown:2,desc:"Cuchillas azules y rojas rodean por completo al enemigo durante 2s."}
   ]},
-  {id:"yhwach",name:"Yhwach",emoji:"🔮",price:100000,power:3000,category:"god",passive:"advanced_mind",
-    abilities:[
-      {name:"Toque del Futuro",vfx:"future_touch",color:"#8a2be2",dmg:3500,special:"future_touch",cooldown:3,desc:"Marcas al enemigo con el futuro. Al recibir daño de una habilidad: esperas 2s, devuelves ese daño al enemigo y te curas lo que perdiste. Si mueres, causas ese mismo daño otra vez al enemigo que te mató."},
-      {name:"¿Enserio?",vfx:"parallel_world",color:"#888888",dmg:0,special:"parallel_world",parallelTurns:4,cooldown:5,desc:"La pantalla se vuelve gris por 4s. Ves cómo te matan en un mundo paralelo. Vuelves a la realidad con +300% de daño. Ahora si te sacan 100, devuelves 300."}
-  ]},
+  {id:"yhwach",name:"Yhwach",emoji:"🔮",price:100000,power:3000,category:"god",abilities:[{name:"The Almighty",vfx:"god_eyes",color:"#444444",dmg:5000,cooldown:3,desc:"Ve el futuro y golpea donde quiera."},{name:"Auswählen",vfx:"beam_holy",color:"#00aaff",dmg:6500,cooldown:3,desc:"Rayo sagrado que purifica."}]},
   {id:"gilgamesh",name:"Gilgamesh",emoji:"⚜️",price:150000,power:4500,category:"god",abilities:[{name:"Lluvia Dorada",vfx:"gate_babylon",color:"#ffd700",dmg:7500,cooldown:3,desc:"Cientos de armas doradas caen."},{name:"Enuma Elish",vfx:"beam_spiral_red",color:"#ff0000",dmg:10000,cooldown:4,desc:"Rayo espiral que parte el mundo."}]},
   {id:"escanor",name:"Escanor",emoji:"☀️",price:200000,power:6000,category:"god",abilities:[{name:"Cruel Sun",vfx:"sun_drop",color:"#ff8c00",dmg:11000,cooldown:3,desc:"Sol ardiente que cae del cielo."},{name:"The One",vfx:"slash_solar",color:"#ffee00",dmg:14000,cooldown:4,desc:"Poder máximo al mediodía, corte solar."}]},
   {id:"rimuru",name:"Rimuru",emoji:"💧",price:300000,power:8500,category:"god",abilities:[{name:"Depredador",vfx:"black_slime",color:"#00008b",dmg:15000,cooldown:3,desc:"Slime negro que devora materia."},{name:"Megiddo",vfx:"laser_rain",color:"#00ffff",dmg:20000,cooldown:4,desc:"Lluvia de láseres de agua sagrada."}]},
@@ -529,6 +525,7 @@ const characters=[
     {name:"Lluvia de Huesos",vfx:"bone_rain",color:"#ffffff",dmg:600000,cooldown:2,desc:"Lluvia de huesos afilados."},
     {name:"Esquiva Kármica",vfx:"sans_dodge",color:"#ff0000",dmg:0,special:"dodge_counter",specialDuration:3,cooldown:4,desc:"3 turnos: esquiva y refleja el ataque con rayos rojos de Karma."}
   ]},
+  // ===== PERSONAJES EXCLUSIVOS DE ADMIN =====
   {id:"sans_killer",name:"Sans Killer",emoji:"☠️",price:0,power:20000000,category:"omni",adminOnly:true,passives:["perfect_dodge","danger_sense"],abilities:[
     {name:"La Zona Letal",vfx:"lethal_zone",color:"#00e5ff",dmg:28000000,cooldown:2,desc:"Huesos celestes invaden la caja del enemigo, se concentran en un punto y EXPLOTAN."},
     {name:"El Rayo de la Muerte",vfx:"death_ray",color:"#ff0000",dmg:0,cooldown:4,special:"deathray",desc:"Un gangster gigante dispara un rayo persistente 7s: -5% de vida por segundo."}
@@ -670,10 +667,9 @@ requestAnimationFrame(autoLoop);
 function renderUpgrades(){document.getElementById("upgradesShop").innerHTML=upgradesData.map(u=>{const o=state.upgrades.includes(u.id);return `<div class="card upgrade-card"><h3>${u.name}</h3><p style="font-size:14px;margin-bottom:10px;color:#bbb;font-weight:600;">${u.desc}</p><div class="price">💰 ${u.cost.toLocaleString()}</div><button class="${o?'owned-btn':''}" onclick="buyUpgrade('${u.id}')">${o?"✓ Activado":"Comprar"}</button></div>`;}).join("");}
 function buyUpgrade(id){const u=upgradesData.find(x=>x.id===id);if(state.upgrades.includes(id))return showToast("Ya la tienes.","info");if(state.money<u.cost)return showToast(`Faltan 💰${(u.cost-state.money).toLocaleString()}`,"error");state.money-=u.cost;state.upgrades.push(id);showToast(`¡${u.name} adquirida!`,"success");updateUI();}
 function abilityTags(c){
-  let t=c.abilities.map(a=>{let n=a.name;if(a.special==="trap")n+=" [ATRAPA]";if(a.special==="burn")n+=` [QUEMA ${a.burnTurns}T]`;if(a.special==="dodge_counter")n+=" [REFLEJA]";if(a.special==="dodge")n+=" [ESQUIVA]";if(a.special==="confuse")n+=" [CONFUNDE]";if(a.special==="weaken")n+=" [DEBILITA]";if(a.special==="dust")n+=" [POLVO 2T]";if(a.special==="kwami")n+=" [KWAMI]";if(a.special==="sysmenu")n+=" [SISTEMA]";if(a.special==="deathray")n+=" [7s]";if(a.special==="future_touch")n+=" [FUTURO]";if(a.special==="parallel_world")n+=" [PARALELO]";return n;}).join(" • ");
+  let t=c.abilities.map(a=>{let n=a.name;if(a.special==="trap")n+=" [ATRAPA]";if(a.special==="burn")n+=` [QUEMA ${a.burnTurns}T]`;if(a.special==="dodge_counter")n+=" [REFLEJA]";if(a.special==="dodge")n+=" [ESQUIVA]";if(a.special==="confuse")n+=" [CONFUNDE]";if(a.special==="weaken")n+=" [DEBILITA]";if(a.special==="dust")n+=" [POLVO 2T]";if(a.special==="kwami")n+=" [KWAMI]";if(a.special==="sysmenu")n+=" [SISTEMA]";if(a.special==="deathray")n+=" [7s]";return n;}).join(" • ");
   if(c.passive==="door_counter")t+=" • 🚪 PASIVA: 25% puerta que devuelve el golpe";
   if(c.passive==="arise")t+=" • 🗡️ PASIVA: LEVÁNTATE (15% reclutar muertos)";
-  if(c.passive==="advanced_mind")t+=" • 🧠 PASIVA: 25% Mente Avanzada (esquiva con visión gris)";
   if(hasPassive(c,"perfect_dodge"))t+=" • ⚡ PASIVA: 85% esquiva (1 golpe = muerte)";
   if(hasPassive(c,"danger_sense"))t+=" • 🦴 PASIVA: 20% bloquea con mano de huesos";
   return t;
@@ -697,7 +693,7 @@ function buyChar(id){
 function showCharModal(c,mode,target){
   const catInfo={basic:["BÁSICO","#4cff77","#0d2b16"],adv:["AVANZADO","#00e5ff","#062a33"],elite:["ÉLITE","#d73cff","#2b0a33"],god:["DIOS","#ffd700","#33290a"],omni:["OMNIPOTENTE","#ff0055","#33000f"]};
   const ci=catInfo[c.category]||catInfo.basic;
-  const abilIcons={trap:"🕸️",burn:"🔥",dodge_counter:"💀",dodge:"✨",confuse:"😵",weaken:"💔",dust:"💨",kwami:"🐈‍⬛",sysmenu:"🖥️",deathray:"☠️",future_touch:"🔮",parallel_world:"🌫️"};
+  const abilIcons={trap:"🕸️",burn:"🔥",dodge_counter:"💀",dodge:"✨",confuse:"😵",weaken:"💔",dust:"💨",kwami:"🐈‍⬛",sysmenu:"🖥️",deathray:"☠️"};
   const banner=document.getElementById("cdBanner");
   const actionBtn=document.getElementById("cdActionBtn");
   const grantNote=document.getElementById("cdGrantNote");
@@ -718,7 +714,6 @@ function showCharModal(c,mode,target){
   let passives="";
   if(c.passive==="door_counter")passives+=`<div class="cd-passive"><h4>🚪 PASIVA — PUERTA VENGADORA</h4><p>25% de probabilidad de que una puerta aparezca y devuelva el ataque completo al enemigo.</p></div>`;
   if(c.passive==="arise")passives+=`<div class="cd-passive"><h4>🗡️ PASIVA — LEVÁNTATE</h4><p>Al morir un enemigo aparece el botón "LEVÁNTATE": 15% de que se una a ti como Sombra con vida completa. 3 intentos por batalla.</p></div>`;
-  if(c.passive==="advanced_mind")passives+=`<div class="cd-passive"><h4>🧠 PASIVA — MENTE AVANZADA</h4><p>25% de probabilidad de que, antes de que te ataquen, la pantalla se vuelva gris. Ves el ataque en ese mundo paralelo y, al volver a la realidad, lo esquivas por completo.</p></div>`;
   if(hasPassive(c,"perfect_dodge"))passives+=`<div class="cd-passive"><h4>⚡ PASIVA — EL ESQUIVE PERFECTO</h4><p>85% de probabilidad de esquivar cualquier ataque. PERO si te dan un solo golpe, MUERES al instante.</p></div>`;
   if(hasPassive(c,"danger_sense"))passives+=`<div class="cd-passive"><h4>🦴 PASIVA — DETECCIÓN DEL PELIGRO</h4><p>20% de probabilidad de que una mano gigante de huesos te cubra y bloquee el ataque por completo.</p></div>`;
   document.getElementById("cdPassive").innerHTML=passives;
@@ -1139,7 +1134,7 @@ function vfxDoorWorld(startEl,endEl,onDone){
   if(startEl)startEl.classList.add("spotlit");
   endEl.classList.add("spotlit");
   const chain=document.createElement("div");chain.className="ghand";chain.textContent="⛓️";
-  chain.style.cssText=`position:absolute;left:${tx}px;top:${left-28}px;font-size:42px;z-index:56;pointer-events:none;transform:translate(-50%,-50%);animation:statusPulse .8s infinite;`;
+  chain.style.cssText=`position:absolute;left:${tx}px;top:${top-28}px;font-size:42px;z-index:56;pointer-events:none;transform:translate(-50%,-50%);animation:statusPulse .8s infinite;`;
   arena.appendChild(chain);
   const spots=[
     {x:left+w*.25,y:top-58},{x:left+w*.75,y:top-58},
@@ -1391,440 +1386,10 @@ function vfxVoidFall(tx,ty,onDone){
   shakeArena(700,20);
 }
 
-// ============ VFX YHWACH (NUEVOS) ============
-function vfxFutureTouch(sx,sy,tx,ty,onDone){
-  makeEffect(0,700,(c,t)=>{
-    c.save();
-    const x=lerp(sx,tx,easeOutCubic(t)),y=lerp(sy,ty,easeOutCubic(t));
-    c.globalAlpha=Math.min(1,t*3)*(1-Math.max(0,t-0.7)*3);
-    c.strokeStyle="rgba(138,43,226,0.9)";c.lineWidth=6;c.shadowColor="#8a2be2";c.shadowBlur=20;
-    c.beginPath();c.arc(x,y,50*(0.5+t*0.5),0,Math.PI*2);c.stroke();
-    c.fillStyle="rgba(255,255,255,0.85)";c.beginPath();c.ellipse(x,y,22,12,0,0,Math.PI*2);c.fill();
-    c.fillStyle="#8a2be2";c.beginPath();c.arc(x,y,7,0,Math.PI*2);c.fill();
-    c.fillStyle="#000";c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill();
-    c.restore();
-  });
-  makeEffect(700,700,(c,t)=>{
-    c.save();
-    c.globalAlpha=1-t;
-    c.strokeStyle="rgba(138,43,226,0.9)";c.lineWidth=8*(1-t*0.4);c.shadowColor="#8a2be2";c.shadowBlur=25;
-    c.beginPath();c.arc(tx,ty,60+t*30,0,Math.PI*2);c.stroke();
-    c.fillStyle="rgba(138,43,226,0.3)";c.font="900 22px 'Russo One',sans-serif";c.textAlign="center";
-    c.fillText("🔮 FUTURO MARCADO",tx,ty-90-t*15);
-    c.restore();
-  },()=>{addImpactBurst(tx,ty,"#8a2be2",16,1.5);});
-  setTimeout(()=>{if(onDone)onDone();},1450);
-  shakeArena(600,10);
-}
-function vfxParallelWorld(tgtEl, onDone){
-  const modal=document.getElementById("battleModal");
-  const arena=document.getElementById("battleArena");
-  if(!tgtEl||!arena||!modal){if(onDone)onDone();return;}
-  const ar=arena.getBoundingClientRect(),r=tgtEl.getBoundingClientRect();
-  const tx=r.left-ar.left+r.width/2,ty=r.top-ar.top+r.height/2;
-  modal.classList.add("world-active");
-  tgtEl.classList.add("spotlit");
-  makeEffect(0,800,(c,t)=>{
-    c.save();
-    c.globalAlpha=0.5*(1-t);
-    c.fillStyle="#888";
-    c.font="900 34px 'Russo One',sans-serif";c.textAlign="center";
-    c.fillText("¿enserio?",tx,ty-90-t*30);
-    c.restore();
-  });
-  makeEffect(800,1200,(c,t)=>{
-    c.save();
-    c.globalAlpha=0.8*(1-t);
-    c.strokeStyle="rgba(255,255,255,0.5)";c.lineWidth=4;
-    c.beginPath();c.moveTo(tx-60,ty-60);c.lineTo(tx+60,ty+60);c.stroke();
-    c.beginPath();c.moveTo(tx+60,ty-60);c.lineTo(tx-60,ty+60);c.stroke();
-    c.restore();
-  });
-  makeEffect(2000,800,(c,t)=>{
-    c.save();
-    c.globalAlpha=1-t;
-    c.strokeStyle="rgba(255,0,0,0.8)";c.lineWidth=8*(1-t*0.5);c.shadowColor="#ff0000";c.shadowBlur=25;
-    c.beginPath();c.arc(tx,ty,80+t*50,0,Math.PI*2);c.stroke();
-    c.fillStyle="rgba(255,255,255,0.9)";c.font="900 28px 'Russo One',sans-serif";c.textAlign="center";
-    c.fillText("⚠ +300% DAÑO",tx,ty-100-t*25);
-    c.restore();
-  },()=>{
-    modal.classList.remove("world-active");
-    tgtEl.classList.remove("spotlit");
-    addImpactBurst(tx,ty,"#ff0000",20,2.5);
-  });
-  setTimeout(()=>{if(onDone)onDone();},2900);
-  shakeArena(1500,15);
-}
-function vfxMindDodge(tx,ty,onDone){
-  const modal=document.getElementById("battleModal");
-  const arena=document.getElementById("battleArena");
-  if(!arena||!modal){if(onDone)onDone();return;}
-  modal.classList.add("world-active");
-  makeEffect(0,1000,(c,t)=>{
-    c.save();
-    c.globalAlpha=0.5*(1-t);
-    c.fillStyle="#aaa";c.font="900 26px 'Russo One',sans-serif";c.textAlign="center";
-    c.fillText("🧠 VISION PARALELA",tx,ty-80-t*20);
-    c.restore();
-  });
-  makeEffect(1000,400,(c,t)=>{
-    c.save();
-    c.globalAlpha=1-t;
-    c.strokeStyle="rgba(138,43,226,0.8)";c.lineWidth=5;c.shadowColor="#8a2be2";c.shadowBlur=15;
-    c.beginPath();c.arc(tx,ty,60+t*40,0,Math.PI*2);c.stroke();
-    c.restore();
-  },()=>{
-    modal.classList.remove("world-active");
-    addImpactBurst(tx,ty,"#8a2be2",16,1.5);
-  });
-  setTimeout(()=>{if(onDone)onDone();},1500);
-  shakeArena(600,10);
-}
-
-// ============ EFECTOS VISUALES MEJORADOS (< 1M) ============
-function vfxSlashWater(tx,ty,onDone){
-  makeEffect(0, 500, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#00aaff"; c.lineWidth = 8; c.shadowColor = "#00aaff"; c.shadowBlur = 15;
-    c.beginPath(); c.moveTo(tx-60, ty-60); c.quadraticCurveTo(tx, ty-10, tx+60, ty+40); c.stroke();
-    c.strokeStyle = "#aaddff"; c.lineWidth = 3;
-    c.beginPath(); c.moveTo(tx-60, ty-60); c.quadraticCurveTo(tx, ty-10, tx+60, ty+40); c.stroke();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#00aaff", 12, 1.2); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 550);
-}
-function vfxSlashFire(tx,ty,onDone){
-  makeEffect(0, 600, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    const g = c.createRadialGradient(tx, ty, 0, tx, ty, 80*(1-t*0.5));
-    g.addColorStop(0, "rgba(255,200,50,0.9)"); g.addColorStop(0.5, "rgba(255,50,0,0.6)"); g.addColorStop(1, "rgba(0,0,0,0)");
-    c.fillStyle = g; c.beginPath(); c.arc(tx, ty, 80*(1-t*0.5), 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff3b1f", 14, 1.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 650);
-}
-function vfxPunchGreen(tx,ty,onDone){
-  makeEffect(0, 400, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.fillStyle = "rgba(0,255,170,0.8)"; c.beginPath(); c.arc(tx, ty, 40*(1-t), 0, Math.PI*2); c.fill();
-    c.strokeStyle = "#00ffaa"; c.lineWidth = 6; c.beginPath(); c.arc(tx, ty, 60*(1-t), 0, Math.PI*2); c.stroke();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#00ffaa", 10, 1.2); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 450);
-}
-function vfxPunchHeavy(tx,ty,onDone){
-  shakeArena(300,10);
-  makeEffect(0, 500, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    const g = c.createRadialGradient(tx, ty, 0, tx, ty, 90*(1-t));
-    g.addColorStop(0, "rgba(255,255,255,0.9)"); g.addColorStop(0.5, "rgba(255,150,0,0.6)"); g.addColorStop(1, "rgba(0,0,0,0)");
-    c.fillStyle = g; c.beginPath(); c.arc(tx, ty, 90*(1-t), 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff4400", 14, 1.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 550);
-}
-function vfxOrbBlue(tx,ty,onDone){
-  makeEffect(0, 700, (c,t)=>{
-    c.save(); c.translate(tx, ty); c.rotate(t*5); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#00aaff"; c.lineWidth = 8; c.shadowColor = "#00aaff"; c.shadowBlur = 20;
-    c.beginPath(); c.arc(0, 0, 50*(1-t*0.5), 0, Math.PI*1.5); c.stroke();
-    c.fillStyle = "rgba(0,170,255,0.4)"; c.beginPath(); c.arc(0, 0, 30*(1-t*0.5), 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#00aaff", 16, 1.8); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 750);
-}
-function vfxSlashTriple(tx,ty,onDone){
-  for(let i=0; i<3; i++){
-    const angle = -0.5 + i*0.5;
-    makeEffect(i*100, 400, (c,t)=>{
-      c.save(); c.translate(tx, ty); c.rotate(angle); c.globalAlpha = 1 - t;
-      c.strokeStyle = "#4cff77"; c.lineWidth = 8; c.shadowColor = "#4cff77"; c.shadowBlur = 12;
-      c.beginPath(); c.moveTo(-60, 0); c.lineTo(60, 0); c.stroke();
-      c.restore();
-    });
-  }
-  setTimeout(()=>{ addImpactBurst(tx, ty, "#4cff77", 12, 1.4); if(onDone) onDone(); }, 500);
-}
-function vfxTornadoGreen(tx,ty,onDone){
-  makeEffect(0, 800, (c,t)=>{
-    c.save(); c.translate(tx, ty + 100 - t*200); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#00cc66"; c.lineWidth = 6; c.shadowColor = "#00cc66"; c.shadowBlur = 15;
-    for(let i=0; i<5; i++){
-      const y = -i*30, r = 40 + i*10;
-      c.beginPath(); c.ellipse(0, y, r*(1-t*0.3), 10, 0, 0, Math.PI*2); c.stroke();
-    }
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#00cc66", 18, 2.0); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 850);
-}
-function vfxLightningBlue(tx,ty,onDone){
-  const points = [{x:tx, y:ty-200}];
-  for(let i=1; i<6; i++){ points.push({x:tx+(Math.random()-.5)*80, y:ty-200+i*50}); }
-  points.push({x:tx, y:ty});
-  makeEffect(0, 400, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#6ee8ff"; c.lineWidth = 12; c.shadowColor = "#6ee8ff"; c.shadowBlur = 25;
-    c.beginPath(); c.moveTo(points[0].x, points[0].y);
-    for(let i=1; i<points.length; i++) c.lineTo(points[i].x, points[i].y);
-    c.stroke();
-    c.strokeStyle = "#fff"; c.lineWidth = 4;
-    c.beginPath(); c.moveTo(points[0].x, points[0].y);
-    for(let i=1; i<points.length; i++) c.lineTo(points[i].x, points[i].y);
-    c.stroke();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#6ee8ff", 16, 1.8); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 450);
-}
-function vfxFireBlack(tx,ty,onDone){
-  for(let i=0; i<15; i++){
-    pushEffect({
-      hasCallback:false, x:tx+(Math.random()-.5)*60, y:ty+30, vx:(Math.random()-.5)*4, vy:-(2+Math.random()*4), life:1, done:false,
-      update(){ this.x+=this.vx; this.y+=this.vy; this.vy*=0.95; this.life-=0.02; if(this.life<=0)this.done=true; },
-      draw(c){ c.save(); c.globalAlpha=this.life*0.8; c.fillStyle="#222"; c.beginPath(); c.arc(this.x, this.y, 8*this.life, 0, Math.PI*2); c.fill(); c.strokeStyle="#ff0000"; c.lineWidth=2; c.stroke(); c.restore(); }
-    });
-  }
-  makeEffect(0, 500, (c,t)=>{ c.save(); c.globalAlpha=1-t; c.fillStyle="rgba(50,0,0,0.6)"; c.beginPath(); c.arc(tx,ty,70*(1-t),0,Math.PI*2); c.fill(); c.restore(); }, ()=>{ addImpactBurst(tx,ty,"#ff0000",14,1.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 550);
-}
-function vfxFlurryFire(tx,ty,onDone){
-  let hits=0; const maxHits=5;
-  const iv=setInterval(()=>{
-    hits++; addImpactBurst(tx+(Math.random()-.5)*40, ty+(Math.random()-.5)*40, "#ff2200", 8, 1.2); shakeArena(80, 5);
-    if(hits>=maxHits){ clearInterval(iv); if(onDone) onDone(); }
-  }, 120);
-}
-function vfxPunchBlue(tx,ty,onDone){
-  makeEffect(0, 500, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#2166ff"; c.lineWidth = 10; c.shadowColor = "#2166ff"; c.shadowBlur = 20;
-    c.beginPath(); c.arc(tx, ty, 60*(1-t), 0, Math.PI*2); c.stroke();
-    c.fillStyle = "rgba(33,102,255,0.3)"; c.beginPath(); c.arc(tx, ty, 40*(1-t), 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#2166ff", 14, 1.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 550);
-}
-function vfxImpactBlackRed(tx,ty,onDone){
-  shakeArena(400, 15);
-  makeEffect(0, 300, (c,t)=>{ c.save(); c.globalAlpha = 1 - t; c.fillStyle = "#000"; c.beginPath(); c.arc(tx, ty, 80*(1-t), 0, Math.PI*2); c.fill(); c.restore(); });
-  makeEffect(150, 400, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#ff183f"; c.lineWidth = 8; c.shadowColor = "#ff183f"; c.shadowBlur = 25;
-    for(let i=0; i<6; i++){ const a = (Math.PI*2/6)*i; c.beginPath(); c.moveTo(tx, ty); c.lineTo(tx+Math.cos(a)*100, ty+Math.sin(a)*100); c.stroke(); }
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff183f", 18, 2.0); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 600);
-}
-function vfxFireMassive(tx,ty,onDone){
-  shakeArena(800, 12);
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    const g = c.createRadialGradient(tx, ty, 0, tx, ty, 150*(1-t*0.3));
-    g.addColorStop(0, "rgba(255,255,150,0.9)"); g.addColorStop(0.3, "rgba(255,100,0,0.7)"); g.addColorStop(0.7, "rgba(150,0,0,0.4)"); g.addColorStop(1, "rgba(0,0,0,0)");
-    c.fillStyle = g; c.beginPath(); c.arc(tx, ty, 150*(1-t*0.3), 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff5a2f", 24, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1050);
-}
-function vfxMeteorDrop(tx,ty,onDone){
-  makeEffect(0, 1200, (c,t)=>{
-    c.save(); const y = ty - 300 + t*300; c.globalAlpha = 1;
-    c.fillStyle = "#8b4513"; c.shadowColor = "#ff0000"; c.shadowBlur = 30;
-    c.beginPath(); c.arc(tx, y, 40, 0, Math.PI*2); c.fill();
-    c.strokeStyle = "#ff8c00"; c.lineWidth = 15; c.beginPath(); c.moveTo(tx, y); c.lineTo(tx-30, y-80); c.stroke();
-    c.restore();
-  }, ()=>{
-    shakeArena(500, 25);
-    makeEffect(0, 500, (c,t)=>{ c.save(); c.globalAlpha=1-t; vfxExplosion(c,tx,ty,"#ff5a2f",t,140); c.restore(); }, ()=>{ addImpactBurst(tx,ty,"#ff5a2f",20,2.2); });
-  });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1800);
-}
-function vfxBoxPurple(tx,ty,onDone){
-  makeEffect(0, 600, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#2b1548"; c.lineWidth = 12; c.shadowColor = "#8a2be2"; c.shadowBlur = 20;
-    const s = 100 * (1 - t*0.5);
-    c.strokeRect(tx-s/2, ty-s/2, s, s);
-    c.fillStyle = "rgba(40,0,80,0.6)"; c.fillRect(tx-s/2, ty-s/2, s, s);
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#8a2be2", 16, 1.8); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 650);
-}
-function vfxIllusionShatter(tx,ty,onDone){
-  makeEffect(0, 800, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#d25cff"; c.lineWidth = 4; c.shadowColor = "#d25cff"; c.shadowBlur = 15;
-    for(let i=0; i<8; i++){
-      const a = (Math.PI*2/8)*i + t*3;
-      c.beginPath(); c.moveTo(tx, ty); c.lineTo(tx+Math.cos(a)*120*(1-t), ty+Math.sin(a)*120*(1-t)); c.stroke();
-    }
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#d25cff", 20, 2.0); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 850);
-}
-function vfxOrbRedRepel(tx,ty,onDone){
-  makeEffect(0, 600, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#ff1f4f"; c.lineWidth = 10; c.shadowColor = "#ff1f4f"; c.shadowBlur = 25;
-    c.beginPath(); c.arc(tx, ty, 80*(1-t*0.3), 0, Math.PI*2); c.stroke();
-    c.fillStyle = "rgba(255,31,79,0.5)"; c.beginPath(); c.arc(tx, ty, 50*(1-t*0.3), 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff1f4f", 18, 2.0); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 650);
-}
-function vfxBeamPurple(tx,ty,onDone){
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.translate(tx, ty - 200); c.rotate(Math.PI/2); c.globalAlpha = 1 - t;
-    c.fillStyle = "rgba(141,50,255,0.8)"; c.shadowColor = "#8d32ff"; c.shadowBlur = 20;
-    c.fillRect(-30, 0, 60, 200);
-    c.fillStyle = "rgba(255,255,255,0.9)"; c.fillRect(-10, 0, 20, 200);
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#8d32ff", 24, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1050);
-}
-function vfxSlashInvisible(tx,ty,onDone){
-  for(let i=0; i<5; i++){
-    makeEffect(i*80, 300, (c,t)=>{
-      c.save(); c.globalAlpha = 1 - t;
-      c.strokeStyle = "#fff"; c.lineWidth = 4; c.shadowColor = "#fff"; c.shadowBlur = 10;
-      const a = Math.random()*Math.PI*2;
-      c.beginPath(); c.moveTo(tx+Math.cos(a)*60, ty+Math.sin(a)*60); c.lineTo(tx+Math.cos(a+1)*60, ty+Math.sin(a+1)*60); c.stroke();
-      c.restore();
-    });
-  }
-  setTimeout(()=>{ addImpactBurst(tx, ty, "#fff", 14, 1.5); if(onDone) onDone(); }, 600);
-}
-function vfxArrowFire(tx,ty,onDone){
-  makeEffect(0, 800, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#ff3300"; c.lineWidth = 6; c.shadowColor = "#ff3300"; c.shadowBlur = 15;
-    c.beginPath(); c.moveTo(tx, ty-200); c.lineTo(tx, ty); c.stroke();
-    c.fillStyle = "#ff0000"; c.beginPath(); c.moveTo(tx-20, ty-20); c.lineTo(tx, ty); c.lineTo(tx+20, ty-20); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff3300", 18, 2.0); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 850);
-}
-function vfxSysWindow(tx,ty,onDone){
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.globalAlpha = Math.min(1, t*3) * (1 - Math.max(0, t-0.7)*3.3);
-    c.strokeStyle = "#7fd8ff"; c.lineWidth = 4; c.shadowColor = "#7fd8ff"; c.shadowBlur = 15;
-    c.strokeRect(tx-80, ty-60, 160, 120);
-    c.fillStyle = "rgba(0,50,80,0.7)"; c.fillRect(tx-80, ty-60, 160, 120);
-    c.fillStyle = "#7fd8ff"; c.font = "700 18px 'Russo One',sans-serif"; c.textAlign = "center";
-    c.fillText("[ SISTEMA ]", tx, ty-30);
-    c.font = "700 14px 'Rajdhani',sans-serif"; c.fillStyle = "#fff";
-    c.fillText("MEJORAS ACTIVADAS", tx, ty+10);
-    c.restore();
-  }, onDone);
-}
-function vfxGodEyes(tx,ty,onDone){
-  makeEffect(0, 1200, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.fillStyle = "#fff"; c.shadowColor = "#8a2be2"; c.shadowBlur = 20;
-    c.beginPath(); c.ellipse(tx-30, ty, 25, 15, 0, 0, Math.PI*2); c.fill();
-    c.beginPath(); c.ellipse(tx+30, ty, 25, 15, 0, 0, Math.PI*2); c.fill();
-    c.fillStyle = "#000"; c.beginPath(); c.arc(tx-30, ty, 8, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(tx+30, ty, 8, 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#8a2be2", 20, 2.0); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1250);
-}
-function vfxBeamHoly(tx,ty,onDone){
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    const g = c.createLinearGradient(tx, ty-200, tx, ty+100);
-    g.addColorStop(0, "rgba(255,255,255,0.9)"); g.addColorStop(0.5, "rgba(0,170,255,0.7)"); g.addColorStop(1, "rgba(0,0,100,0)");
-    c.fillStyle = g; c.fillRect(tx-40, ty-200, 80, 300);
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#00aaff", 24, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1050);
-}
-function vfxGateBabylon(tx,ty,onDone){
-  for(let i=0; i<15; i++){
-    makeEffect(i*60, 500, (c,t)=>{
-      c.save(); c.globalAlpha = 1 - t;
-      c.fillStyle = "#ffd700"; c.shadowColor = "#ffd700"; c.shadowBlur = 10;
-      const x = tx + (Math.random()-.5)*150, y = ty - 150 + t*200;
-      c.fillRect(x-4, y-20, 8, 40);
-      c.beginPath(); c.arc(x, y-20, 6, 0, Math.PI*2); c.fill();
-      c.restore();
-    });
-  }
-  setTimeout(()=>{ addImpactBurst(tx, ty, "#ffd700", 24, 2.5); if(onDone) onDone(); }, 1200);
-}
-function vfxBeamSpiralRed(tx,ty,onDone){
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.translate(tx, ty-150); c.rotate(t*5); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#ff0000"; c.lineWidth = 10; c.shadowColor = "#ff0000"; c.shadowBlur = 20;
-    c.beginPath(); c.moveTo(0, 0); c.lineTo(0, 200); c.stroke();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ff0000", 20, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1050);
-}
-function vfxSunDrop(tx,ty,onDone){
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.fillStyle = "#ff8c00"; c.shadowColor = "#ff8c00"; c.shadowBlur = 30;
-    c.beginPath(); c.arc(tx, ty-200+t*250, 50, 0, Math.PI*2); c.fill();
-    c.restore();
-  }, ()=>{ shakeArena(400,15); addImpactBurst(tx, ty, "#ff8c00", 20, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1050);
-}
-function vfxSlashSolar(tx,ty,onDone){
-  makeEffect(0, 800, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.strokeStyle = "#ffee00"; c.lineWidth = 15; c.shadowColor = "#ffee00"; c.shadowBlur = 25;
-    c.beginPath(); c.arc(tx, ty, 80*(1-t*0.5), Math.PI*1.2, Math.PI*1.8); c.stroke();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#ffee00", 20, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 850);
-}
-function vfxBlackSlime(tx,ty,onDone){
-  for(let i=0; i<10; i++){
-    pushEffect({
-      hasCallback:false, x:tx+(Math.random()-.5)*60, y:ty-50, vx:(Math.random()-.5)*4, vy:Math.random()*2, life:1, done:false,
-      update(){ this.x+=this.vx; this.y+=this.vy; this.life-=0.02; if(this.life<=0)this.done=true; },
-      draw(c){ c.save(); c.globalAlpha=this.life; c.fillStyle="#00008b"; c.beginPath(); c.arc(this.x, this.y, 15*this.life, 0, Math.PI*2); c.fill(); c.restore(); }
-    });
-  }
-  setTimeout(()=>{ addImpactBurst(tx, ty, "#00008b", 16, 1.8); if(onDone) onDone(); }, 600);
-}
-function vfxLaserRain(tx,ty,onDone){
-  for(let i=0; i<10; i++){
-    makeEffect(i*80, 500, (c,t)=>{
-      c.save(); c.globalAlpha = 1 - t;
-      c.strokeStyle = "#00ffff"; c.lineWidth = 4; c.shadowColor = "#00ffff"; c.shadowBlur = 15;
-      c.beginPath(); c.moveTo(tx+(Math.random()-.5)*150, ty-150); c.lineTo(tx, ty); c.stroke();
-      c.restore();
-    });
-  }
-  setTimeout(()=>{ addImpactBurst(tx, ty, "#00ffff", 20, 2.0); if(onDone) onDone(); }, 1000);
-}
-function vfxProjectileGray(tx,ty,onDone){
-  makeEffect(0, 600, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.fillStyle = "#888"; c.shadowColor = "#fff"; c.shadowBlur = 10;
-    const x = tx-100 + t*100, y = ty-50 + t*50;
-    c.beginPath(); c.moveTo(x, y-20); c.lineTo(x+15, y); c.lineTo(x, y+20); c.lineTo(x-15, y); c.fill();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#888", 16, 1.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 650);
-}
-function vfxBlackHoleGrowth(tx,ty,onDone){
-  makeEffect(0, 1000, (c,t)=>{
-    c.save(); c.globalAlpha = 1 - t;
-    c.fillStyle = "#000"; c.shadowColor = "#333"; c.shadowBlur = 20;
-    c.beginPath(); c.arc(tx, ty, 80*(1+t*0.5), 0, Math.PI*2); c.fill();
-    c.strokeStyle = "#333"; c.lineWidth = 4;
-    c.beginPath(); c.arc(tx, ty, 100*(1+t*0.5), 0, Math.PI*2); c.stroke();
-    c.restore();
-  }, ()=>{ addImpactBurst(tx, ty, "#333", 24, 2.5); });
-  setTimeout(()=>{ if(onDone) onDone(); }, 1050);
-}
-
 // ============ BATALLA ============
 let battleState=null,isHost=false,mySelectedTeam=[],pendingEnemyTeam=null,teamResendTimer=null;
 function getFP(side){if(!vfxCanvas)ensureCanvas();if(side==="left")return{x:vfxW*.22,y:vfxH*.5};return{x:vfxW*.78,y:vfxH*.5};}
-function initBS(f){return{...f,currentHP:f.power*10,maxHP:f.power*10,trapped:0,burn:0,burnDmg:0,burnTurns:0,dodgeActive:false,dodgeTurns:0,dodgeType:null,confusedTurns:0,weakenedTurns:0,dustTurns:0,kwamiTurns:0,sysDmg:1,arisen:false,futureMarked:false,futureDmg:0,futureAttackerIdx:-1,futureAttackerSide:"",parallelActive:false,parallelTurns:0,mindDodgeChance:0.25,cds:f.abilities.map(()=>0)};}
+function initBS(f){return{...f,currentHP:f.power*10,maxHP:f.power*10,trapped:0,burn:0,burnDmg:0,burnTurns:0,dodgeActive:false,dodgeTurns:0,dodgeType:null,confusedTurns:0,weakenedTurns:0,dustTurns:0,kwamiTurns:0,sysDmg:1,arisen:false,cds:f.abilities.map(()=>0)};}
 function showDmg(el,dmg,color="#ff1238",cls=""){if(!el)return;if(document.querySelectorAll('.damage-text').length>=8)return;const r=el.getBoundingClientRect(),ar=document.getElementById("battleArena").getBoundingClientRect();const d=document.createElement("div");d.className=`damage-text ${cls}`;d.textContent=`-${dmg.toLocaleString()}`;d.style.left=(r.left-ar.left+r.width/2)+"px";d.style.top=(r.top-ar.top+r.height/3)+"px";document.getElementById("battleArena").appendChild(d);setTimeout(()=>d.remove(),1200);}
 function addLog(msg,type=""){const l=document.getElementById("battleLog");const e=document.createElement("div");e.className=`log-entry ${type}`;e.textContent=msg;l.appendChild(e);l.scrollTop=l.scrollHeight;}
 function setTI(text,color="var(--primary)"){const e=document.getElementById("turnIndicator");e.textContent=text;e.style.color=color;}
@@ -1839,8 +1404,6 @@ function renderArena(pTeam,eTeam,isPTurn){
     if(f.confusedTurns>0)icons.push("😵");if(f.weakenedTurns>0)icons.push("💔");
     if(f.dustTurns>0)icons.push("💨");if(f.kwamiTurns>0)icons.push("🐈‍⬛");
     if((f.sysDmg||1)>1)icons.push("🔷");
-    if(f.futureMarked)icons.push("🔮");
-    if(f.parallelActive)icons.push("🌫️");
     if(hasPassive(f,"perfect_dodge")&&f.currentHP>0)icons.push("⚡");
     return icons.map((ic,n)=>`<div class="status-icon" style="right:${8+n*32}px;">${ic}</div>`).join("");
   };
@@ -1851,7 +1414,7 @@ function renderArena(pTeam,eTeam,isPTurn){
     d.innerHTML=`${mkIcons(f)}<div class="emoji">${f.emoji}</div><div class="name">${f.name}</div><div class="hp-bar"><div class="hp-fill" style="width:${(f.currentHP/f.maxHP)*100}%">${Math.floor(f.currentHP).toLocaleString()} / ${f.maxHP.toLocaleString()}</div></div><div class="abilities">${f.abilities.map((a,ai)=>{
       const cd=f.cds?f.cds[ai]:0;
       const dis=!act||cd>0;
-      return `<button class="ability-btn ${f.burnTurns>0&&a.special==='burn'?'burn-effect':''} ${f.dodgeActive&&a.special==='dodge_counter'?'dodge-active':''}" onclick="useAbility(${i},${ai})" ${dis?'disabled':''}>${cd>0?`<span class="cd-badge">${cd}</span>`:""}${a.name}${a.special==='trap'?' 🔗':''}${a.special==='burn'?' 🔥':''}${a.special==='dodge_counter'?' 💀':''}${a.special==='dodge'?' ✨':''}${a.special==='confuse'?' 😵':''}${a.special==='weaken'?' 💔':''}${a.special==='dust'?' 💨':''}${a.special==='kwami'?' 🐈‍⬛':''}${a.special==='sysmenu'?' 🖥️':''}${a.special==='deathray'?' ☠️':''}${a.special==='future_touch'?' 🔮':''}${a.special==='parallel_world'?' 🌫️':''}</button>`;
+      return `<button class="ability-btn ${f.burnTurns>0&&a.special==='burn'?'burn-effect':''} ${f.dodgeActive&&a.special==='dodge_counter'?'dodge-active':''}" onclick="useAbility(${i},${ai})" ${dis?'disabled':''}>${cd>0?`<span class="cd-badge">${cd}</span>`:""}${a.name}${a.special==='trap'?' 🔗':''}${a.special==='burn'?' 🔥':''}${a.special==='dodge_counter'?' 💀':''}${a.special==='dodge'?' ✨':''}${a.special==='confuse'?' 😵':''}${a.special==='weaken'?' 💔':''}${a.special==='dust'?' 💨':''}${a.special==='kwami'?' 🐈‍⬛':''}${a.special==='sysmenu'?' 🖥️':''}${a.special==='deathray'?' ☠️':''}</button>`;
     }).join("")}</div>`;
     ld.appendChild(d);
   });
@@ -1893,39 +1456,6 @@ function playAttackVfx(ab,fromSide,atkEl,tEl,finish,tickFn){
   if(ab.vfx==="death_ray"){vfxDeathRay(sp.x,sp.y,pos.x,pos.y,finish,tickFn);return;}
   if(ab.vfx==="void_hands"){vfxVoidHands(pos.x,pos.y,finish);return;}
   if(ab.vfx==="void_fall"){vfxVoidFall(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="future_touch"){vfxFutureTouch(sp.x,sp.y,pos.x,pos.y,finish);return;}
-  if(ab.vfx==="parallel_world"){vfxParallelWorld(tEl,finish);return;}
-  if(ab.vfx==="slash_water"){vfxSlashWater(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="slash_fire"){vfxSlashFire(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="punch_green"){vfxPunchGreen(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="punch_heavy"){vfxPunchHeavy(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="orb_blue"){vfxOrbBlue(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="slash_triple"){vfxSlashTriple(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="tornado_green"){vfxTornadoGreen(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="lightning_blue"){vfxLightningBlue(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="fire_black"){vfxFireBlack(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="flurry_fire"){vfxFlurryFire(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="punch_blue"){vfxPunchBlue(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="impact_black_red"){vfxImpactBlackRed(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="fire_massive"){vfxFireMassive(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="meteor_drop"){vfxMeteorDrop(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="box_purple"){vfxBoxPurple(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="illusion_shatter"){vfxIllusionShatter(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="orb_red_repel"){vfxOrbRedRepel(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="beam_purple"){vfxBeamPurple(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="slash_invisible"){vfxSlashInvisible(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="arrow_fire"){vfxArrowFire(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="sys_window"){vfxSysWindow(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="god_eyes"){vfxGodEyes(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="beam_holy"){vfxBeamHoly(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="gate_babylon"){vfxGateBabylon(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="beam_spiral_red"){vfxBeamSpiralRed(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="sun_drop"){vfxSunDrop(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="slash_solar"){vfxSlashSolar(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="black_slime"){vfxBlackSlime(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="laser_rain"){vfxLaserRain(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="projectile_gray"){vfxProjectileGray(pos.x,pos.y,finish);return;}
-  if(ab.vfx==="black_hole_growth"){vfxBlackHoleGrowth(pos.x,pos.y,finish);return;}
   makeEffect(0,300,(c,t)=>vfxExplosion(c,pos.x,pos.y,ab.color,t,80));addImpactBurst(pos.x,pos.y,ab.color,10);
   delayed(300,finish);
 }
@@ -2053,39 +1583,6 @@ function useAbility(fi,ai){
   battleState.isPlayerTurn=false;
   if(f.cds)f.cds[ai]=ab.cooldown||0;
 
-  if(ab.special==="future_touch"){
-    const alive=battleState.enemyTeam.filter(e=>e.currentHP>0);
-    if(!alive.length){endBattle(true);return;}
-    const tgt=alive[Math.floor(Math.random()*alive.length)];
-    const ti=battleState.enemyTeam.indexOf(tgt);
-    tgt.futureMarked=true;
-    tgt.futureDmg=ab.dmg;
-    tgt.futureAttackerIdx=fi;
-    tgt.futureAttackerSide="left";
-    addLog(`🔮 ${f.name} usa ${ab.name}! ${tgt.name} ha sido marcado por el futuro.`,"system");
-    if(battleState.isPvP)netSend({type:"ability",fighterIdx:fi,abilityIdx:ai,targetIdx:ti,outcome:"future_touch"});
-    const pos=getFP("right"),sp=getFP("left");
-    vfxFutureTouch(sp.x,sp.y,pos.x,pos.y,()=>{
-      if(!battleState)return;
-      if(!battleState.isPvP)delayed(800,()=>enemyTurn());
-    });
-    return;
-  }
-
-  if(ab.special==="parallel_world"){
-    f.parallelActive=true;f.parallelTurns=ab.parallelTurns||4;
-    f.sysDmg=(f.sysDmg||1)+3.0; 
-    addLog(`🌫️ ${f.name} activa "${ab.name}"! Ve tu muerte en el mundo paralelo. ¡Daño incrementado en 300%!`,"system");
-    if(battleState.isPvP)netSend({type:"ability",fighterIdx:fi,abilityIdx:ai,buff:true,outcome:"parallel_world"});
-    const atkEl=document.getElementById(`pF${fi}`);
-    vfxParallelWorld(atkEl,()=>{
-      if(!battleState)return;
-      refreshBS();
-      if(!battleState.isPvP)delayed(800,()=>enemyTurn());
-    });
-    return;
-  }
-
   if(ab.special==="dodge_counter"||ab.special==="dodge"){
     f.dodgeActive=true;f.dodgeTurns=ab.specialDuration||2;f.dodgeType=ab.special;
     if(battleState.isPvP)netSend({type:"ability",fighterIdx:fi,abilityIdx:ai,buff:true});
@@ -2106,6 +1603,7 @@ function useAbility(fi,ai){
 
   const buildNs=()=>({trapped:tgt.trapped,burnTurns:tgt.burnTurns,burnDmg:tgt.burnDmg,dodgeActive:tgt.dodgeActive,dodgeTurns:tgt.dodgeTurns,dodgeType:tgt.dodgeType,confusedTurns:tgt.confusedTurns,weakenedTurns:tgt.weakenedTurns,dustTurns:tgt.dustTurns,kwamiTurns:tgt.kwamiTurns});
 
+  // ===== RAYO DE LA MUERTE (Sans Killer) =====
   if(ab.special==="deathray"){
     const ns=buildNs();
     if(battleState.isPvP)netSend({type:"ability",fighterIdx:fi,abilityIdx:ai,targetIdx:ti,outcome:"deathray",ns});
@@ -2129,6 +1627,7 @@ function useAbility(fi,ai){
     return;
   }
 
+  // ===== KWAMI DEL CAOS: atacante marcado =====
   if(f.kwamiTurns>0&&ab.dmg>0){
     f.kwamiTurns--;
     const reduced=Math.floor(dmg*0.5),recoil=Math.floor(dmg*1.5);
@@ -2304,6 +1803,7 @@ function enemyTurn(){
       }
     }
 
+    // Elegir habilidad disponible (sin cooldown)
     let avail=atk.abilities.map((a,i)=>({a,i})).filter(x=>!atk.cds||atk.cds[x.i]===0);
     if(avail.length===0)avail=[{a:atk.abilities[0],i:0}];
     const chosen=avail[Math.floor(Math.random()*avail.length)];
@@ -2325,16 +1825,7 @@ function enemyTurn(){
     const wasWeakened=tgt.weakenedTurns>0;
     if(wasWeakened)dmg=Math.floor(dmg*2);
 
-    if(tgt.passive==="advanced_mind"&&Math.random()<tgt.mindDodgeChance){
-      addLog(`🧠 ¡MENTE AVANZADA! ${tgt.name} vislumbra el ataque en un mundo paralelo y lo esquiva.`,"system");
-      if(battleState.isPvP)netSend({type:"ability",fighterIdx:atkIdx,abilityIdx:abIdx,targetIdx:ti,outcome:"mind_dodge"});
-      const tEl=document.getElementById(`pF${ti}`);
-      const ar=document.getElementById("battleArena").getBoundingClientRect(),r=tEl.getBoundingClientRect();
-      const tx=r.left-ar.left+r.width/2,ty=r.top-ar.top+r.height/2;
-      vfxMindDodge(tx,ty,()=>{ if(battleState)finishET(); });
-      return;
-    }
-
+    // ===== RAYO DE LA MUERTE enemigo =====
     if(ab.special==="deathray"){
       addLog(`☠️ ${atk.name} invoca EL RAYO DE LA MUERTE!`,"system");
       const tEl=document.getElementById(`pF${ti}`),atkEl=document.getElementById(`eF${atkIdx}`);
@@ -2350,6 +1841,7 @@ function enemyTurn(){
       return;
     }
 
+    // ===== KWAMI DEL CAOS: enemigo marcado ataca =====
     if(atk.kwamiTurns>0&&ab.dmg>0){
       atk.kwamiTurns--;
       const reduced=Math.floor(dmg*0.5),recoil=Math.floor(dmg*1.5);
@@ -2375,6 +1867,7 @@ function enemyTurn(){
       addLog(`${atk.name} activa ${ab.name}!`,"enemy");refreshBS();finishET();return;
     }
 
+    // Pasivas defensivas del jugador (Sans Killer en tu equipo)
     let defOutcome=null;
     if(!tgt.dodgeActive)defOutcome=checkDefensivePassives(tgt);
     if(tgt.dodgeActive){
@@ -2436,47 +1929,6 @@ function enemyTurn(){
       addLog(` ${tgt.name} recibe -${finalDmg.toLocaleString()}!${wasWeakened?" (💔 x2)":""}`,"enemy");
       showDmg(tEl,finalDmg);updateHP(tEl,tgt.currentHP,tgt.maxHP);markDeadIf(tEl,tgt);
       if(wasStatus)refreshBS();
-      
-      if(tgt.futureMarked){
-        const futureDmg = tgt.futureDmg;
-        addLog(`🔮 ¡Yhwach activó el Toque del Futuro! El daño vuelve a ${atk.name} en 2s...`,"system");
-        tgt.futureMarked = false;
-        if(battleState.isPvP)netSend({type:"ability",fighterIdx:ti,abilityIdx:0,targetIdx:atkIdx,outcome:"future_reflect",dmg:futureDmg,heal:finalDmg});
-        
-        delayed(2000, ()=>{
-          if(!battleState) return;
-          const attackerEl = document.getElementById(`eF${atkIdx}`);
-          const tgtEl = document.getElementById(`pF${ti}`);
-          atk.currentHP -= futureDmg;
-          showDmg(attackerEl, futureDmg, "#8a2be2", "purple-dmg"); updateHP(attackerEl, atk.currentHP, atk.maxHP); markDeadIf(attackerEl, atk);
-          tgt.currentHP += finalDmg;
-          if(tgt.currentHP > tgt.maxHP) tgt.currentHP = tgt.maxHP;
-          showDmg(tgtEl, finalDmg, "#00ff86", "green-dmg"); updateHP(tgtEl, tgt.currentHP, tgt.maxHP);
-          addLog(` 🔮 ¡El futuro se alteró! ${atk.name} recibe -${futureDmg.toLocaleString()} y ${tgt.name} se cura +${finalDmg.toLocaleString()}.`,"system");
-          addImpactBurst(getFP("right").x, getFP("right").y, "#8a2be2", 20, 2.0);
-          refreshBS();
-          if(battleState.enemyTeam.every(e=>e.currentHP<=0)){delayed(500,()=>endBattle(true));return;}
-        });
-      }
-      
-      if(tgt.currentHP <= 0 && tgt.futureMarked){
-        const futureDmg = tgt.futureDmg;
-        addLog(`💀 ¡${tgt.name} cayó! Pero el Toque del Futuro desencadena su daño final en ${atk.name}...`,"system");
-        tgt.futureMarked = false;
-        if(battleState.isPvP)netSend({type:"ability",fighterIdx:ti,abilityIdx:0,targetIdx:atkIdx,outcome:"future_death",dmg:futureDmg});
-        
-        delayed(2000, ()=>{
-          if(!battleState) return;
-          const attackerEl = document.getElementById(`eF${atkIdx}`);
-          atk.currentHP -= futureDmg;
-          showDmg(attackerEl, futureDmg, "#fff", "lethal-dmg"); updateHP(attackerEl, atk.currentHP, atk.maxHP); markDeadIf(attackerEl, atk);
-          addLog(` 💀 ¡Daño letal del futuro! ${atk.name} recibe -${futureDmg.toLocaleString()}.`,"system");
-          shakeArena(600, 20);
-          refreshBS();
-          if(battleState.enemyTeam.every(e=>e.currentHP<=0)){delayed(500,()=>endBattle(true));return;}
-        });
-      }
-
       finishET();
     };
     playAttackVfx(ab,"right",atkEl,tEl,finish);
@@ -2487,21 +1939,10 @@ function finishET(){if(!battleState)return;if(battleState.playerTeam.every(p=>p.
 function startPTurn(){
   if(!battleState)return;
   battleState.isPlayerTurn=true;
-  battleState.playerTeam.forEach(f=>{
-    if(f.trapped>0)f.trapped--;if(f.weakenedTurns>0)f.weakenedTurns--;if(f.dustTurns>0)f.dustTurns--;if(f.cds)f.cds=f.cds.map(c=>Math.max(0,c-1));
-    if(f.dodgeActive){f.dodgeTurns--;if(f.dodgeTurns<=0){f.dodgeActive=false;f.dodgeType=null;}}
-    if(f.parallelActive){
-      f.parallelTurns--;
-      if(f.parallelTurns<=0){
-        f.parallelActive=false;
-        f.sysDmg=Math.max(1,(f.sysDmg||1)-3.0);
-        addLog(`🌫️ El mundo paralelo de ${f.name} se desvanece. Vuelve a la normalidad.`,"system");
-      }
-    }
-  });
+  battleState.playerTeam.forEach(f=>{if(f.trapped>0)f.trapped--;if(f.weakenedTurns>0)f.weakenedTurns--;if(f.dustTurns>0)f.dustTurns--;if(f.cds)f.cds=f.cds.map(c=>Math.max(0,c-1));if(f.dodgeActive){f.dodgeTurns--;if(f.dodgeTurns<=0){f.dodgeActive=false;f.dodgeType=null;}}});
   if(battleState.isPvP){
     battleState.enemyTeam.forEach(f=>{if(f.cds)f.cds=f.cds.map(c=>Math.max(0,c-1));});
-    netSend({type:"statusSync",statuses:battleState.playerTeam.map(f=>({dodgeActive:f.dodgeActive,dodgeTurns:f.dodgeTurns,dodgeType:f.dodgeType,confusedTurns:f.confusedTurns,weakenedTurns:f.weakenedTurns,trapped:f.trapped,burnTurns:f.burnTurns,burnDmg:f.burnDmg,dustTurns:f.dustTurns,kwamiTurns:f.kwamiTurns,futureMarked:f.futureMarked,parallelActive:f.parallelActive,parallelTurns:f.parallelTurns,sysDmg:f.sysDmg}))});
+    netSend({type:"statusSync",statuses:battleState.playerTeam.map(f=>({dodgeActive:f.dodgeActive,dodgeTurns:f.dodgeTurns,dodgeType:f.dodgeType,confusedTurns:f.confusedTurns,weakenedTurns:f.weakenedTurns,trapped:f.trapped,burnTurns:f.burnTurns,burnDmg:f.burnDmg,dustTurns:f.dustTurns,kwamiTurns:f.kwamiTurns}))});
   }
 
   const confused=battleState.playerTeam.map((f,i)=>({f,i})).filter(x=>x.f.confusedTurns>0&&x.f.currentHP>0);
@@ -3005,12 +2446,6 @@ function execPvPEnemy(msg){
       const eEl=document.getElementById(`eF${fi}`);
       addLog(`🚪 ¡${tgt.name} devuelve el golpe con una puerta! ${f.name} -${kd.toLocaleString()}`,"system");
       showDmg(eEl,kd,"#ffd700","karma-dmg");updateHP(eEl,f.currentHP,f.maxHP);markDeadIf(eEl,f);
-    }else if(outcome==="mind_dodge"){
-      addLog(`🧠 ¡MENTE AVANZADA! ${tgt.name} esquiva en el mundo paralelo.`,"system");
-      const tEl=document.getElementById(`pF${ti}`);
-      const ar=document.getElementById("battleArena").getBoundingClientRect(),r=tEl.getBoundingClientRect();
-      const tx=r.left-ar.left+r.width/2,ty=r.top-ar.top+r.height/2;
-      vfxMindDodge(tx,ty,null);
     }
     finishPvPET();
   };
@@ -3019,7 +2454,7 @@ function execPvPEnemy(msg){
   if(outcome==="reflected"){vfxKarmaCounter(aPos.x,aPos.y,applyFinish);return;}
   if(outcome==="door_reflect"){vfxDoorReflect(dPos.x,dPos.y,aPos.x,aPos.y,applyFinish);return;}
   if(outcome==="bone_block"){vfxBoneBlock(dPos.x,dPos.y,applyFinish);return;}
-  if(outcome==="dodged"||outcome==="perfect_dodge"||outcome==="mind_dodge"){
+  if(outcome==="dodged"||outcome==="perfect_dodge"){
     makeEffect(0,400,(c,t)=>{c.save();c.globalAlpha=(1-t)*0.5;drawOrb(c,dPos.x,dPos.y,40*(1-t),"#ffffff",0.4);c.restore();});
     delayed(450,applyFinish);return;
   }
