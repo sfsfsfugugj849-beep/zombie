@@ -240,6 +240,19 @@ const QUESTIONS = [
 const WEAPONS = ['Pistola', 'Rifle', 'Bate', 'Cuchillo', 'Escopeta'];
 const PLAYER_COLORS = ['#ff6666', '#66ff66', '#6666ff', '#ffff66'];
 
+// ============ CONFIGURACIÓN DE RED (STUN) ============
+const peerConfig = {
+  config: {
+    'iceServers': [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' }
+    ]
+  }
+};
+
 // ============ GESTIÓN DE CONEXIONES MEJORADA ============
 function showJoin() {
   document.getElementById('joinBox').style.display = 'block';
@@ -254,7 +267,7 @@ function createRoom() {
   
   document.getElementById('status').textContent = 'Creando servidor...';
   
-  peer = new Peer(roomId);
+  peer = new Peer(roomId, peerConfig);
   
   peer.on('open', (id) => {
     myId = id;
@@ -264,7 +277,6 @@ function createRoom() {
     document.getElementById('hostControls').style.display = 'block';
     document.getElementById('status').textContent = 'Servidor listo. Esperando jugadores...';
     
-    // Añadirme a mí mismo como primer jugador
     players[myId] = {
       name: myName, 
       x: 200, y: 400, 
@@ -279,27 +291,33 @@ function createRoom() {
   });
 
   peer.on('connection', (c) => {
-    if (Object.keys(players).length >= 4) { 
-      c.send({type:'full'}); 
-      setTimeout(() => c.close(), 100); 
-      return; 
-    }
-    
-    connections.push(c);
-    
-    c.on('open', () => {
-      c.on('message', (data) => handleMsg(data, c));
-    });
+    const setupConn = () => {
+      if (Object.keys(players).length >= 4) { 
+        c.send({type:'full'}); 
+        setTimeout(() => c.close(), 100); 
+        return; 
+      }
+      
+      if (!connections.includes(c)) connections.push(c);
+      
+      c.on('data', (data) => handleMsg(data, c));
+    };
+
+    if (c.open) setupConn();
+    else c.on('open', setupConn);
     
     c.on('close', () => {
-      // Eliminar jugador desconectado
-      const playerId = Object.keys(players).find(id => players[id].name === c.metadata?.name);
-      if (playerId) {
+      const playerId = c.peer;
+      if (players[playerId]) {
         delete players[playerId];
         broadcast({type:'sync', players: players});
         updatePlayersList();
       }
       connections = connections.filter(conn => conn !== c);
+    });
+
+    c.on('error', (err) => {
+      console.log('Error de conexión:', err);
     });
   });
   
@@ -317,7 +335,7 @@ function joinRoom() {
   
   document.getElementById('status').textContent = 'Buscando sala...';
   
-  peer = new Peer();
+  peer = new Peer(peerConfig);
   
   peer.on('open', (id) => {
     myId = id;
@@ -325,17 +343,20 @@ function joinRoom() {
       metadata: { name: myName }
     });
     
-    conn.on('open', () => {
+    const setupConn = () => {
       document.getElementById('menu').style.display = 'none';
       document.getElementById('lobby').style.display = 'flex';
       document.getElementById('roomId').textContent = 'Conectado a: ' + roomId;
       document.getElementById('status').textContent = 'Conectado. Esperando inicio...';
       
-      // Enviar datos de unión
+      // Enviar datos de unión al host
       conn.send({type:'join', name: myName, id: myId});
       
-      conn.on('message', (data) => handleMsg(data));
-    });
+      conn.on('data', (data) => handleMsg(data));
+    };
+
+    if (conn.open) setupConn();
+    else conn.on('open', setupConn);
     
     conn.on('error', (err) => {
       alert('Error de conexión: ' + err);
@@ -350,6 +371,12 @@ function joinRoom() {
   
   peer.on('error', (err) => {
     alert('Error al conectar: ' + err.type);
+  });
+}
+
+function broadcast(data, excludeConn = null) {
+  connections.forEach(c => { 
+    if (c.open && c !== excludeConn) c.send(data); 
   });
 }
 
@@ -375,13 +402,13 @@ function handleMsg(data, senderConn = null) {
       targetX: 200+colorIdx*50, targetY: 400, 
       lives: 2, weapon: null, 
       alive: true, 
-      color: PLAYER_COLORS[colorIdx], 
+      color: PLAYER_COLORS[colorIdx % PLAYER_COLORS.length], 
       sitting: false, frame: 0, facing: 1
     };
     
     updatePlayersList();
     
-    // Enviar estado actual al nuevo jugador
+    // Enviar estado actual completo al nuevo jugador
     if (senderConn) {
       senderConn.send({
         type:'sync', 
@@ -389,11 +416,14 @@ function handleMsg(data, senderConn = null) {
         chairs: chairs,
         boxes: boxes,
         duolingoTimer: duolingoTimer,
-        gameStarted: gameStarted
+        gameStarted: gameStarted,
+        duolingo: duolingo,
+        voting: voting,
+        fightMode: fightMode
       });
     }
     
-    // Avisar a todos que hay un nuevo jugador
+    // Avisar a todos del nuevo jugador
     broadcast({type:'sync', players: players});
   }
   
@@ -401,7 +431,11 @@ function handleMsg(data, senderConn = null) {
     players = data.players;
     if (data.chairs) chairs = data.chairs;
     if (data.boxes) boxes = data.boxes;
-    if (data.duolingoTimer) duolingoTimer = data.duolingoTimer;
+    if (data.duolingoTimer !== undefined) duolingoTimer = data.duolingoTimer;
+    if (data.duolingo !== undefined) duolingo = data.duolingo;
+    if (data.voting !== undefined) voting = data.voting;
+    if (data.fightMode !== undefined) fightMode = data.fightMode;
+    
     if (data.gameStarted && !gameStarted) {
       gameStarted = true;
       document.getElementById('lobby').style.display = 'none';
@@ -418,6 +452,7 @@ function handleMsg(data, senderConn = null) {
       players[data.id].targetX = data.x;
       players[data.id].targetY = data.y;
     }
+    if (isHost) broadcast(data, senderConn);
   }
   
   if (data.type === 'sit') {
@@ -433,6 +468,7 @@ function handleMsg(data, senderConn = null) {
         }
       }
     }
+    if (isHost) broadcast(data, senderConn);
   }
   
   if (data.type === 'start') {
@@ -470,24 +506,42 @@ function handleMsg(data, senderConn = null) {
     document.getElementById('answer').focus();
   }
   
+  if (data.type === 'submit_answer') {
+    if (isHost) checkAnswer(data.id, data.answer);
+  }
+
   if (data.type === 'answer_result') {
     document.getElementById('dialog').style.display = 'none';
     if (data.correct) {
       playSound('correct');
-      showMsg('✅ ¡Correcto! Duolingo se retira...');
+      showMsg(`✅ ¡${players[data.id]?.name || 'Alguien'} respondió bien! Duolingo se retira...`);
     } else {
       playSound('wrong');
-      showMsg('❌ ¡Incorrecto! Pierdes una vida');
-      players[myId].lives--;
-      screenShake = 15;
-      if (players[myId].lives <= 0) {
-        players[myId].alive = false;
-        playSound('death');
+      if (data.id === myId) {
+        showMsg('❌ ¡Incorrecto! Pierdes una vida');
+        screenShake = 15;
+      } else {
+        showMsg(`❌ ¡${players[data.id]?.name} se equivocó!`);
+      }
+      
+      if (players[data.id]) {
+        players[data.id].lives--;
+        if (players[data.id].lives <= 0) {
+          players[data.id].alive = false;
+          if (data.id === myId) playSound('death');
+        }
       }
     }
     currentQuestion = null;
   }
-  
+
+  if (data.type === 'open_box_req') {
+    if (isHost) {
+      const box = boxes.find(b => b.id === data.boxId);
+      if (box && !box.opened) openBox(box, data.playerId);
+    }
+  }
+
   if (data.type === 'open_box') {
     const box = boxes.find(b => b.id === data.boxId);
     if (box && !box.opened) {
@@ -525,8 +579,11 @@ function handleMsg(data, senderConn = null) {
   if (data.type === 'vote') {
     votes[data.id] = data.vote;
     updateVoteCount();
-    if (isHost && Object.keys(votes).length === Object.keys(players).filter(id => players[id].alive).length) {
-      resolveVote();
+    if (isHost) {
+      broadcast(data, senderConn);
+      if (Object.keys(votes).length === Object.keys(players).filter(id => players[id].alive).length) {
+        resolveVote();
+      }
     }
   }
   
@@ -559,20 +616,17 @@ function handleMsg(data, senderConn = null) {
         screenShake = 25;
       }
     }
+    if (isHost) broadcast(data, senderConn);
   }
   
   if (data.type === 'player_died') {
-    players[data.id].lives = 0;
-    players[data.id].alive = false;
-    playSound('death');
-    showMsg('💀 ' + data.name + ' ha muerto');
+    if (players[data.id]) {
+      players[data.id].lives = 0;
+      players[data.id].alive = false;
+      if (data.id === myId) playSound('death');
+      showMsg('💀 ' + data.name + ' ha muerto');
+    }
   }
-}
-
-function broadcast(data) {
-  connections.forEach(c => { 
-    if (c.open) c.send(data); 
-  });
 }
 
 function updatePlayersList() {
@@ -633,7 +687,6 @@ canvas.addEventListener('click', e => {
   const x = (e.clientX - rect.left) / scale;
   const y = (e.clientY - rect.top) / scale;
   
-  // Verificar si clickeó una silla
   let satOnChair = false;
   chairs.forEach((chair, idx) => {
     const dist = Math.hypot(x - chair.x, y - chair.y);
@@ -648,7 +701,8 @@ canvas.addEventListener('click', e => {
         satOnChair = true;
         playSound('sit');
         const data = {type:'sit', id: myId, sitting: true, chairIdx: idx};
-        conn ? conn.send(data) : broadcast(data);
+        if (isHost) broadcast(data);
+        else conn.send(data);
       }
     }
   });
@@ -657,9 +711,10 @@ canvas.addEventListener('click', e => {
   
   players[myId].targetX = x;
   players[myId].targetY = y;
-  conn ? conn.send({type:'move', id: myId, x: x, y: y}) : broadcast({type:'move', id: myId, x: x, y: y});
   
-  // Abrir caja
+  if (isHost) broadcast({type:'move', id: myId, x: x, y: y});
+  else conn.send({type:'move', id: myId, x: x, y: y});
+  
   boxes.forEach(box => {
     if (!box.opened && x > box.x && x < box.x + box.w && y > box.y && y < box.y + box.h) {
       const dist = Math.hypot(players[myId].x - (box.x+25), players[myId].y - (box.y+25));
@@ -670,15 +725,14 @@ canvas.addEventListener('click', e => {
     }
   });
   
-  // Atacar Duolingo
   if (fightMode && duolingo && players[myId].weapon) {
     const dist = Math.hypot(players[myId].x - duolingo.x, players[myId].y - duolingo.y);
     if (dist < 100) {
       const dmg = getWeaponDamage(players[myId].weapon);
       playSound('shoot');
       const data = {type:'fight_attack', damage: dmg};
-      conn ? conn.send(data) : broadcast(data);
-      handleMsg(data);
+      if (isHost) handleMsg(data);
+      else conn.send(data);
     }
   }
 });
@@ -688,7 +742,8 @@ function toggleSit() {
   if (players[myId].sitting) {
     players[myId].sitting = false;
     const data = {type:'sit', id: myId, sitting: false};
-    conn ? conn.send(data) : broadcast(data);
+    if (isHost) broadcast(data);
+    else conn.send(data);
     playSound('sit');
   } else {
     let closest = null, minDist = Infinity, closestIdx = -1;
@@ -703,7 +758,8 @@ function toggleSit() {
       players[myId].targetX = closest.x;
       players[myId].targetY = closest.y;
       const data = {type:'sit', id: myId, sitting: true, chairIdx: closestIdx};
-      conn ? conn.send(data) : broadcast(data);
+      if (isHost) broadcast(data);
+      else conn.send(data);
       playSound('sit');
     } else {
       showMsg('🪑 Acércate a una silla primero');
@@ -720,18 +776,6 @@ function openBox(box, playerId) {
   const data = {type:'open_box', boxId: box.id, playerId: playerId, weapon: weapon};
   broadcast(data);
   handleMsg(data);
-}
-
-// Host maneja peticiones de abrir caja
-if (peer) {
-  peer.on('connection', c => {
-    c.on('message', data => {
-      if (data.type === 'open_box_req' && isHost) {
-        const box = boxes.find(b => b.id === data.boxId);
-        if (box && !box.opened) openBox(box, data.playerId);
-      }
-    });
-  });
 }
 
 // ============ DIBUJO MEJORADO ============
@@ -1197,8 +1241,11 @@ function spawnDuolingo() {
 
 function castVote(vote) {
   const data = {type:'vote', id: myId, vote: vote};
-  conn ? conn.send(data) : broadcast(data);
-  handleMsg(data);
+  if (isHost) {
+    handleMsg(data);
+  } else {
+    conn.send(data);
+  }
   document.getElementById('votePanel').style.display = 'none';
 }
 
@@ -1219,18 +1266,29 @@ function resolveVote() {
   }
 }
 
+function checkAnswer(playerId, ans) {
+  if (!currentQuestion) return;
+  const correct = ans === currentQuestion.a.toLowerCase();
+  
+  if (correct) {
+    broadcast({type:'answer_result', id: playerId, correct: true});
+    handleMsg({type:'answer_result', id: playerId, correct: true});
+    duolingo = null;
+    fightMode = false;
+    resetTimer();
+  } else {
+    broadcast({type:'answer_result', id: playerId, correct: false});
+    handleMsg({type:'answer_result', id: playerId, correct: false});
+  }
+}
+
 function submitAnswer() {
   const ans = document.getElementById('answer').value.trim().toLowerCase();
-  const correct = ans === currentQuestion.a.toLowerCase();
   document.getElementById('dialog').style.display = 'none';
   if (isHost) {
-    broadcast({type:'answer_result', correct: correct});
-    handleMsg({type:'answer_result', correct: correct});
-    if (correct) {
-      duolingo = null;
-      fightMode = false;
-      resetTimer();
-    }
+    checkAnswer(myId, ans);
+  } else {
+    conn.send({type:'submit_answer', id: myId, answer: ans});
   }
 }
 
