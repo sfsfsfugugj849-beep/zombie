@@ -1,519 +1,125 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<title>Math Duel — 2 Jugadores</title>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
-  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #0a0a0a; color: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; touch-action: none; }
-  #app { position: relative; width: 100%; height: 100%; }
-  .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; z-index: 10; background: radial-gradient(ellipse at center, #1a0f0f 0%, #050505 100%); }
-  .screen.active { display: flex; }
-  h1 { font-size: clamp(28px, 6vw, 48px); color: #ffdd55; text-shadow: 0 0 20px rgba(255, 221, 85, 0.4); margin: 0 0 8px; letter-spacing: 2px; }
-  h2 { color: #88ddff; margin: 0 0 20px; font-weight: 500; }
-  p { color: #aaa; margin: 6px 0; font-size: 14px; }
-  .small { font-size: 12px; color: #777; margin-top: 20px; }
-  input { background: #1a1a1a; border: 2px solid #ffdd55; color: #fff; padding: 12px 20px; font-size: 18px; border-radius: 8px; width: 100%; max-width: 320px; text-align: center; text-transform: uppercase; letter-spacing: 3px; margin: 8px 0; font-family: monospace; }
-  input:focus { outline: none; box-shadow: 0 0 15px rgba(255, 221, 85, 0.5); }
-  button { background: linear-gradient(180deg, #ffdd55, #ffaa00); color: #1a1a1a; border: none; padding: 14px 32px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; margin: 8px; min-width: 200px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 0 #aa7700, 0 6px 10px rgba(0,0,0,0.5); transition: transform 0.05s, box-shadow 0.05s; }
-  button:active { transform: translateY(2px); box-shadow: 0 2px 0 #aa7700, 0 3px 5px rgba(0,0,0,0.5); }
-  button.secondary { background: linear-gradient(180deg, #444, #222); color: #fff; box-shadow: 0 4px 0 #111, 0 6px 10px rgba(0,0,0,0.5); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .code-display { font-family: monospace; font-size: 36px; color: #ffdd55; background: #000; padding: 16px 24px; border-radius: 8px; border: 2px dashed #ffaa55; letter-spacing: 8px; margin: 12px 0; }
-  #gameScreen { padding: 0; background: linear-gradient(180deg, #1a0a2e 0%, #0a0a1a 100%); justify-content: space-between; }
-  .scoreboard { display: flex; justify-content: space-around; width: 100%; padding: 20px 14px 0; gap: 10px; }
-  .player-score { flex: 1; background: rgba(255,255,255,0.05); border: 2px solid #333; border-radius: 12px; padding: 12px; transition: all 0.3s; }
-  .player-score.me { border-color: #ffdd55; background: rgba(255, 221, 85, 0.08); }
-  .player-score.peer { border-color: #88ddff; background: rgba(136, 221, 255, 0.05); }
-  .player-score.correct { border-color: #5c5; background: rgba(85, 200, 85, 0.2); transform: scale(1.05); }
-  .player-score.wrong { border-color: #c55; background: rgba(200, 85, 85, 0.2); }
-  .player-name { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-  .player-points { font-size: clamp(24px, 6vw, 36px); font-weight: bold; color: #ffdd55; margin-top: 4px; }
-  .player-score.peer .player-points { color: #88ddff; }
-  .round-info { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; }
-  .question-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 0 20px; }
-  .question-text { font-size: clamp(36px, 8vw, 60px); font-weight: bold; color: #fff; margin: 10px 0; text-align: center; }
-  .question-emoji { font-size: 60px; margin-bottom: 8px; }
-  .timer-bar { width: 100%; max-width: 400px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 16px 0; }
-  .timer-fill { height: 100%; background: linear-gradient(90deg, #ffdd55, #ff8800); transition: width 0.1s linear; }
-  .options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 500px; margin-top: 20px; }
-  .option-btn { background: linear-gradient(180deg, #2a2a4e, #1a1a3e); color: #fff; border: 2px solid #4a4a6e; padding: 18px; font-size: clamp(18px, 4vw, 24px); font-weight: bold; border-radius: 12px; cursor: pointer; min-width: 0; box-shadow: 0 3px 0 #0a0a1a; margin: 0; }
-  .option-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0a0a1a; }
-  .option-btn.correct { background: linear-gradient(180deg, #4a8, #286); border-color: #5c5; animation: pulse 0.5s; }
-  .option-btn.wrong { background: linear-gradient(180deg, #a44, #822); border-color: #c55; }
-  .option-btn.disabled { opacity: 0.4; pointer-events: none; }
-  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
-  .feedback { font-size: 18px; min-height: 28px; margin-top: 12px; font-weight: bold; }
-  .feedback.good { color: #5c5; }
-  .feedback.bad { color: #c55; }
-  .key-hint { font-size: 11px; color: #666; margin-top: 4px; }
-  #winnerScreen { background: rgba(0,0,0,0.95); }
-  .winner-text { font-size: clamp(32px, 7vw, 56px); margin: 10px 0; }
-  .winner-text.win { color: #ffdd55; text-shadow: 0 0 30px rgba(255, 221, 85, 0.6); }
-  .winner-text.lose { color: #88ddff; text-shadow: 0 0 30px rgba(136, 221, 255, 0.5); }
-  .winner-text.tie { color: #ff88dd; }
-  .final-scores { display: flex; gap: 30px; margin: 20px 0; font-size: 24px; }
-  .final-score { padding: 12px 20px; border-radius: 10px; background: rgba(255,255,255,0.05); }
-  #status { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 6px 12px; border-radius: 6px; font-size: 12px; z-index: 7; display: none; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Duelo Matemático 2 Jugadores</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh}
+    .card{background:#111827;padding:24px;border-radius:16px;max-width:720px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{text-align:center;margin-top:0}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .player{flex:1;min-width:260px;background:#1f2937;padding:16px;border-radius:12px}
+    button,input{font-size:16px;border:none;border-radius:10px;padding:12px}
+    input{width:calc(100% - 24px);margin:10px 0;background:#0b1220;color:#fff}
+    button{background:#38bdf8;color:#00111a;font-weight:bold;cursor:pointer}
+    button:hover{opacity:.92}
+    .q{font-size:20px;font-weight:bold;margin:12px 0}
+    .score{margin-top:10px}
+    .center{text-align:center;margin:16px 0}
+    .hidden{display:none}
+  </style>
 </head>
 <body>
-<div id="app">
-  <div id="menu" class="screen active">
-    <h1>🧮 MATH DUEL</h1>
-    <h2>2 Jugadores · Competencia Matemática</h2>
-    <div class="row">
-      <button id="btnCreate">🎮 Crear Duelo</button>
-      <button id="btnJoin" class="secondary">🔗 Unirse con Código</button>
+  <div class="card">
+    <h1>Duelo Matemático</h1>
+    <p class="center">Responde una pregunta por turno. El primer jugador en llegar a 5 puntos gana.</p>
+    <div class="center">
+      <button onclick="startGame()">Empezar</button>
+      <button onclick="resetGame()">Reiniciar</button>
     </div>
-    <p class="small">Gana el primero en responder bien. 10 rondas, suma más puntos y vences.</p>
-  </div>
-  <div id="lobby" class="screen">
-    <h1 id="lobbyTitle">Esperando...</h1>
-    <div id="lobbyContent"></div>
-  </div>
-  <div id="gameScreen" class="screen">
-    <div class="scoreboard">
-      <div class="player-score me" id="myScore">
-        <div class="player-name">Tú</div>
-        <div class="player-points" id="myPoints">0</div>
-        <div class="round-info">Ronda <span id="roundNum">1</span>/10</div>
+
+    <div id="game" class="hidden">
+      <div class="row">
+        <div class="player">
+          <h2>Jugador 1</h2>
+          <div id="q1" class="q"></div>
+          <input id="a1" type="number" placeholder="Tu respuesta" />
+          <button onclick="checkAnswer(1)">Responder</button>
+          <div class="score">Puntos: <span id="s1">0</span></div>
+        </div>
+
+        <div class="player">
+          <h2>Jugador 2</h2>
+          <div id="q2" class="q"></div>
+          <input id="a2" type="number" placeholder="Tu respuesta" />
+          <button onclick="checkAnswer(2)">Responder</button>
+          <div class="score">Puntos: <span id="s2">0</span></div>
+        </div>
       </div>
-      <div class="player-score peer" id="peerScore">
-        <div class="player-name">Rival</div>
-        <div class="player-points" id="peerPoints">0</div>
-        <div class="round-info" id="peerStatus">Esperando...</div>
-      </div>
-    </div>
-    <div class="question-area">
-      <div class="question-emoji" id="qEmoji">🧠</div>
-      <div class="question-text" id="qText">Cargando pregunta...</div>
-      <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
-      <div class="options" id="options"></div>
-      <div class="feedback" id="feedback">&nbsp;</div>
-      <div class="key-hint">PC: teclas 1-4 · Cel: toca la opción</div>
-    </div>
-    <div style="height: 20px;"></div>
-  </div>
-  <div id="winnerScreen" class="screen">
-    <h1 class="winner-text" id="winnerTitle">🏆</h1>
-    <div class="final-scores">
-      <div class="final-score"><div style="font-size:12px;color:#aaa">Tú</div><div id="finalMy">0</div></div>
-      <div class="final-score"><div style="font-size:12px;color:#aaa">Rival</div><div id="finalPeer">0</div></div>
-    </div>
-    <div class="row">
-      <button id="btnRematch">🔄 Revancha</button>
-      <button id="btnMenu" class="secondary">🏠 Menú</button>
+
+      <div class="center"><div id="msg"></div></div>
     </div>
   </div>
-  <div id="status"></div>
-</div>
-<script>
-// ===== Generador de preguntas =====
-const QUESTION_TYPES = ['add', 'sub', 'mul', 'div', 'pow', 'sqrt', 'percent', 'fraction', 'equation'];
 
-function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  <script>
+    let score1 = 0, score2 = 0;
+    let current1 = 0, current2 = 0;
+    const ops = ['+', '-', '*'];
 
-function makeOptions(correct) {
-  const opts = new Set([correct]);
-  while (opts.size < 4) {
-    const delta = rand(1, Math.max(3, Math.abs(correct) / 2 || 5));
-    const variant = Math.random() < 0.5 ? correct + delta : correct - delta;
-    if (variant !== correct && variant !== 0) opts.add(variant);
-  }
-  return shuffle([...opts]);
-}
+    function randInt(min, max){
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-function genQuestion() {
-  const type = QUESTION_TYPES[Math.floor(Math.random() * QUESTION_TYPES.length)];
-  let q, a, emoji;
-  switch (type) {
-    case 'add': {
-      const x = rand(50, 999), y = rand(50, 999);
-      q = x + ' + ' + y;
-      a = x + y;
-      emoji = '➕';
-      break;
-    }
-    case 'sub': {
-      const x = rand(500, 999), y = rand(50, 499);
-      q = x + ' − ' + y;
-      a = x - y;
-      emoji = '➖';
-      break;
-    }
-    case 'mul': {
-      const x = rand(11, 99), y = rand(2, 25);
-      q = x + ' × ' + y;
-      a = x * y;
-      emoji = '✖️';
-      break;
-    }
-    case 'div': {
-      const y = rand(2, 12);
-      const result = rand(5, 50);
-      const x = y * result;
-      q = x + ' ÷ ' + y;
-      a = result;
-      emoji = '➗';
-      break;
-    }
-    case 'pow': {
-      const exp = rand(2, 5);
-      const base = rand(2, 12);
-      q = base + ' ^ ' + exp;
-      a = Math.pow(base, exp);
-      emoji = '🔢';
-      break;
-    }
-    case 'sqrt': {
-      const n = rand(2, 12);
-      const v = n * n;
-      q = '√' + v;
-      a = n;
-      emoji = '√';
-      break;
-    }
-    case 'percent': {
-      const base = rand(50, 500);
-      const pct = [10, 20, 25, 30, 50, 75][rand(0, 5)];
-      q = pct + '% de ' + base;
-      a = Math.round(base * pct / 100);
-      emoji = '💯';
-      break;
-    }
-    case 'fraction': {
-      const d = rand(2, 9);
-      const n = rand(1, d - 1);
-      const mult = rand(2, 6);
-      q = n + '/' + d + ' de ' + (d * mult);
-      a = n * mult;
-      emoji = '½';
-      break;
-    }
-    case 'equation': {
-      // ax + b = c => x = (c - b) / a
-      const a2 = rand(2, 9);
-      const x = rand(2, 12);
-      const b = rand(1, 20);
-      const c = a2 * x + b;
-      q = a2 + 'x + ' + b + ' = ' + c;
-      a = x;
-      emoji = '❓';
-      break;
-    }
-  }
-  return { q, a, options: makeOptions(a), emoji };
-}
+    function makeQuestion(){
+      const op = ops[randInt(0, ops.length - 1)];
+      let a = randInt(1, 12), b = randInt(1, 12), answer = 0;
 
-// ===== Estado =====
-let peer = null, conn = null, isHost = false, myId = null, roomCode = null;
-let myScore = 0, peerScore = 0;
-let currentRound = 0;
-const TOTAL_ROUNDS = 10;
-let roundActive = false;
-let myAnswered = false, peerAnswered = false;
-let timerInterval = null;
-let timeLeft = 0;
-const ROUND_TIME = 10; // segundos
-let currentQuestion = null;
-let me = 'A', peer = 'B';
-let lastReceivedQuestion = null;
-
-const $ = (id) => document.getElementById(id);
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); }
-function status(msg, ms) { const el = $('status'); el.textContent = msg; el.style.display = 'block'; clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', ms || 2000); }
-function genCode() { const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random()*chars.length)]; return s; }
-
-const PEER_PREFIX = 'zs-';
-const PEER_CONFIG = { host: '0.peerjs.com', port: 443, secure: true, debug: 1 };
-
-function initPeer(myFixedId) {
-  return new Promise((resolve, reject) => {
-    const p = myFixedId ? new Peer(myFixedId, PEER_CONFIG) : new Peer(PEER_CONFIG);
-    p.on('open', (id) => resolve(p));
-    p.on('error', (err) => {
-      console.error('Peer error:', err);
-      if (['unavailable-id', 'network', 'server-error', 'socket-error', 'socket-closed'].includes(err.type)) {
-        reject(Object.assign(err, { retry: true })); return;
+      if(op === '+') answer = a + b;
+      if(op === '-') {
+        if(b > a) [a, b] = [b, a];
+        answer = a - b;
       }
-      reject(err);
-    });
-  });
-}
+      if(op === '*') answer = a * b;
 
-async function createRoom() {
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const code = genCode();
-    try { peer = await initPeer(PEER_PREFIX + code); roomCode = code; isHost = true; return; }
-    catch (e) { if (e.retry && attempt < 7) continue; throw e; }
-  }
-  throw new Error('No se pudo generar código. Intenta de nuevo.');
-}
+      return { text: `${a} ${op} ${b} = ?`, answer };
+    }
 
-function joinRoom(code) {
-  const targetId = PEER_PREFIX + code;
-  return new Promise((resolve, reject) => {
-    initPeer().then(p => {
-      peer = p;
-      const c = peer.connect(targetId, { reliable: true });
-      let done = false;
-      const timeout = setTimeout(() => { if (done) return; done = true; try { c.close(); } catch (e) {} reject(new Error('No se encontró la partida.')); }, 12000);
-      c.on('open', () => { if (done) return; done = true; clearTimeout(timeout); conn = c; isHost = false; resolve(); });
-      c.on('error', (err) => { if (done) return; done = true; clearTimeout(timeout); reject(err); });
-    }).catch(reject);
-  });
-}
+    function updateUI(){
+      document.getElementById('s1').textContent = score1;
+      document.getElementById('s2').textContent = score2;
+      document.getElementById('q1').textContent = current1.text;
+      document.getElementById('q2').textContent = current2.text;
+    }
 
-// ===== UI handlers =====
-$('btnCreate').onclick = async () => {
-  $('btnCreate').disabled = true; $('btnJoin').disabled = true;
-  $('lobbyTitle').textContent = '🎮 Creando duelo...';
-  $('lobbyContent').innerHTML = '<p>Reservando código...</p>';
-  showScreen('lobby');
-  try {
-    await createRoom();
-    $('lobbyTitle').textContent = '⚔️ DUELO CREADO';
-    $('lobbyContent').innerHTML = '<p>Comparte este código con tu rival:</p><div class="code-display">' + roomCode + '</div><button id="btnCopyCode" class="secondary">📋 Copiar</button><p style="margin-top:18px">Esperando rival...</p>';
-    $('btnCopyCode').onclick = () => { try { navigator.clipboard.writeText(roomCode); } catch (e) {} $('btnCopyCode').textContent = '✅ Copiado'; setTimeout(() => $('btnCopyCode').textContent = '📋 Copiar', 1500); };
-    status('', 0);
-    peer.on('connection', (c) => { conn = c; setupConn(); });
-  } catch (e) {
-    alert('Error: ' + e.message);
-    $('btnCreate').disabled = false; $('btnJoin').disabled = false;
-    showScreen('menu');
-  }
-};
+    function startGame(){
+      document.getElementById('game').classList.remove('hidden');
+      resetGame();
+    }
 
-$('btnJoin').onclick = () => {
-  const hashCode = location.hash.replace('#', '').toUpperCase();
-  $('lobbyContent').innerHTML = '<p>Escribe el código del duelo:</p><input id="codeInput" maxlength="5" placeholder="ABCDE" autocomplete="off" value="' + hashCode + '" /><button id="btnConnect">🔗 Conectar</button><button class="secondary" id="btnBack">← Volver</button>';
-  $('lobbyTitle').textContent = '🔗 UNIRSE';
-  showScreen('lobby');
-  setTimeout(() => { $('codeInput').focus(); if (hashCode.length === 5) doJoin(); }, 100);
-  $('btnConnect').onclick = doJoin;
-  $('btnBack').onclick = () => showScreen('menu');
-  $('codeInput').onkeypress = (e) => { if (e.key === 'Enter') doJoin(); };
-};
+    function resetGame(){
+      score1 = 0;
+      score2 = 0;
+      current1 = makeQuestion();
+      current2 = makeQuestion();
+      document.getElementById('a1').value = '';
+      document.getElementById('a2').value = '';
+      document.getElementById('msg').textContent = '¡Listo!';
+      updateUI();
+    }
 
-async function doJoin() {
-  const code = $('codeInput').value.trim().toUpperCase();
-  if (code.length !== 5) { alert('Código de 5 letras/números'); return; }
-  $('btnConnect').disabled = true;
-  $('lobbyTitle').textContent = '🔗 Conectando...';
-  $('lobbyContent').innerHTML = '<p>Buscando duelo <span id="dots">.</span></p>';
-  let n = 1;
-  const dotTimer = setInterval(() => { n = (n % 3) + 1; const d = $('dots'); if (d) d.textContent = '.'.repeat(n); }, 400);
-  try {
-    await joinRoom(code);
-    clearInterval(dotTimer);
-    status('¡Conectado!', 2000);
-    startGame();
-  } catch (e) {
-    clearInterval(dotTimer);
-    alert('❌ ' + e.message);
-    $('btnJoin').click();
-  }
-}
+    function checkAnswer(player){
+      const input = document.getElementById(player === 1 ? 'a1' : 'a2');
+      const val = Number(input.value);
+      const current = player === 1 ? current1 : current2;
 
-function setupConn() {
-  conn.on('open', () => { status('¡Conectado!', 2000); startGame(); });
-  conn.on('data', (data) => {
-    if (data.type === 'hello') {} // handshake opcional
-    else if (data.type === 'answer') { handlePeerAnswer(data); }
-    else if (data.type === 'round') { receiveRound(data); }
-    else if (data.type === 'sync') { receiveSync(data); }
-    else if (data.type === 'rematch') { myScore = 0; peerScore = 0; currentRound = 0; startGame(); }
-  });
-  conn.on('close', () => {
-    alert('El rival se desconectó.');
-    showScreen('menu');
-    $('btnCreate').disabled = false; $('btnJoin').disabled = false;
-  });
-}
+      if(val === current.answer){
+        if(player === 1) score1++;
+        else score2++;
+        document.getElementById('msg').textContent = `Jugador ${player} acertó.`;
+      } else {
+        document.getElementById('msg').textContent = `Jugador ${player} falló. La respuesta era ${current.answer}.`;
+      }
 
-function startGame() {
-  myScore = 0; peerScore = 0; currentRound = 0;
-  $('myPoints').textContent = '0';
-  $('peerPoints').textContent = '0';
-  showScreen('gameScreen');
-  nextRound();
-}
+      if(player === 1) current1 = makeQuestion();
+      else current2 = makeQuestion();
 
-function nextRound() {
-  currentRound++;
-  if (currentRound > TOTAL_ROUNDS) { endGame(); return; }
-  $('roundNum').textContent = currentRound;
-  $('feedback').innerHTML = '&nbsp;';
-  $('feedback').className = 'feedback';
-  $('myScore').className = 'player-score me';
-  $('peerScore').className = 'player-score peer';
-  $('peerStatus').textContent = 'Esperando...';
+      input.value = '';
+      updateUI();
 
-  const q = genQuestion();
-  currentQuestion = q;
-  $('qEmoji').textContent = q.emoji;
-  $('qText').textContent = q.q + ' = ?';
-  const optsEl = $('options');
-  optsEl.innerHTML = '';
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn';
-    btn.textContent = opt;
-    btn.dataset.value = opt;
-    btn.dataset.idx = i;
-    btn.onclick = () => answer(opt, btn);
-    optsEl.appendChild(btn);
-  });
-
-  // Enviar al peer
-  try { conn.send({ type: 'round', q: q.q, a: q.a, options: q.options, emoji: q.emoji, round: currentRound }); } catch (e) {}
-
-  startTimer();
-}
-
-function startTimer() {
-  roundActive = true; myAnswered = false; peerAnswered = false;
-  timeLeft = ROUND_TIME;
-  $('timerFill').style.width = '100%';
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timeLeft -= 0.1;
-    $('timerFill').style.width = Math.max(0, (timeLeft / ROUND_TIME) * 100) + '%';
-    if (timeLeft <= 0) { clearInterval(timerInterval); endRound(null, null, true); }
-  }, 100);
-}
-
-function receiveRound(data) {
-  // Si soy host, ignoro; si soy peer, esto es mi pregunta
-  if (isHost) return; // host ya la generó, ignora
-  currentQuestion = { q: data.q, a: data.a, options: data.options, emoji: data.emoji };
-  currentRound = data.round;
-  $('roundNum').textContent = currentRound;
-  $('feedback').innerHTML = '&nbsp;';
-  $('feedback').className = 'feedback';
-  $('myScore').className = 'player-score me';
-  $('peerScore').className = 'player-score peer';
-  $('peerStatus').textContent = 'Pensando...';
-  $('qEmoji').textContent = data.emoji;
-  $('qText').textContent = data.q + ' = ?';
-  const optsEl = $('options');
-  optsEl.innerHTML = '';
-  data.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn';
-    btn.textContent = opt;
-    btn.dataset.value = opt;
-    btn.onclick = () => answer(opt, btn);
-    optsEl.appendChild(btn);
-  });
-  startTimer();
-}
-
-function answer(value, btnEl) {
-  if (!roundActive || myAnswered) return;
-  myAnswered = true;
-  clearInterval(timerInterval);
-  const correct = value === currentQuestion.a;
-  // Marcar UI
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.classList.add('disabled');
-    if (parseInt(b.dataset.value) === currentQuestion.a) b.classList.add('correct');
-  });
-  if (correct) {
-    btnEl.classList.add('correct');
-    myScore += 100;
-    $('myPoints').textContent = myScore;
-    $('myScore').classList.add('correct');
-    $('feedback').textContent = '✅ ¡Correcto! +100';
-    $('feedback').className = 'feedback good';
-  } else {
-    btnEl.classList.add('wrong');
-    myScore = Math.max(0, myScore - 25);
-    $('myPoints').textContent = myScore;
-    $('myScore').classList.add('wrong');
-    $('feedback').textContent = '❌ Incorrecto. -25';
-    $('feedback').className = 'feedback bad';
-  }
-  try { conn.send({ type: 'answer', correct, value }); } catch (e) {}
-  $('peerStatus').textContent = 'Esperando...';
-  if (peerAnswered) setTimeout(() => nextRound(), 1500);
-  else setTimeout(() => { if (peerAnswered) nextRound(); }, 1500);
-}
-
-function handlePeerAnswer(data) {
-  peerAnswered = true;
-  if (data.correct) {
-    peerScore += 100;
-    $('peerStatus').textContent = '✅ Acertó';
-    $('peerScore').classList.add('correct');
-  } else {
-    peerScore = Math.max(0, peerScore - 25);
-    $('peerStatus').textContent = '❌ Falló';
-    $('peerScore').classList.add('wrong');
-  }
-  $('peerPoints').textContent = peerScore;
-  // Si el peer responde primero pero el local no, también procesamos el resultado
-  if (!myAnswered && data.correct) {
-    // Mostrar feedback
-    $('feedback').textContent = '⚠️ El rival acertó primero. Responde rápido.';
-    $('feedback').className = 'feedback bad';
-  }
-  if (myAnswered) setTimeout(() => nextRound(), 1500);
-}
-
-function endRound(myAns, peerAns, byTimeout) {
-  // ya manejado en answer/handlePeerAnswer, si timeout
-  if (byTimeout && !myAnswered) {
-    myAnswered = true;
-    document.querySelectorAll('.option-btn').forEach(b => {
-      b.classList.add('disabled');
-      if (parseInt(b.dataset.value) === currentQuestion.a) b.classList.add('correct');
-    });
-    $('feedback').textContent = '⏱️ Tiempo agotado';
-    $('feedback').className = 'feedback bad';
-  }
-  setTimeout(() => nextRound(), 1500);
-}
-
-function endGame() {
-  clearInterval(timerInterval);
-  $('finalMy').textContent = myScore;
-  $('finalPeer').textContent = peerScore;
-  const wEl = $('winnerTitle');
-  if (myScore > peerScore) {
-    wEl.textContent = '🏆 ¡VICTORIA!';
-    wEl.className = 'winner-text win';
-  } else if (myScore < peerScore) {
-    wEl.textContent = '😢 Derrota';
-    wEl.className = 'winner-text lose';
-  } else {
-    wEl.textContent = '🤝 Empate';
-    wEl.className = 'winner-text tie';
-  }
-  showScreen('winnerScreen');
-}
-
-$('btnRematch').onclick = () => {
-  try { conn.send({ type: 'rematch' }); } catch (e) {}
-  startGame();
-};
-$('btnMenu').onclick = () => location.reload();
-
-// ===== Teclas 1-4 en PC =====
-window.addEventListener('keydown', (e) => {
-  if (!$('gameScreen').classList.contains('active')) return;
-  if (['1', '2', '3', '4'].includes(e.key)) {
-    const idx = parseInt(e.key) - 1;
-    const btns = document.querySelectorAll('.option-btn');
-    if (btns[idx] && !myAnswered) btns[idx].click();
-  }
-});
-</script>
+      if(score1 >= 5) document.getElementById('msg').textContent = 'Jugador 1 ganó la competencia.';
+      if(score2 >= 5) document.getElementById('msg').textContent = 'Jugador 2 ganó la competencia.';
+    }
+  </script>
 </body>
 </html>
