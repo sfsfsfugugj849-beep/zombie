@@ -8,148 +8,56 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
-  html, body {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    background: #0a0a0a; color: #e8e8e8;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    overflow: hidden; touch-action: none;
-  }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #0a0a0a; color: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; touch-action: none; }
   #app { position: relative; width: 100%; height: 100%; }
-
-  .screen {
-    position: absolute; inset: 0;
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    padding: 20px; text-align: center; z-index: 10;
-    background: radial-gradient(ellipse at center, #1a0f0f 0%, #050505 100%);
-  }
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; z-index: 10; background: radial-gradient(ellipse at center, #1a0f0f 0%, #050505 100%); }
   .screen.active { display: flex; }
   h1 { font-size: clamp(28px, 6vw, 48px); color: #ff4040; text-shadow: 0 0 20px #ff2020; margin: 0 0 8px; letter-spacing: 2px; }
   h2 { color: #ffaa55; margin: 0 0 20px; font-weight: 500; }
   p { color: #aaa; margin: 6px 0; font-size: 14px; }
   .small { font-size: 12px; color: #777; margin-top: 20px; }
-  input {
-    background: #1a1a1a; border: 2px solid #ff4040; color: #fff;
-    padding: 12px 20px; font-size: 18px; border-radius: 8px;
-    width: 100%; max-width: 320px; text-align: center;
-    text-transform: uppercase; letter-spacing: 3px; margin: 8px 0;
-    font-family: monospace;
-  }
+  input { background: #1a1a1a; border: 2px solid #ff4040; color: #fff; padding: 12px 20px; font-size: 18px; border-radius: 8px; width: 100%; max-width: 320px; text-align: center; text-transform: uppercase; letter-spacing: 3px; margin: 8px 0; font-family: monospace; }
   input:focus { outline: none; box-shadow: 0 0 15px #ff404080; }
-  button {
-    background: linear-gradient(180deg, #d83030, #a02020);
-    color: white; border: none; padding: 14px 32px;
-    font-size: 16px; font-weight: bold; border-radius: 8px;
-    cursor: pointer; margin: 8px; min-width: 200px;
-    text-transform: uppercase; letter-spacing: 1px;
-    box-shadow: 0 4px 0 #601010, 0 6px 10px rgba(0,0,0,0.5);
-    transition: transform 0.05s, box-shadow 0.05s;
-  }
+  button { background: linear-gradient(180deg, #d83030, #a02020); color: white; border: none; padding: 14px 32px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; margin: 8px; min-width: 200px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 0 #601010, 0 6px 10px rgba(0,0,0,0.5); transition: transform 0.05s, box-shadow 0.05s; }
   button:active { transform: translateY(2px); box-shadow: 0 2px 0 #601010, 0 3px 5px rgba(0,0,0,0.5); }
   button.secondary { background: linear-gradient(180deg, #444, #222); box-shadow: 0 4px 0 #111, 0 6px 10px rgba(0,0,0,0.5); }
   button:disabled { opacity: 0.5; cursor: not-allowed; }
-
   .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .code-display {
-    font-family: monospace; font-size: 36px; color: #ffdd55;
-    background: #000; padding: 16px 24px; border-radius: 8px;
-    border: 2px dashed #ffaa55; letter-spacing: 8px; margin: 12px 0;
-  }
-
+  .code-display { font-family: monospace; font-size: 36px; color: #ffdd55; background: #000; padding: 16px 24px; border-radius: 8px; border: 2px dashed #ffaa55; letter-spacing: 8px; margin: 12px 0; }
   #classSelect { gap: 12px; }
-  .class-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-    max-width: 500px; width: 100%; max-height: 60vh; overflow-y: auto;
-    padding: 10px;
-  }
+  .class-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 500px; width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px; }
   @media (min-width: 600px) { .class-grid { grid-template-columns: repeat(3, 1fr); max-width: 700px; } }
-  .class-card {
-    background: #1a1a1a; border: 2px solid #333; border-radius: 10px;
-    padding: 12px; cursor: pointer; transition: all 0.15s;
-    text-align: left; min-height: 90px;
-  }
+  .class-card { background: #1a1a1a; border: 2px solid #333; border-radius: 10px; padding: 12px; cursor: pointer; transition: all 0.15s; text-align: left; min-height: 90px; }
   .class-card:hover { border-color: #ff8040; transform: translateY(-2px); }
   .class-card.selected { border-color: #ffdd55; background: #2a2010; box-shadow: 0 0 20px #ffaa5550; }
   .class-card .name { font-weight: bold; color: #ffdd55; font-size: 14px; }
   .class-card .emoji { font-size: 28px; float: right; }
   .class-card .desc { color: #aaa; font-size: 11px; margin-top: 4px; line-height: 1.3; }
   .class-card .ability { color: #88ddff; font-size: 10px; margin-top: 4px; font-style: italic; }
-
   #gameScreen { padding: 0; background: #000; }
   canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-  #hud {
-    position: absolute; top: 0; left: 0; right: 0;
-    padding: 10px 14px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.85), transparent);
-    display: flex; justify-content: space-between; align-items: center;
-    pointer-events: none; z-index: 5; font-size: 14px;
-  }
+  #hud { position: absolute; top: 0; left: 0; right: 0; padding: 10px 14px; background: linear-gradient(180deg, rgba(0,0,0,0.85), transparent); display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 5; font-size: 14px; }
   .hud-item { display: flex; align-items: center; gap: 6px; }
   .bar { width: 120px; height: 12px; background: #333; border-radius: 6px; overflow: hidden; border: 1px solid #555; }
   .bar-fill { height: 100%; transition: width 0.2s; }
   .hp-fill { background: linear-gradient(90deg, #ff3030, #ff6060); }
   .ability-fill { background: linear-gradient(90deg, #4080ff, #80c0ff); }
   .ability-ready { background: linear-gradient(90deg, #ffdd55, #fff8aa); }
-
-  #mobileControls {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    display: none; padding: 14px; z-index: 6;
-    pointer-events: none;
-  }
-  #mobileControls .ctrl-btn {
-    pointer-events: auto;
-    background: rgba(255,255,255,0.15);
-    border: 2px solid rgba(255,255,255,0.4);
-    color: white; border-radius: 50%;
-    width: 64px; height: 64px;
-    font-size: 24px; display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
-  }
+  #mobileControls { position: absolute; bottom: 0; left: 0; right: 0; display: none; padding: 14px; z-index: 6; pointer-events: none; }
+  #mobileControls .ctrl-btn { pointer-events: auto; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.4); color: white; border-radius: 50%; width: 64px; height: 64px; font-size: 24px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .ctrl-btn:active { background: rgba(255,255,255,0.4); }
-  #joystick {
-    position: absolute; bottom: 20px; left: 20px;
-    width: 130px; height: 130px;
-    background: rgba(255,255,255,0.1);
-    border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    pointer-events: auto;
-  }
-  #joystickKnob {
-    width: 50px; height: 50px;
-    background: rgba(255,255,255,0.4);
-    border-radius: 50%;
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-  #btnAttack {
-    position: absolute; bottom: 30px; right: 30px;
-    width: 80px; height: 80px;
-    background: rgba(255, 60, 60, 0.7);
-    border: 3px solid rgba(255, 120, 120, 0.9);
-    color: white; border-radius: 50%;
-    font-size: 14px; font-weight: bold;
-    pointer-events: auto;
-  }
-  #btnAbility {
-    position: absolute; bottom: 120px; right: 35px;
-    width: 64px; height: 64px;
-    background: rgba(80, 160, 255, 0.6);
-    border: 2px solid rgba(150, 200, 255, 0.8);
-    color: white; border-radius: 50%;
-    font-size: 11px; font-weight: bold;
-    pointer-events: auto;
-  }
-
+  #joystick { position: absolute; bottom: 20px; left: 20px; width: 130px; height: 130px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; pointer-events: auto; }
+  #joystickKnob { width: 50px; height: 50px; background: rgba(255,255,255,0.4); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+  #btnAttack { position: absolute; bottom: 30px; right: 30px; width: 80px; height: 80px; background: rgba(255, 60, 60, 0.7); border: 3px solid rgba(255, 120, 120, 0.9); color: white; border-radius: 50%; font-size: 14px; font-weight: bold; pointer-events: auto; }
+  #btnAbility { position: absolute; bottom: 120px; right: 35px; width: 64px; height: 64px; background: rgba(80, 160, 255, 0.6); border: 2px solid rgba(150, 200, 255, 0.8); color: white; border-radius: 50%; font-size: 11px; font-weight: bold; pointer-events: auto; }
   #gameOver { background: rgba(0,0,0,0.95); }
   .big-text { font-size: clamp(36px, 8vw, 64px); color: #ff3030; text-shadow: 0 0 30px #ff0000; margin: 0; }
   .winner { color: #ffdd55; }
-
   #status { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 6px 12px; border-radius: 6px; font-size: 12px; z-index: 7; display: none; }
 </style>
 </head>
 <body>
 <div id="app">
-
   <div id="menu" class="screen active">
     <h1>🧟 ZOMBIE SURVIVAL</h1>
     <h2>2 Jugadores · Cross-Device</h2>
@@ -159,36 +67,23 @@
     </div>
     <p class="small">Un jugador crea, el otro mete el código. Funciona entre distintos países.</p>
   </div>
-
   <div id="lobby" class="screen">
     <h1 id="lobbyTitle">Esperando...</h1>
     <div id="lobbyContent"></div>
   </div>
-
   <div id="classSelect" class="screen">
     <h1>ELIGE TU CLASE</h1>
     <h2 id="playerLabel">Jugador 1</h2>
     <div class="class-grid" id="classGrid"></div>
     <button id="btnReady" disabled>✅ Listo</button>
-    <p class="small" id="classHint">Esperando al otro jugador...</p>
+    <p class="small" id="classHint">Elige tu clase</p>
   </div>
-
   <div id="gameScreen" class="screen">
     <canvas id="canvas"></canvas>
     <div id="hud">
-      <div class="hud-item">
-        <span>❤️</span>
-        <div class="bar"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div>
-        <span id="hpText">100</span>
-      </div>
-      <div class="hud-item">
-        <span id="abilityIcon">⚡</span>
-        <div class="bar"><div class="bar-fill ability-fill" id="abilityBar" style="width:100%"></div></div>
-      </div>
-      <div class="hud-item">
-        <span>🧟</span><span id="waveText">1</span>
-        <span style="margin-left:10px">⭐</span><span id="scoreText">0</span>
-      </div>
+      <div class="hud-item"><span>❤️</span><div class="bar"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div><span id="hpText">100</span></div>
+      <div class="hud-item"><span id="abilityIcon">⚡</span><div class="bar"><div class="bar-fill ability-fill" id="abilityBar" style="width:100%"></div></div></div>
+      <div class="hud-item"><span>🧟</span><span id="waveText">1</span><span style="margin-left:10px">⭐</span><span id="scoreText">0</span></div>
     </div>
     <div id="mobileControls">
       <div id="joystick"><div id="joystickKnob"></div></div>
@@ -197,7 +92,6 @@
     </div>
     <div id="status"></div>
   </div>
-
   <div id="gameOver" class="screen">
     <h1 class="big-text" id="gameOverText">GAME OVER</h1>
     <h2 id="gameOverSub" class="winner"></h2>
@@ -206,42 +100,30 @@
       <button id="btnMenu" class="secondary">🏠 Menú</button>
     </div>
   </div>
-
 </div>
-
 <script>
 const CLASSES = [
-  { id: 'soldier',  name: 'Soldado',    emoji: '🎖️', color: '#88aa66', desc: 'Equilibrado, confiable.', ability: 'Granada: AoE damage + empuje', cd: 8 },
+  { id: 'soldier', name: 'Soldado', emoji: '🎖️', color: '#88aa66', desc: 'Equilibrado, confiable.', ability: 'Granada: AoE damage + empuje', cd: 8 },
   { id: 'necromancer', name: 'Necromante', emoji: '💀', color: '#aa55ff', desc: 'Revive zombies como aliados.', ability: 'Drenar vida de un zombie', cd: 6 },
-  { id: 'ice',      name: 'Hielo',      emoji: '❄️', color: '#55ddff', desc: 'Congela enemigos y crea muros.', ability: 'Rayo de hielo: congela varios', cd: 7 },
-  { id: 'fire',     name: 'Fuego',      emoji: '🔥', color: '#ff6633', desc: 'Quema en área, daña con el tiempo.', ability: 'Llamarada AoE', cd: 8 },
-  { id: 'medic',    name: 'Médico',     emoji: '💊', color: '#ff66aa', desc: 'Cura aliados y a sí misma.', ability: 'Curar aliado cercano', cd: 5 },
-  { id: 'sniper',   name: 'Francotirador', emoji: '🎯', color: '#cccc88', desc: 'Daño alto a distancia, lenta.', ability: 'Tiro certero: atraviesa', cd: 4 },
-  { id: 'engineer', name: 'Ingeniera',  emoji: '🔧', color: '#ffaa55', desc: 'Coloca torretas automáticas.', ability: 'Torreta: dispara sola', cd: 10 },
-  { id: 'shadow',   name: 'Sombra',     emoji: '🌑', color: '#6666aa', desc: 'Se vuelve invisible y letal.', ability: 'Furtividad: invisibilidad', cd: 8 },
-  { id: 'brawler',  name: 'Luchadora',  emoji: '👊', color: '#ff4444', desc: 'Daño melee brutal, poca vida.', ability: 'Ira: doble daño por 3s', cd: 7 },
-  { id: 'electric', name: 'Eléctrica',  emoji: '⚡', color: '#ffdd44', desc: 'Cadenas eléctricas entre zombies.', ability: 'Descarga: salta entre enemigos', cd: 6 },
+  { id: 'ice', name: 'Hielo', emoji: '❄️', color: '#55ddff', desc: 'Congela enemigos.', ability: 'Rayo de hielo: congela varios', cd: 7 },
+  { id: 'fire', name: 'Fuego', emoji: '🔥', color: '#ff6633', desc: 'Quema en área, daña con el tiempo.', ability: 'Llamarada AoE', cd: 8 },
+  { id: 'medic', name: 'Médico', emoji: '💊', color: '#ff66aa', desc: 'Cura aliados y a sí misma.', ability: 'Curar aliado cercano', cd: 5 },
+  { id: 'sniper', name: 'Francotirador', emoji: '🎯', color: '#cccc88', desc: 'Daño alto a distancia, lenta.', ability: 'Tiro certero: atraviesa', cd: 4 },
+  { id: 'engineer', name: 'Ingeniera', emoji: '🔧', color: '#ffaa55', desc: 'Coloca torretas automáticas.', ability: 'Torreta: dispara sola', cd: 10 },
+  { id: 'shadow', name: 'Sombra', emoji: '🌑', color: '#6666aa', desc: 'Se vuelve invisible y letal.', ability: 'Furtividad: invisibilidad', cd: 8 },
+  { id: 'brawler', name: 'Luchadora', emoji: '👊', color: '#ff4444', desc: 'Daño melee brutal, poca vida.', ability: 'Ira: doble daño por 3s', cd: 7 },
+  { id: 'electric', name: 'Eléctrica', emoji: '⚡', color: '#ffdd44', desc: 'Cadenas eléctricas entre zombies.', ability: 'Descarga: salta entre enemigos', cd: 6 },
 ];
 
 let peer = null, conn = null, isHost = false, myId = null, roomCode = null;
 let myClass = null, peerClass = null, bothReady = false, game = null;
+let peerClassPending = false;
 const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent) || ('ontouchstart' in window);
 
 function $(id) { return document.getElementById(id); }
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  $(id).classList.add('active');
-}
-function status(msg, ms = 2000) {
-  const el = $('status');
-  el.textContent = msg; el.style.display = 'block';
-  clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', ms);
-}
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s = ''; for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random()*chars.length)];
-  return s;
-}
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); }
+function status(msg, ms) { const el = $('status'); el.textContent = msg; el.style.display = 'block'; clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', ms || 2000); }
+function genCode() { const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random()*chars.length)]; return s; }
 
 const PEER_PREFIX = 'zs-';
 const PEER_CONFIG = { host: '0.peerjs.com', port: 443, secure: true, debug: 1 };
@@ -263,10 +145,8 @@ function initPeer(myFixedId) {
 async function createRoom() {
   for (let attempt = 0; attempt < 8; attempt++) {
     const code = genCode();
-    try {
-      peer = await initPeer(PEER_PREFIX + code);
-      roomCode = code; isHost = true; return;
-    } catch (e) { if (e.retry && attempt < 7) continue; throw e; }
+    try { peer = await initPeer(PEER_PREFIX + code); roomCode = code; isHost = true; return; }
+    catch (e) { if (e.retry && attempt < 7) continue; throw e; }
   }
   throw new Error('No se pudo generar un código libre. Intenta de nuevo.');
 }
@@ -278,11 +158,7 @@ function joinRoom(code) {
       peer = p;
       const c = peer.connect(targetId, { reliable: true });
       let done = false;
-      const timeout = setTimeout(() => {
-        if (done) return; done = true;
-        try { c.close(); } catch {}
-        reject(new Error('No se encontró la partida. Verifica el código.'));
-      }, 12000);
+      const timeout = setTimeout(() => { if (done) return; done = true; try { c.close(); } catch (e) {} reject(new Error('No se encontró la partida. Verifica el código.')); }, 12000);
       c.on('open', () => { if (done) return; done = true; clearTimeout(timeout); conn = c; isHost = false; resolve(); });
       c.on('error', (err) => { if (done) return; done = true; clearTimeout(timeout); reject(err); });
     }).catch(reject);
@@ -297,21 +173,19 @@ $('btnCreate').onclick = async () => {
   try {
     await createRoom();
     $('lobbyTitle').textContent = '🎮 PARTIDA CREADA';
-    $('lobbyContent').innerHTML = `
-      <p>Comparte ESTE código con tu compañero:</p>
-      <div class="code-display" id="shareCode">${roomCode}</div>
-      <button id="btnCopyCode" class="secondary">📋 Copiar código</button>
-      <p style="margin-top:18px">Esperando conexión...</p>
-      <p class="small" style="font-size:12px">Tip: también puedes compartir este link:<br>
-        <span style="color:#88ddff;font-family:monospace;font-size:11px">${location.href.split('#')[0]}#${roomCode}</span>
-      </p>
-    `;
+    $('lobbyContent').innerHTML =
+      '<p>Comparte ESTE código con tu compañero:</p>' +
+      '<div class="code-display" id="shareCode">' + roomCode + '</div>' +
+      '<button id="btnCopyCode" class="secondary">📋 Copiar código</button>' +
+      '<p style="margin-top:18px">Esperando conexión...</p>' +
+      '<p class="small" style="font-size:12px">Tip: también puedes compartir este link:<br>' +
+      '<span style="color:#88ddff;font-family:monospace;font-size:11px">' + location.href.split('#')[0] + '#' + roomCode + '</span></p>';
     $('btnCopyCode').onclick = () => {
-      navigator.clipboard.writeText(roomCode);
+      try { navigator.clipboard.writeText(roomCode); } catch (e) {}
       $('btnCopyCode').textContent = '✅ ¡Copiado!';
       setTimeout(() => $('btnCopyCode').textContent = '📋 Copiar código', 1500);
     };
-    status('');
+    status('', 0);
     peer.on('connection', (c) => { conn = c; setupConn(); });
   } catch (e) {
     alert('Error: ' + e.message);
@@ -322,15 +196,14 @@ $('btnCreate').onclick = async () => {
 
 $('btnJoin').onclick = () => {
   const hashCode = location.hash.replace('#', '').toUpperCase();
-  $('lobbyContent').innerHTML = `
-    <p>Escribe el código de la partida:</p>
-    <input id="codeInput" maxlength="5" placeholder="ABCDE" autocomplete="off" value="${hashCode}" />
-    <button id="btnConnect">🔗 Conectar</button>
-    <button class="secondary" id="btnBack">← Volver</button>
-  `;
+  $('lobbyContent').innerHTML =
+    '<p>Escribe el código de la partida:</p>' +
+    '<input id="codeInput" maxlength="5" placeholder="ABCDE" autocomplete="off" value="' + hashCode + '" />' +
+    '<button id="btnConnect">🔗 Conectar</button>' +
+    '<button class="secondary" id="btnBack">← Volver</button>';
   $('lobbyTitle').textContent = '🔗 UNIRSE';
   showScreen('lobby');
-  setTimeout(() => { $('codeInput').focus(); if (hashCode.length === 5) $('btnConnect').click(); }, 100);
+  setTimeout(() => { $('codeInput').focus(); if (hashCode.length === 5) doJoin(); }, 100);
   $('btnConnect').onclick = doJoin;
   $('btnBack').onclick = () => showScreen('menu');
   $('codeInput').onkeypress = (e) => { if (e.key === 'Enter') doJoin(); };
@@ -357,10 +230,16 @@ async function doJoin() {
 }
 
 function setupConn() {
-  conn.on('open', () => { status('¡Conectado!', 2000); showClassSelect(); });
+  conn.on('open', () => {
+    status('¡Conectado!', 2000);
+    showClassSelect();
+    if (myClass) { try { conn.send({ type: 'class', class: myClass }); } catch (e) {} }
+    if (peerClassPending && peerClass) { peerClassPending = false; updateClassHint(); if (myClass) startGame(); }
+  });
   conn.on('data', (data) => {
-    if (data.type === 'class') { peerClass = data.class; updateClassHint(); if (myClass) startGame(); }
-    else if (data.type === 'restart') { myClass = null; peerClass = null; bothReady = false; showClassSelect(); }
+    if (data.type === 'hello') { if (myClass) { try { conn.send({ type: 'class', class: myClass }); } catch (e) {} } }
+    else if (data.type === 'class') { peerClass = data.class; peerClassPending = false; updateClassHint(); if (myClass) startGame(); }
+    else if (data.type === 'restart') { myClass = null; peerClass = null; bothReady = false; peerClassPending = false; showClassSelect(); }
     else if (data.type === 'input') { if (game) game.applyPeerInput(data); }
     else if (data.type === 'state') { if (game) game.applyPeerState(data); }
     else if (data.type === 'spawn') { if (game) game.applyPeerSpawn(data); }
@@ -369,6 +248,7 @@ function setupConn() {
     if (game) { game.end(true); }
     else { alert('El otro jugador se desconectó.'); showScreen('menu'); $('btnCreate').disabled = false; $('btnJoin').disabled = false; }
   });
+  try { conn.send({ type: 'hello' }); } catch (e) {}
 }
 
 function showClassSelect() {
@@ -377,29 +257,42 @@ function showClassSelect() {
   CLASSES.forEach(c => {
     const card = document.createElement('div');
     card.className = 'class-card';
-    card.innerHTML = `<div class="emoji">${c.emoji}</div><div class="name">${c.name}</div><div class="desc">${c.desc}</div><div class="ability">⚡ ${c.ability} (${c.cd}s CD)</div>`;
+    card.innerHTML = '<div class="emoji">' + c.emoji + '</div><div class="name">' + c.name + '</div><div class="desc">' + c.desc + '</div><div class="ability">⚡ ' + c.ability + ' (' + c.cd + 's CD)</div>';
     card.onclick = () => {
       document.querySelectorAll('.class-card').forEach(x => x.classList.remove('selected'));
-      card.classList.add('selected'); myClass = c; $('btnReady').disabled = false;
+      card.classList.add('selected');
+      myClass = c;
+      $('btnReady').disabled = false;
     };
     grid.appendChild(card);
   });
   $('btnReady').disabled = true;
-  $('classHint').textContent = 'Esperando al otro jugador...';
+  $('classHint').textContent = 'Elige tu clase';
   showScreen('classSelect');
 }
 
 $('btnReady').onclick = () => {
   if (!myClass) return;
   $('btnReady').disabled = true;
-  conn.send({ type: 'class', class: myClass });
   $('classHint').textContent = 'Esperando al otro jugador...';
+  let attempts = 0;
+  const trySend = () => {
+    if (!conn || !conn.open) {
+      if (attempts++ < 15) { setTimeout(trySend, 200); return; }
+      alert('Conexión inestable, intenta de nuevo.');
+      $('btnReady').disabled = false;
+      return;
+    }
+    try { conn.send({ type: 'class', class: myClass }); }
+    catch (e) { if (attempts++ < 15) setTimeout(trySend, 200); }
+  };
+  trySend();
   if (peerClass) startGame(); else updateClassHint();
 };
 
 function updateClassHint() {
   if (myClass && peerClass) startGame();
-  else if (myClass) $('classHint').textContent = 'Esperando al otro jugador...';
+  else if (myClass) $('classHint').textContent = peerClass ? 'Iniciando...' : 'Esperando al otro jugador...';
 }
 
 function startGame() {
@@ -416,10 +309,16 @@ class Game {
     this.canvas = $('canvas');
     this.ctx = this.canvas.getContext('2d');
     this.myClass = myClass; this.peerClass = peerClass; this.isHost = isHost;
-    this.keys = {}; this.joystick = { x: 0, y: 0, active: false };
-    this.entities = new Map(); this.inputSeq = 0; this.gameOver = false;
-    this.spawnTimer = 0; this.wave = 1; this.score = 0;
-    this.myId = 'me'; this.peerId = 'peer';
+    this.keys = {};
+    this.joystick = { x: 0, y: 0, active: false };
+    this.entities = new Map();
+    this.inputSeq = 0;
+    this.gameOver = false;
+    this.spawnTimer = 0;
+    this.wave = 1;
+    this.score = 0;
+    this.myId = 'me';
+    this.peerId = 'peer';
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
@@ -428,19 +327,20 @@ class Game {
     this.canvas.width = window.innerWidth * dpr;
     this.canvas.height = window.innerHeight * dpr;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.W = window.innerWidth; this.H = window.innerHeight;
+    this.W = window.innerWidth;
+    this.H = window.innerHeight;
   }
   start() {
     this.entities.set(this.myId, this.makePlayer(this.myId, this.myClass, this.W * 0.3, this.H * 0.5, true));
     this.entities.set(this.peerId, this.makePlayer(this.peerId, this.peerClass, this.W * 0.7, this.H * 0.5, false));
-    this.abilityCd = 0; this.attackCd = 0;
+    this.attackCd = 0;
     this.setupInput();
     if (this.isHost) this.startHostLoop(); else this.startClientLoop();
     const render = () => { this.draw(); if (!this.gameOver) requestAnimationFrame(render); };
     requestAnimationFrame(render);
   }
   makePlayer(id, cls, x, y, isMe) {
-    return { id, classDef: cls, x, y, vx: 0, vy: 0, hp: 100, maxHp: 100, angle: 0, attacking: false, attackTimer: 0, abilityCd: 0, abilityReady: true, isMe, allies: [], buffs: {} };
+    return { id, classDef: cls, x, y, vx: 0, vy: 0, hp: 100, maxHp: 100, angle: 0, attacking: false, attackTimer: 0, abilityCd: 0, abilityReady: true, isMe, buffs: {} };
   }
   setupInput() {
     window.addEventListener('keydown', (e) => {
@@ -451,26 +351,22 @@ class Game {
     window.addEventListener('keyup', (e) => { this.keys[e.key.toLowerCase()] = false; });
     const joy = $('joystick'), knob = $('joystickKnob');
     if (joy) {
-      const handleStart = (e) => {
-        e.preventDefault(); this.joystick.active = true;
-        const t = e.touches ? e.touches[0] : e;
-        this.joystick.startX = t.clientX; this.joystick.startY = t.clientY;
-      };
+      const handleStart = (e) => { e.preventDefault(); this.joystick.active = true; const t = e.touches ? e.touches[0] : e; this.joystick.startX = t.clientX; this.joystick.startY = t.clientY; };
       const handleMove = (e) => {
         if (!this.joystick.active) return; e.preventDefault();
         const t = e.touches ? e.touches[0] : e;
         let dx = t.clientX - this.joystick.startX, dy = t.clientY - this.joystick.startY;
         const dist = Math.hypot(dx, dy), max = 40;
         if (dist > max) { dx = dx / dist * max; dy = dy / dist * max; }
-        knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+        knob.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
         this.joystick.x = dx / max; this.joystick.y = dy / max;
       };
       const handleEnd = (e) => { e.preventDefault(); this.joystick.active = false; this.joystick.x = 0; this.joystick.y = 0; knob.style.transform = 'translate(-50%, -50%)'; };
       joy.addEventListener('touchstart', handleStart); joy.addEventListener('touchmove', handleMove); joy.addEventListener('touchend', handleEnd);
       joy.addEventListener('mousedown', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleEnd);
     }
-    $('btnAttack')?.addEventListener('click', () => this.tryAttack());
-    $('btnAbility')?.addEventListener('click', () => this.tryAbility());
+    $('btnAttack') && $('btnAttack').addEventListener('click', () => this.tryAttack());
+    $('btnAbility') && $('btnAbility').addEventListener('click', () => this.tryAbility());
   }
   getInputDir() {
     let dx = 0, dy = 0;
@@ -487,22 +383,23 @@ class Game {
     this.attackCd = 0.4;
     this.entities.get(this.myId).attacking = true;
     this.entities.get(this.myId).attackTimer = 0.2;
-    if (!this.isHost) { conn.send({ type: 'input', kind: 'attack' }); return; }
+    if (!this.isHost) { try { conn.send({ type: 'input', kind: 'attack' }); } catch (e) {} return; }
     this.doAttack(this.myId);
   }
   tryAbility() {
     const me = this.entities.get(this.myId);
     if (me.abilityCd > 0 || this.gameOver) return;
-    me.abilityCd = me.classDef.cd; me.abilityReady = false;
-    if (!this.isHost) { conn.send({ type: 'input', kind: 'ability' }); return; }
+    me.abilityCd = me.classDef.cd;
+    me.abilityReady = false;
+    if (!this.isHost) { try { conn.send({ type: 'input', kind: 'ability' }); } catch (e) {} return; }
     this.doAbility(this.myId);
   }
   startHostLoop() { this.hostInterval = setInterval(() => this.hostTick(), 1000 / 30); }
   startClientLoop() {
     setInterval(() => {
       if (this.gameOver) return;
-      const { dx, dy } = this.getInputDir();
-      if (dx || dy) conn.send({ type: 'input', kind: 'move', dx, dy });
+      const inp = this.getInputDir();
+      if (inp.dx || inp.dy) { try { conn.send({ type: 'input', kind: 'move', dx: inp.dx, dy: inp.dy }); } catch (e) {} }
     }, 50);
   }
   hostTick() {
@@ -510,11 +407,11 @@ class Game {
     const dt = 1/30;
     const me = this.entities.get(this.myId);
     const peer = this.entities.get(this.peerId);
-    const { dx, dy } = this.getInputDir();
-    me.x += dx * 180 * dt; me.y += dy * 180 * dt;
+    const inp = this.getInputDir();
+    me.x += inp.dx * 180 * dt; me.y += inp.dy * 180 * dt;
     me.x = Math.max(20, Math.min(this.W - 20, me.x));
     me.y = Math.max(60, Math.min(this.H - 20, me.y));
-    if (dx || dy) me.angle = Math.atan2(dy, dx);
+    if (inp.dx || inp.dy) me.angle = Math.atan2(inp.dy, inp.dx);
     if (this.peerInput) {
       peer.x += this.peerInput.dx * 180 * dt; peer.y += this.peerInput.dy * 180 * dt;
       peer.x = Math.max(20, Math.min(this.W - 20, peer.x));
@@ -562,7 +459,7 @@ class Game {
     const isBoss = Math.random() < 0.05 + this.wave * 0.01;
     const z = { id, type: 'zombie', x, y, vx: 0, vy: 0, hp: isBoss ? 200 : 30 + this.wave * 5, maxHp: isBoss ? 200 : 30 + this.wave * 5, speed: isBoss ? 40 : 50 + Math.random() * 30, damage: isBoss ? 20 : 10, size: isBoss ? 30 : 16, boss: isBoss, frozen: 0, burning: 0 };
     this.entities.set(id, z);
-    conn.send({ type: 'spawn', entity: z });
+    try { conn.send({ type: 'spawn', entity: z }); } catch (e) {}
   }
   updateZombie(z, dt) {
     if (z.frozen > 0) { z.frozen -= dt; return; }
@@ -600,7 +497,9 @@ class Game {
           e.hp -= p.damage || 30;
           if (p.kind === 'ice') e.frozen = 2;
           if (p.kind === 'fire') e.burning = 3;
-          if (p.kind === 'electric') { this.entities.forEach(e2 => { if (e2.type === 'zombie' && e2 !== e && e2.hp > 0) { const d2 = Math.hypot(e2.x - e.x, e2.y - e.y); if (d2 < 100) e2.hp -= 15; } }); }
+          if (p.kind === 'electric') {
+            this.entities.forEach(e2 => { if (e2.type === 'zombie' && e2 !== e && e2.hp > 0) { const d2 = Math.hypot(e2.x - e.x, e2.y - e.y); if (d2 < 100) e2.hp -= 15; } });
+          }
           if (e.hp <= 0) { this.entities.delete(e.id); this.score += e.boss ? 50 : 5; }
           if (p.pierce) return;
           p.life = 0;
@@ -618,7 +517,7 @@ class Game {
       t.cd = 0.5;
       const p = { id: 'p' + Date.now() + Math.random(), type: 'projectile', x: t.x, y: t.y, vx: (target.x - t.x) / nd * 500, vy: (target.y - t.y) / nd * 500, damage: 10, pierce: false, kind: 'turret', life: 1, owner: t.id };
       this.entities.set(p.id, p);
-      conn.send({ type: 'spawn', entity: p });
+      try { conn.send({ type: 'spawn', entity: p }); } catch (e) {}
     }
   }
   doAttack(attackerId) {
@@ -678,8 +577,10 @@ class Game {
       targets.forEach(t => { const d = Math.hypot(t.x - u.x, t.y - u.y); if (d < bd) { best = t; bd = d; } });
       if (best) { best.hp = Math.min(best.maxHp, best.hp + 40); this.spawnFx(best.x, best.y, 30, 'heal', 0.4); }
     } else if (id === 'sniper') { this.spawnProjectile(u, 800, 80, true, 'pierce'); }
-    else if (id === 'engineer') { this.entities.set('t' + Date.now(), { id: 't' + Date.now(), type: 'turret', x: u.x, y: u.y, hp: 60, owner: userId, life: 15, cd: 0 }); }
-    else if (id === 'shadow') { u.buffs.invisible = 3; u.buffs.ira = 3; }
+    else if (id === 'engineer') {
+      const t = { id: 't' + Date.now(), type: 'turret', x: u.x, y: u.y, hp: 60, owner: userId, life: 15, cd: 0 };
+      this.entities.set(t.id, t);
+    } else if (id === 'shadow') { u.buffs.invisible = 3; u.buffs.ira = 3; }
     else if (id === 'brawler') { u.buffs.ira = 3; u.buffs.speed = 3; }
     else if (id === 'electric') {
       const start = { x: u.x, y: u.y }; let prev = start;
@@ -689,12 +590,12 @@ class Game {
   spawnProjectile(owner, speed, damage, pierce, kind) {
     const p = { id: 'p' + Date.now() + Math.random(), type: 'projectile', x: owner.x + Math.cos(owner.angle) * 20, y: owner.y + Math.sin(owner.angle) * 20, vx: Math.cos(owner.angle) * speed, vy: Math.sin(owner.angle) * speed, damage, pierce, kind, life: 1.5, owner: owner.id };
     this.entities.set(p.id, p);
-    conn.send({ type: 'spawn', entity: p });
+    try { conn.send({ type: 'spawn', entity: p }); } catch (e) {}
   }
   spawnFx(x, y, radius, kind, life) {
     const f = { id: 'f' + Date.now() + Math.random(), type: 'fx', x, y, radius, kind, life };
     this.entities.set(f.id, f);
-    conn.send({ type: 'spawn', entity: f });
+    try { conn.send({ type: 'spawn', entity: f }); } catch (e) {}
   }
   checkGameOver() {
     const me = this.entities.get(this.myId), peer = this.entities.get(this.peerId);
@@ -717,8 +618,19 @@ class Game {
   }
   applyPeerSpawn(data) { this.entities.set(data.entity.id, data.entity); }
   sendState() {
-    const snap = { type: 'state', t: Date.now(), entities: Array.from(this.entities.values()).map(e => ({ id: e.id, type: e.type, x: e.x|0, y: e.y|0, hp: e.hp, maxHp: e.maxHp, angle: e.angle, size: e.size, boss: e.boss, frozen: e.frozen, burning: e.burning, classDef: e.classDef, attacking: e.attacking, abilityCd: e.abilityCd, abilityReady: e.abilityReady, buffInvisible: e.buffs?.invisible, buffIra: e.buffs?.ira, life: e.life, radius: e.radius, kind: e.kind })), wave: this.wave, score: this.score };
-    if (conn && conn.open) conn.send(snap);
+    const snap = {
+      type: 'state', t: Date.now(),
+      entities: Array.from(this.entities.values()).map(e => ({
+        id: e.id, type: e.type, x: e.x|0, y: e.y|0, hp: e.hp, maxHp: e.maxHp,
+        angle: e.angle, size: e.size, boss: e.boss, frozen: e.frozen, burning: e.burning,
+        classDef: e.classDef, attacking: e.attacking,
+        abilityCd: e.abilityCd, abilityReady: e.abilityReady,
+        buffInvisible: e.buffs && e.buffs.invisible, buffIra: e.buffs && e.buffs.ira,
+        life: e.life, radius: e.radius, kind: e.kind,
+      })),
+      wave: this.wave, score: this.score,
+    };
+    if (conn && conn.open) { try { conn.send(snap); } catch (e) {} }
   }
   applyPeerState(data) {
     if (this.isHost) return;
@@ -735,7 +647,8 @@ class Game {
     $('abilityBar').style.width = (100 - (cd / total * 100)) + '%';
     $('abilityBar').className = 'bar-fill ' + (me.abilityReady ? 'ability-ready' : 'ability-fill');
     $('abilityIcon').textContent = me.classDef.emoji;
-    $('waveText').textContent = this.wave; $('scoreText').textContent = this.score;
+    $('waveText').textContent = this.wave;
+    $('scoreText').textContent = this.score;
   }
   draw() {
     const c = this.ctx;
@@ -746,12 +659,12 @@ class Game {
     this.entities.forEach(e => {
       if (e.type === 'fx') {
         const alpha = Math.min(1, e.life * 2);
-        if (e.kind === 'explosion') { c.fillStyle = `rgba(255,150,50,${alpha})`; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
-        else if (e.kind === 'drain') { c.fillStyle = `rgba(180,80,255,${alpha})`; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
-        else if (e.kind === 'ice') { c.fillStyle = `rgba(120,220,255,${alpha*0.6})`; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
-        else if (e.kind === 'fire') { c.fillStyle = `rgba(255,100,30,${alpha*0.7})`; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
-        else if (e.kind === 'heal') { c.fillStyle = `rgba(120,255,180,${alpha})`; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
-        else if (e.kind === 'electric') { c.fillStyle = `rgba(255,255,80,${alpha})`; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.5 - e.life*0.4), 0, Math.PI*2); c.fill(); }
+        if (e.kind === 'explosion') { c.fillStyle = 'rgba(255,150,50,' + alpha + ')'; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
+        else if (e.kind === 'drain') { c.fillStyle = 'rgba(180,80,255,' + alpha + ')'; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
+        else if (e.kind === 'ice') { c.fillStyle = 'rgba(120,220,255,' + (alpha*0.6) + ')'; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
+        else if (e.kind === 'fire') { c.fillStyle = 'rgba(255,100,30,' + (alpha*0.7) + ')'; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
+        else if (e.kind === 'heal') { c.fillStyle = 'rgba(120,255,180,' + alpha + ')'; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.2 - e.life*0.4), 0, Math.PI*2); c.fill(); }
+        else if (e.kind === 'electric') { c.fillStyle = 'rgba(255,255,80,' + alpha + ')'; c.beginPath(); c.arc(e.x, e.y, e.radius * (1.5 - e.life*0.4), 0, Math.PI*2); c.fill(); }
         return;
       }
       if (e.type === 'projectile') {
@@ -773,7 +686,7 @@ class Game {
         c.strokeStyle = '#552288'; c.lineWidth = 2; c.beginPath(); c.moveTo(e.x - 6, e.y - 6); c.lineTo(e.x + 6, e.y + 6); c.moveTo(e.x + 6, e.y - 6); c.lineTo(e.x - 6, e.y + 6); c.stroke(); return;
       }
       const cls = e.classDef; if (!cls) return;
-      const invisible = e.buffs?.invisible > 0 && !e.isMe;
+      const invisible = e.buffs && e.buffs.invisible > 0 && !e.isMe;
       c.globalAlpha = invisible ? 0.3 : 1;
       c.fillStyle = cls.color; c.beginPath(); c.arc(e.x, e.y, 18, 0, Math.PI*2); c.fill();
       c.strokeStyle = e.isMe ? '#fff' : '#ffdd55'; c.lineWidth = e.isMe ? 3 : 2; c.stroke();
@@ -789,7 +702,11 @@ class Game {
   }
 }
 
-$('btnRestart').onclick = () => { if (conn && conn.open) conn.send({ type: 'restart' }); showClassSelect(); myClass = null; bothReady = false; };
+$('btnRestart').onclick = () => {
+  try { if (conn && conn.open) conn.send({ type: 'restart' }); } catch (e) {}
+  showClassSelect();
+  myClass = null; bothReady = false; peerClass = null; peerClassPending = false;
+};
 $('btnMenu').onclick = () => location.reload();
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && confirm('¿Salir al menú?')) location.reload(); });
 </script>
