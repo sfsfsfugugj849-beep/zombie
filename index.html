@@ -2,254 +2,517 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Curiosidades Matemáticas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Math Duel — 2 Jugadores</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    margin: 0; height: 100%;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: #e8e8e8;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
-  }
-  .container { text-align: center; max-width: 600px; width: 90%; padding: 30px; }
-  h1 { color: #ffdd55; margin: 0 0 8px; font-size: clamp(28px, 6vw, 42px); text-shadow: 0 0 20px rgba(255, 221, 85, 0.4); }
-  .subtitle { color: #88ddff; font-size: 14px; margin-bottom: 30px; }
-  .fact-box {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 221, 85, 0.3);
-    border-radius: 16px;
-    padding: 30px 24px;
-    min-height: 180px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 24px;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s;
-  }
-  .fact-box.entering { animation: fadeIn 0.4s ease-out; }
-  .fact { font-size: clamp(16px, 3.5vw, 20px); line-height: 1.6; color: #fff; }
-  .fact .highlight { color: #ffdd55; font-weight: bold; }
-  .fact .formula { font-family: "Courier New", monospace; background: rgba(255,221,85,0.1); padding: 2px 6px; border-radius: 4px; color: #ffdd55; }
-  .counter { color: #888; font-size: 13px; margin-bottom: 16px; }
-  button {
-    background: linear-gradient(180deg, #ffdd55, #ffaa00);
-    color: #1a1a2e; border: none; padding: 16px 40px;
-    font-size: 17px; font-weight: bold; border-radius: 50px;
-    cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;
-    box-shadow: 0 4px 0 #aa7700, 0 8px 20px rgba(255, 170, 0, 0.4);
-    transition: transform 0.1s, box-shadow 0.1s;
-  }
-  button:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #aa7700, 0 10px 25px rgba(255, 170, 0, 0.5); }
-  button:active { transform: translateY(2px); box-shadow: 0 2px 0 #aa7700, 0 4px 10px rgba(255, 170, 0, 0.3); }
-  .stats { margin-top: 20px; font-size: 12px; color: #888; }
-  .floating-num {
-    position: absolute; color: rgba(255, 221, 85, 0.15);
-    font-size: 80px; font-weight: bold; pointer-events: none;
-    animation: floatUp 3s ease-out forwards;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-  @keyframes floatUp { 0% { opacity: 0.4; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(-200px) rotate(20deg); } }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #0a0a0a; color: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; touch-action: none; }
+  #app { position: relative; width: 100%; height: 100%; }
+  .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; z-index: 10; background: radial-gradient(ellipse at center, #1a0f0f 0%, #050505 100%); }
+  .screen.active { display: flex; }
+  h1 { font-size: clamp(28px, 6vw, 48px); color: #ffdd55; text-shadow: 0 0 20px rgba(255, 221, 85, 0.4); margin: 0 0 8px; letter-spacing: 2px; }
+  h2 { color: #88ddff; margin: 0 0 20px; font-weight: 500; }
+  p { color: #aaa; margin: 6px 0; font-size: 14px; }
+  .small { font-size: 12px; color: #777; margin-top: 20px; }
+  input { background: #1a1a1a; border: 2px solid #ffdd55; color: #fff; padding: 12px 20px; font-size: 18px; border-radius: 8px; width: 100%; max-width: 320px; text-align: center; text-transform: uppercase; letter-spacing: 3px; margin: 8px 0; font-family: monospace; }
+  input:focus { outline: none; box-shadow: 0 0 15px rgba(255, 221, 85, 0.5); }
+  button { background: linear-gradient(180deg, #ffdd55, #ffaa00); color: #1a1a1a; border: none; padding: 14px 32px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; margin: 8px; min-width: 200px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 0 #aa7700, 0 6px 10px rgba(0,0,0,0.5); transition: transform 0.05s, box-shadow 0.05s; }
+  button:active { transform: translateY(2px); box-shadow: 0 2px 0 #aa7700, 0 3px 5px rgba(0,0,0,0.5); }
+  button.secondary { background: linear-gradient(180deg, #444, #222); color: #fff; box-shadow: 0 4px 0 #111, 0 6px 10px rgba(0,0,0,0.5); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .code-display { font-family: monospace; font-size: 36px; color: #ffdd55; background: #000; padding: 16px 24px; border-radius: 8px; border: 2px dashed #ffaa55; letter-spacing: 8px; margin: 12px 0; }
+  #gameScreen { padding: 0; background: linear-gradient(180deg, #1a0a2e 0%, #0a0a1a 100%); justify-content: space-between; }
+  .scoreboard { display: flex; justify-content: space-around; width: 100%; padding: 20px 14px 0; gap: 10px; }
+  .player-score { flex: 1; background: rgba(255,255,255,0.05); border: 2px solid #333; border-radius: 12px; padding: 12px; transition: all 0.3s; }
+  .player-score.me { border-color: #ffdd55; background: rgba(255, 221, 85, 0.08); }
+  .player-score.peer { border-color: #88ddff; background: rgba(136, 221, 255, 0.05); }
+  .player-score.correct { border-color: #5c5; background: rgba(85, 200, 85, 0.2); transform: scale(1.05); }
+  .player-score.wrong { border-color: #c55; background: rgba(200, 85, 85, 0.2); }
+  .player-name { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+  .player-points { font-size: clamp(24px, 6vw, 36px); font-weight: bold; color: #ffdd55; margin-top: 4px; }
+  .player-score.peer .player-points { color: #88ddff; }
+  .round-info { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; }
+  .question-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 0 20px; }
+  .question-text { font-size: clamp(36px, 8vw, 60px); font-weight: bold; color: #fff; margin: 10px 0; text-align: center; }
+  .question-emoji { font-size: 60px; margin-bottom: 8px; }
+  .timer-bar { width: 100%; max-width: 400px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin: 16px 0; }
+  .timer-fill { height: 100%; background: linear-gradient(90deg, #ffdd55, #ff8800); transition: width 0.1s linear; }
+  .options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 500px; margin-top: 20px; }
+  .option-btn { background: linear-gradient(180deg, #2a2a4e, #1a1a3e); color: #fff; border: 2px solid #4a4a6e; padding: 18px; font-size: clamp(18px, 4vw, 24px); font-weight: bold; border-radius: 12px; cursor: pointer; min-width: 0; box-shadow: 0 3px 0 #0a0a1a; margin: 0; }
+  .option-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0a0a1a; }
+  .option-btn.correct { background: linear-gradient(180deg, #4a8, #286); border-color: #5c5; animation: pulse 0.5s; }
+  .option-btn.wrong { background: linear-gradient(180deg, #a44, #822); border-color: #c55; }
+  .option-btn.disabled { opacity: 0.4; pointer-events: none; }
+  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+  .feedback { font-size: 18px; min-height: 28px; margin-top: 12px; font-weight: bold; }
+  .feedback.good { color: #5c5; }
+  .feedback.bad { color: #c55; }
+  .key-hint { font-size: 11px; color: #666; margin-top: 4px; }
+  #winnerScreen { background: rgba(0,0,0,0.95); }
+  .winner-text { font-size: clamp(32px, 7vw, 56px); margin: 10px 0; }
+  .winner-text.win { color: #ffdd55; text-shadow: 0 0 30px rgba(255, 221, 85, 0.6); }
+  .winner-text.lose { color: #88ddff; text-shadow: 0 0 30px rgba(136, 221, 255, 0.5); }
+  .winner-text.tie { color: #ff88dd; }
+  .final-scores { display: flex; gap: 30px; margin: 20px 0; font-size: 24px; }
+  .final-score { padding: 12px 20px; border-radius: 10px; background: rgba(255,255,255,0.05); }
+  #status { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 6px 12px; border-radius: 6px; font-size: 12px; z-index: 7; display: none; }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>🔢 Curiosidades Matemáticas</h1>
-  <p class="subtitle">Presiona el botón para descubrir algo nuevo</p>
-  <div class="counter" id="counter">Dato #0</div>
-  <div class="fact-box" id="factBox">
-    <div class="fact" id="fact">¡Hola! Presiona el botón para empezar a aprender cosas increíbles sobre las matemáticas. 📐✨</div>
+<div id="app">
+  <div id="menu" class="screen active">
+    <h1>🧮 MATH DUEL</h1>
+    <h2>2 Jugadores · Competencia Matemática</h2>
+    <div class="row">
+      <button id="btnCreate">🎮 Crear Duelo</button>
+      <button id="btnJoin" class="secondary">🔗 Unirse con Código</button>
+    </div>
+    <p class="small">Gana el primero en responder bien. 10 rondas, suma más puntos y vences.</p>
   </div>
-  <button id="btnFact">🎲 Nuevo Dato</button>
-  <div class="stats" id="stats">Presionado 0 veces</div>
+  <div id="lobby" class="screen">
+    <h1 id="lobbyTitle">Esperando...</h1>
+    <div id="lobbyContent"></div>
+  </div>
+  <div id="gameScreen" class="screen">
+    <div class="scoreboard">
+      <div class="player-score me" id="myScore">
+        <div class="player-name">Tú</div>
+        <div class="player-points" id="myPoints">0</div>
+        <div class="round-info">Ronda <span id="roundNum">1</span>/10</div>
+      </div>
+      <div class="player-score peer" id="peerScore">
+        <div class="player-name">Rival</div>
+        <div class="player-points" id="peerPoints">0</div>
+        <div class="round-info" id="peerStatus">Esperando...</div>
+      </div>
+    </div>
+    <div class="question-area">
+      <div class="question-emoji" id="qEmoji">🧠</div>
+      <div class="question-text" id="qText">Cargando pregunta...</div>
+      <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback">&nbsp;</div>
+      <div class="key-hint">PC: teclas 1-4 · Cel: toca la opción</div>
+    </div>
+    <div style="height: 20px;"></div>
+  </div>
+  <div id="winnerScreen" class="screen">
+    <h1 class="winner-text" id="winnerTitle">🏆</h1>
+    <div class="final-scores">
+      <div class="final-score"><div style="font-size:12px;color:#aaa">Tú</div><div id="finalMy">0</div></div>
+      <div class="final-score"><div style="font-size:12px;color:#aaa">Rival</div><div id="finalPeer">0</div></div>
+    </div>
+    <div class="row">
+      <button id="btnRematch">🔄 Revancha</button>
+      <button id="btnMenu" class="secondary">🏠 Menú</button>
+    </div>
+  </div>
+  <div id="status"></div>
 </div>
 <script>
-const FACTS = [
-  "El número <span class='highlight'>π (pi)</span> tiene infinitos decimales y nunca se repite. Ya se calcularon más de <span class='highlight'>100 billones</span> de dígitos.",
-  "Si escribes <span class='highlight'>2 + 2 = 5</span>, estás cometiendo un error... pero si los matemáticas se equivocan, también se equivocan los puentes. 😅",
-  "El número <span class='highlight'>0</span> no fue aceptado en Europa hasta el <span class='highlight'>siglo XIII</span>. Los romanos no lo usaban.",
-  "Existe un número llamado <span class='highlight'>Graham</span> tan grande que no cabe en el universo observable si lo escribieras dígito por dígito.",
-  "El <span class='highlight'>número 6174</span> se llama <span class='highlight'>constante de Kaprekar</span>. Si tomas cualquier número de 4 dígitos, los reordenas y restas, siempre llegas a 6174 en máximo 7 pasos.",
-  "<span class='highlight'>0.999... (con infinitos 9)</span> es exactamente igual a <span class='highlight'>1</span>. No 'casi' 1. ES 1.",
-  "El <span class='highlight'>número áureo (φ ≈ 1.618)</span> aparece en la naturaleza, el arte, la arquitectura y hasta en las espirales de las galaxias.",
-  "La <span class='highlight'>conjetura de Collatz</span>: toma cualquier número, si es par divídelo entre 2, si es impar multiplícalo por 3 y suma 1. Siempre llegarás a 1. Nadie ha podido probarlo.",
-  "Existe un <span class='highlight'>googol</span> (1 seguido de 100 ceros) y un <span class='highlight'>googolplex</span> (1 seguido de un googol de ceros).",
-  "El símbolo <span class='highlight'>=</span> fue inventado por <span class='highlight'>Robert Recorde</span> en 1557. Lo eligió porque 'dos líneas paralelas son más iguales que dos cosas cualesquiera'.",
-  "La <span class='highlight'>paradoja del cumpleaños</span> dice que en un grupo de solo <span class='highlight'>23 personas</span>, hay más del 50% de probabilidad de que dos cumplan años el mismo día.",
-  "El símbolo de <span class='highlight'>∞</span> (infinito) lo inventó <span class='highlight'>John Wallis</span> en 1655.",
-  "<span class='highlight'>√2</span> fue el primer número <span class='highlight'>irracional</span> conocido. Los pitagóricos lo descubrieron y lo mantuvieron en secreto.",
-  "La suma de los ángulos internos de un triángulo es siempre <span class='highlight'>180°</span>... pero solo en geometría plana.",
-  "El <span class='highlight'>último teorema de Fermat</span> estuvo sin resolverse <span class='highlight'>358 años</span> hasta 1994.",
-  "<span class='highlight'>2 + 2 = 5</span> es posible si trabajas en <span class='highlight'>aritmética modular</span> (módulo 3).",
-  "El número <span class='highlight'>e (≈ 2.71828)</span> aparece en la fórmula <span class='formula'>e^(iπ) + 1 = 0</span>, considerada la más bella de las matemáticas.",
-  "Solo existe <span class='highlight'>un número primo par</span>: el <span class='highlight'>2</span>.",
-  "La <span class='highlight'>secuencia de Fibonacci</span> (1, 1, 2, 3, 5, 8...) aparece en pétalos de flores, conchas de caracol y reproducción de conejos.",
-  "Un <span class='highlight'>gúgol</span> (googol) tiene <span class='highlight'>100 ceros</span>. Tu cuerpo tiene unos <span class='highlight'>10²⁸</span> átomos.",
-  "La palabra <span class='highlight'>álgebra</span> viene del árabe <span class='highlight'>al-jabr</span> ('reunión de partes'). La inventó <span class='highlight'>Al-Juarismi</span> en el siglo IX.",
-  "El <span class='highlight'>problema de los 4 colores</span> estuvo sin resolverse <span class='highlight'>124 años</span> y se resolvió en 1976 con ayuda de una computadora.",
-  "<span class='highlight'>Euler</span> publicó tantos trabajos que la Academia tardó <span class='highlight'>47 años</span> en publicar todo lo que dejó al morir.",
-  "Multiplicar por <span class='highlight'>9</span> tiene un truco: extiende los dedos de ambas manos, baja el que corresponde al número. Ejemplo: 9×3 = baja el 3° dedo → quedan 2 a la izq y 7 a la der = 27. 🤯",
-  "El <span class='highlight'>cero</span> es el único número que no se puede escribir en <span class='highlight'>numeración romana</span>.",
-  "El primo más grande conocido (2024) tiene más de <span class='highlight'>82 millones de dígitos</span>.",
-  "El triángulo con lados <span class='highlight'>3, 4 y 5</span> es el <span class='highlight'>triángulo rectángulo</span> más simple. Los egipcios lo usaban para hacer esquinas perfectas en las pirámides.",
-  "La palabra <span class='highlight'>cálculo</span> viene del latín <span class='highlight'>calculus</span>, que significa 'piedra pequeña'. Los romanos contaban con piedritas.",
-  "La <span class='highlight'>hipotenusa</span> viene del griego <span class='highlight'>hypoteinousa</span> que significa 'que se extiende debajo'.",
-  "En <span class='highlight'>topología</span>, una <span class='highlight'>taza</span> y un <span class='highlight'>dona</span> son equivalentes: ambas tienen un solo agujero. 🍩☕",
-  "El matemático <span class='highlight'>Paul Erdős</span> decía que si un problema es muy difícil, es un teorema. Si es aún más difícil, es una conjetura.",
-  "La <span class='highlight'>función 1/x</span> tiene una 'asíntota' en x=0: nunca toca el eje vertical pero se acerca infinitamente.",
-  "El <span class='highlight'>cuadrado mágico</span> 3×3 más pequeño: sus filas, columnas y diagonales suman 15. Aparece en el cuadro <span class='highlight'>Melancolía</span> de Durero (1514).",
-  "Sumar <span class='highlight'>1+2+3+...+100</span> da <span class='highlight'>5050</span>. El pequeño Gauss lo descubrió a los 10 años en 1 minuto.",
-  "El símbolo de <span class='highlight'>%</span> viene de la abreviatura de 'per cento' (por ciento) en italiano.",
-  "La <span class='highlight'>paradoja de Russell</span> casi destruye las matemáticas en 1901: un conjunto que 'contiene todos los conjuntos que no se contienen a sí mismos' lleva a contradicción.",
-  "El número <span class='highlight'>6</span> es el más pequeño que cumple: 6 = 1+2+3. Se llama <span class='highlight'>número perfecto</span>. El siguiente es 28, después 496, después 8128.",
-  "La probabilidad de sacar <span class='highlight'>doble seis</span> con dos dados es solo <span class='highlight'>1/36</span> (≈ 2.78%).",
-  "<span class='highlight'>Fibonacci</span> llevó los números arábigos a Europa en <span class='highlight'>1202</span> con su libro <span class='highlight'>Liber Abaci</span>.",
-  "El <span class='highlight'>infinito</span> no es un número, es un concepto. Hay infinitos 'más grandes' que otros.",
-  "La <span class='highlight'>suma de los primeros n números</span> es <span class='formula'>n(n+1)/2</span>. Para 100: 100×101/2 = 5050.",
-  "El número <span class='highlight'>2520</span> es divisible por 1, 2, 3, 4, 5, 6, 7, 8, 9 y 10 al mismo tiempo.",
-  "<span class='highlight'>√(-1)</span> no existe en números reales, pero los matemáticos lo llamaron <span class='highlight'>i</span> (unidad imaginaria) y construyeron toda una nueva dimensión numérica con él.",
-  "La <span class='highlight'>longitud de la costa de Gran Bretaña</span> es infinita según la paradoja de Mandelbrot: depende de la escala con que midas.",
-  "<span class='highlight'>Grigori Perelman</span> resolvió la <span class='highlight'>conjetura de Poincaré</span> en 2003 y rechazó el premio de <span class='highlight'>1 millón de dólares</span>.",
-  "La probabilidad de ganar la lotería (6 de 49) es de <span class='highlight'>1 en 13,983,816</span>. Tienes más probabilidad de que te caiga un rayo (1 en 15,000).",
-  "La <span class='highlight'>constante de Euler-Mascheroni (γ ≈ 0.5772)</span> aparece en análisis, pero nadie sabe si es racional o irracional.",
-  "Si sumas <span class='highlight'>1/2 + 1/4 + 1/8 + 1/16...</span> hasta el infinito, obtienes exactamente <span class='highlight'>1</span>.",
-  "La <span class='highlight'>trigonometría</span> significa 'medición de triángulos'. La inventaron los griegos para astronomía.",
-  "Un <span class='highlight'>factorial</span> crece rapidísimo: <span class='highlight'>20!</span> = 2,432,902,008,176,640,000. Y <span class='highlight'>100!</span> tiene 158 dígitos.",
-  "El símbolo de <span class='highlight'>π</span> lo popularizó <span class='highlight'>William Jones</span> en 1706.",
-  "<span class='highlight'>Fermat</span> escribió <span class='formula'>aⁿ + bⁿ = cⁿ</span> y dijo 'no tiene solución para n>2'. La prueba tardó 358 años.",
-  "El <span class='highlight'>cubo de Rubik</span> tiene <span class='highlight'>43,252,003,274,489,856,000</span> combinaciones.",
-  "Si divides <span class='highlight'>1 entre 998001</span>, obtienes <span class='formula'>0.001002003004...997999</span>. ¡Sin patrón!",
-  "<span class='highlight'>Gauss</span> decía: 'Las matemáticas son la reina de las ciencias y la teoría de números es la reina de las matemáticas'.",
-  "La palabra <span class='highlight'>cifra</span> viene del árabe <span class='highlight'>sifr</span>, que significa 'cero'.",
-  "El <span class='highlight'>teorema de Pitágoras</span> tiene más de <span class='highlight'>370 demostraciones</span> conocidas. Es el teorema con más pruebas en la historia.",
-  "Un <span class='highlight'>número primo</span> es mayor que 1 y solo divisible por 1 y por sí mismo. Hay infinitos (Euclides lo demostró hace 2300 años).",
-  "La <span class='highlight'>paradoja de Monty Hall</span>: si en un concurso eliges una puerta y el presentador abre una vacía, ¿cambias? ¡Sí! Tienes el doble de probabilidad.",
-  "El <span class='highlight'>cálculo infinitesimal</span> lo inventaron al mismo tiempo <span class='highlight'>Newton</span> y <span class='highlight'>Leibniz</span> en el siglo XVII.",
-  "La <span class='highlight'>constante de Avogadro (6.022 × 10²³)</span> es el número de partículas en un mol de sustancia.",
-  "El <span class='highlight'>triángulo de Pascal</span> contiene los coeficientes del binomio y muchas sorpresas: cada fila suma una potencia de 2.",
-  "La <span class='highlight'>función f(x) = x²</span> no tiene inversa porque f(-2) = f(2) = 4. Por eso necesitas 'restringir el dominio'.",
-  "El matemático indio <span class='highlight'>Aryabhata</span> calculó π como <span class='highlight'>3.1416</span> en el año <span class='highlight'>499 d.C.</span>, casi mil años antes que en Europa.",
-  "La palabra <span class='highlight'>cero</span> viene del sánscrito <span class='highlight'>shunya</span> (vacío), luego árabe <span class='highlight'>sifr</span>, italiano <span class='highlight'>zephirum</span>, y 'zero'.",
-  "El número <span class='highlight'>142857</span> es el 'número cíclico' más famoso. Si lo multiplicas por 2, 3, 4, 5 o 6, obtienes una rotación de sí mismo.",
-  "La <span class='highlight'>suma 1+1/2+1/3+1/4+...</span> (serie armónica) crece sin límite, pero <span class='highlight'>1+1/4+1/9+1/16+...</span> converge a <span class='formula'>π²/6</span>.",
-  "El <span class='highlight'>problema de los tres cuerpos</span> (predecir el movimiento de 3 cuerpos celestes) no tiene solución general. Lo demostró Poincaré en 1889.",
-  "Si lanzas una moneda y sale cara 10 veces seguidas, la probabilidad de cara en el siguiente lanzamiento sigue siendo <span class='highlight'>50%</span>. La moneda no tiene memoria.",
-  "El símbolo <span class='highlight'>∫</span> (integral) es una 'S' alargada, del latín 'summa'.",
-  "La <span class='highlight'>paradoja del abuelo</span>: si viajas al pasado y matas a tu abuelo antes de que tenga hijos, ¿existirías? La física dice que es imposible.",
-  "La <span class='highlight'>geometría fractal</span> describe formas que se repiten a diferentes escalas: copos de nieve, brócoli, líneas costeras.",
-  "<span class='highlight'>Hypatia de Alejandría</span> fue la primera mujer matemática conocida. Vivió en el siglo IV.",
-  "La palabra <span class='highlight'>teorema</span> viene del griego <span class='highlight'>theorema</span> que significa 'espectáculo'.",
-  "Si divides <span class='highlight'>1 entre 81</span>, obtienes <span class='formula'>0.012345679012345679...</span>. Fíjate que falta el <span class='highlight'>8</span>.",
-  "La <span class='highlight'>constante de Boltzmann (1.38 × 10⁻²³)</span> relaciona la temperatura con la energía en física.",
-  "El triángulo equilátero tiene <span class='highlight'>menor perímetro</span> para un área dada. Por eso las pompas de jabón son esféricas.",
-  "<span class='highlight'>Pythagoras</span> creía que los números tenían propiedades místicas. Su escuela era casi una secta.",
-  "La <span class='highlight'>serie de Taylor</span> permite escribir cualquier función 'suave' como suma infinita de polinomios.",
-  "El número <span class='highlight'>i^i</span> (i elevado a i) es un número <span class='highlight'>real</span>: <span class='formula'>i^i ≈ 0.2079</span>.",
-  "En 1900, <span class='highlight'>David Hilbert</span> propuso 23 problemas matemáticos sin resolver. Aún quedan algunos abiertos.",
-  "El <span class='highlight'>problema del viajante</span> (la ruta más corta que pasa por N ciudades) es NP-duro.",
-  "La <span class='highlight'>paradoja de Simpson</span> muestra que una tendencia puede revertirse cuando se combinan grupos.",
-  "El número <span class='highlight'>1729</span> es el <span class='highlight'>número de Hardy-Ramanujan</span>: el más pequeño que se puede expresar como suma de dos cubos de dos formas distintas.",
-  "La palabra <span class='highlight'>matemáticas</span> viene del griego <span class='highlight'>mathematikos</span> que significa 'inclinado a aprender'.",
-  "Si escribes todos los números del 1 al 100, el dígito que más aparece es el <span class='highlight'>1</span> (21 veces). El que menos es el <span class='highlight'>0</span> (2 veces).",
-  "La <span class='highlight'>función zeta de Riemann</span> tiene un premio de <span class='highlight'>1 millón de dólares</span> para quien demuestre su hipótesis. Llevamos 165 años.",
-  "<span class='highlight'>Évariste Galois</span> murió a los <span class='highlight'>20 años</span> en un duelo, pero antes fundó toda una rama del álgebra abstracta.",
-  "La palabra <span class='highlight'>círculo</span> viene del latín <span class='highlight'>circulus</span>, diminutivo de 'circus'.",
-  "El <span class='highlight'>algoritmo de Euclides</span> para calcular el máximo común divisor tiene <span class='highlight'>2300 años</span>. Aún se usa en criptografía moderna.",
-  "La <span class='highlight'>paradoja de los gemelos</span> de Einstein: si viajas a velocidad cercana a la luz, regresas más joven. Lo han confirmado relojes atómicos.",
-  "El número <span class='highlight'>0.101001000100001...</span> es <span class='highlight'>irracional y trascendente</span>.",
-  "La <span class='highlight'>conjetura de Goldbach</span> dice que todo número par mayor que 2 es suma de dos primos. Nadie ha podido probarlo.",
-  "En <span class='highlight'>binario</span>, el número <span class='highlight'>2.000.000</span> en decimal es <span class='highlight'>11110100001001000000</span>.",
-  "<span class='highlight'>John Conway</span> inventó el <span class='highlight'>Juego de la Vida</span> en 1970, un autómata celular que simula evolución.",
-  "El <span class='highlight'>Hombre de Vitruvio</span> de Da Vinci tiene proporciones áureas. La relación entre altura y ombligo es 1.618.",
-  "El símbolo <span class='highlight'>∈</span> (pertenece a) parece una 'e' cursiva. Lo introdujo <span class='highlight'>Giuseppe Peano</span> en 1889.",
-  "La <span class='highlight'>suma 1 - 1 + 1 - 1 + 1 - 1...</span> es controversial. Algunos dicen 0, otros 1, otros 1/2 (suma de Cesàro).",
-  "<span class='highlight'>Kurt Gödel</span> demostró en 1931 que hay verdades matemáticas que <span class='highlight'>nunca se pueden probar</span>.",
-  "Si multiplicas <span class='highlight'>12345679</span> (sin el 8) por <span class='highlight'>9</span>, obtienes <span class='highlight'>111111111</span>. 🤯",
-  "El <span class='highlight'>cubo mágico</span> más grande conocido (orden 7) tiene <span class='highlight'>10²⁴⁵</span> combinaciones. Más que átomos en el universo visible.",
-  "La <span class='highlight'>cifra de control</span> de los códigos de barras EAN-13 se calcula con pesos 1 y 3 alternados.",
-  "<span class='highlight'>Bernhard Riemann</span> escribió solo <span class='highlight'>un paper</span> sobre teoría de números, pero cambió la disciplina para siempre.",
-  "La <span class='highlight'>paradoja de Hilbert</span> (el hotel infinito): un hotel con infinitas habitaciones puede aceptar más huéspedes aunque esté 'lleno'.",
-  "La <span class='highlight'>suma de los primeros n cuadrados</span> es <span class='formula'>n(n+1)(2n+1)/6</span>. Para n=10: 385.",
-  "La palabra <span class='highlight'>coseno</span> viene del latín <span class='highlight'>complementi sinus</span> (seno del complemento).",
-  "<span class='highlight'>René Descartes</span> inventó la <span class='highlight'>geometría analítica</span> y dijo: 'Pienso, luego existo'.",
-  "La <span class='highlight'>paradoja de Banach-Tarski</span>: una esfera se puede cortar en 5 piezas y rearmar para formar DOS esferas del mismo tamaño.",
-  "El número <span class='highlight'>42</span> es la respuesta al 'sentido de la vida' según <span class='highlight'>Hitchhiker's Guide</span>. Suma de los primeros 6 primos.",
-  "La palabra <span class='highlight'>geometría</span> significa 'medición de la tierra'. Los antiguos egipcios la necesitaban para las crecidas del Nilo.",
-  "Si sumas <span class='highlight'>1+3+5+7+...+(2n-1)</span> obtienes exactamente <span class='highlight'>n²</span>. La suma de impares da cuadrados perfectos.",
-  "El número <span class='highlight'>e</span> se define como el límite de <span class='formula'>(1 + 1/n)ⁿ</span> cuando n tiende a infinito.",
-  "La <span class='highlight'>media</span> de 1, 2, 3, 4, 5 es 3. La <span class='highlight'>mediana</span> también es 3. La <span class='highlight'>moda</span>... no hay (todos diferentes).",
-  "El <span class='highlight'>número 9</span> tiene una propiedad mágica: 9×1=9, 9×2=18 (1+8=9), 9×3=27 (2+7=9), 9×4=36 (3+6=9)... siempre suma 9.",
-  "La palabra <span class='highlight'>álgebra</span>, <span class='highlight'>algoritmo</span> y <span class='highlight'>almanque</span> vienen del matemático <span class='highlight'>Al-Juarismi</span>.",
-  "El <span class='highlight'>problema de Monty Hall</span> fue tan controversial que hasta el gran <span class='highlight'>Paul Erdős</span> se negó a creerlo hasta que lo vio simulado.",
-  "La <span class='highlight'>velocidad de la luz</span> es <span class='highlight'>299,792,458 m/s</span> exactamente, porque se usa para definir el metro.",
-  "El número <span class='highlight'>666</span> no es la marca de la bestia en algunos manuscritos antiguos. En uno aparece como <span class='highlight'>616</span>.",
-  "La <span class='highlight'>secuencia de look-and-say</span> empieza: 1, 11, 21, 1211, 111221, 312211, 13112221... cada término describe al anterior.",
-  "La palabra <span class='highlight'>cifra</span>, <span class='highlight'>cero</span>, <span class='highlight'>zero</span> y <span class='highlight'>zephyr</span> (céfiro) tienen el mismo origen etimológico.",
-  "Si escribes el número 1.000.000 en <span class='highlight'>romano</span>, es M. En <span class='highlight'>binario</span>, es 11110100001001000000. En <span class='highlight'>hexadecimal</span>, es F4240.",
-  "El <span class='highlight'>último teorema de Fermat</span> decía: 'Tengo una demostración maravillosa, pero el margen es muy pequeño para escribirla'. Mentira, no la tenía.",
-  "El matemático <span class='highlight'>Srinivasa Ramanujan</span> decía que sus fórmulas se le 'revelaban' en sueños, durante visiones de la diosa Namagiri.",
-  "La <span class='highlight'>conjetura de Poincaré</span> es el único de los 'Problemas del Milenio' que se ha resuelto. Lo hizo Perelman en 2003 y rechazó el premio.",
-  "El número <span class='highlight'>1/7 = 0.142857142857...</span> es un decimal periódico. Curiosamente, 142857×7 = 999999.",
-  "La <span class='highlight'>fórmula de Euler</span> (e^(iπ) + 1 = 0) une las 5 constantes más importantes de las matemáticas en una sola ecuación.",
-  "El <span class='highlight'>número plástico</span> (≈ 1.3247) es la raíz real de x³ = x + 1. Es importante en dinámica y teoría de números.",
-  "La <span class='highlight'>paradoja de San Petersburgo</span> muestra que un juego con premio infinito tiene valor infinito, pero nadie pagaría más de $25 por jugarlo.",
-  "El matemático <span class='highlight'>George Cantor</span> demostró que hay <span class='highlight'>diferentes tamaños de infinito</span>. Los números reales son 'más infinitos' que los naturales.",
-  "La palabra <span class='highlight'>función</span> viene del latín <span class='highlight'>functio</span> que significa 'ejecución' o 'cumplimiento'.",
-  "El <span class='highlight'>teorema del mono infinito</span> dice que un mono escribiendo aleatoriamente eventualmente escribirá las obras completas de Shakespeare.",
-  "El matemático <span class='highlight'>Archimedes</span> fue asesinado por un soldado romano durante la conquista de Siracusa, en el año 212 a.C.",
-  "El <span class='highlight'>número 153</span> es un número narcisista: 1³ + 5³ + 3³ = 1 + 125 + 27 = 153. ¡Es igual a sí mismo!",
-  "El símbolo de <span class='highlight'>%</span> se usaba originalmente en negocios financieros. Hoy en día se usa en casi todo.",
-  "El <span class='highlight'>problema del cumpleaños</span> tiene aplicación en criptografía: los ataques de cumpleaños permiten colisiones en hashes.",
-  "La palabra <span class='highlight'>algoritmo</span> se originó con <span class='highlight'>Al-Juarismi</span> (cuyo nombre latinizado es 'Algoritmi'). De ahí viene 'algoritmo'.",
-];
+// ===== Generador de preguntas =====
+const QUESTION_TYPES = ['add', 'sub', 'mul', 'div', 'pow', 'sqrt', 'percent', 'fraction', 'equation'];
 
-let history = [];
-let pressCount = 0;
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function makeOptions(correct) {
+  const opts = new Set([correct]);
+  while (opts.size < 4) {
+    const delta = rand(1, Math.max(3, Math.abs(correct) / 2 || 5));
+    const variant = Math.random() < 0.5 ? correct + delta : correct - delta;
+    if (variant !== correct && variant !== 0) opts.add(variant);
+  }
+  return shuffle([...opts]);
+}
+
+function genQuestion() {
+  const type = QUESTION_TYPES[Math.floor(Math.random() * QUESTION_TYPES.length)];
+  let q, a, emoji;
+  switch (type) {
+    case 'add': {
+      const x = rand(50, 999), y = rand(50, 999);
+      q = x + ' + ' + y;
+      a = x + y;
+      emoji = '➕';
+      break;
+    }
+    case 'sub': {
+      const x = rand(500, 999), y = rand(50, 499);
+      q = x + ' − ' + y;
+      a = x - y;
+      emoji = '➖';
+      break;
+    }
+    case 'mul': {
+      const x = rand(11, 99), y = rand(2, 25);
+      q = x + ' × ' + y;
+      a = x * y;
+      emoji = '✖️';
+      break;
+    }
+    case 'div': {
+      const y = rand(2, 12);
+      const result = rand(5, 50);
+      const x = y * result;
+      q = x + ' ÷ ' + y;
+      a = result;
+      emoji = '➗';
+      break;
+    }
+    case 'pow': {
+      const exp = rand(2, 5);
+      const base = rand(2, 12);
+      q = base + ' ^ ' + exp;
+      a = Math.pow(base, exp);
+      emoji = '🔢';
+      break;
+    }
+    case 'sqrt': {
+      const n = rand(2, 12);
+      const v = n * n;
+      q = '√' + v;
+      a = n;
+      emoji = '√';
+      break;
+    }
+    case 'percent': {
+      const base = rand(50, 500);
+      const pct = [10, 20, 25, 30, 50, 75][rand(0, 5)];
+      q = pct + '% de ' + base;
+      a = Math.round(base * pct / 100);
+      emoji = '💯';
+      break;
+    }
+    case 'fraction': {
+      const d = rand(2, 9);
+      const n = rand(1, d - 1);
+      const mult = rand(2, 6);
+      q = n + '/' + d + ' de ' + (d * mult);
+      a = n * mult;
+      emoji = '½';
+      break;
+    }
+    case 'equation': {
+      // ax + b = c => x = (c - b) / a
+      const a2 = rand(2, 9);
+      const x = rand(2, 12);
+      const b = rand(1, 20);
+      const c = a2 * x + b;
+      q = a2 + 'x + ' + b + ' = ' + c;
+      a = x;
+      emoji = '❓';
+      break;
+    }
+  }
+  return { q, a, options: makeOptions(a), emoji };
+}
+
+// ===== Estado =====
+let peer = null, conn = null, isHost = false, myId = null, roomCode = null;
+let myScore = 0, peerScore = 0;
+let currentRound = 0;
+const TOTAL_ROUNDS = 10;
+let roundActive = false;
+let myAnswered = false, peerAnswered = false;
+let timerInterval = null;
+let timeLeft = 0;
+const ROUND_TIME = 10; // segundos
+let currentQuestion = null;
+let me = 'A', peer = 'B';
+let lastReceivedQuestion = null;
+
 const $ = (id) => document.getElementById(id);
-const factEl = $('fact');
-const boxEl = $('factBox');
-const btnEl = $('btnFact');
-const counterEl = $('counter');
-const statsEl = $('stats');
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); }
+function status(msg, ms) { const el = $('status'); el.textContent = msg; el.style.display = 'block'; clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', ms || 2000); }
+function genCode() { const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random()*chars.length)]; return s; }
 
-function pickRandomFact() {
-  let available = FACTS.filter((_, i) => i !== history[history.length - 1]);
-  if (available.length === 0) available = FACTS;
-  const idx = FACTS.indexOf(available[Math.floor(Math.random() * available.length)]);
-  history.push(idx);
-  if (history.length > FACTS.length) history = history.slice(-Math.floor(FACTS.length / 2));
-  return FACTS[idx];
+const PEER_PREFIX = 'zs-';
+const PEER_CONFIG = { host: '0.peerjs.com', port: 443, secure: true, debug: 1 };
+
+function initPeer(myFixedId) {
+  return new Promise((resolve, reject) => {
+    const p = myFixedId ? new Peer(myFixedId, PEER_CONFIG) : new Peer(PEER_CONFIG);
+    p.on('open', (id) => resolve(p));
+    p.on('error', (err) => {
+      console.error('Peer error:', err);
+      if (['unavailable-id', 'network', 'server-error', 'socket-error', 'socket-closed'].includes(err.type)) {
+        reject(Object.assign(err, { retry: true })); return;
+      }
+      reject(err);
+    });
+  });
 }
 
-function spawnFloatingNum() {
-  const nums = ['0', '1', 'π', '∞', 'e', 'φ', '√2', '∑', 'i', 'Δ'];
-  const num = nums[Math.floor(Math.random() * nums.length)];
-  const el = document.createElement('div');
-  el.className = 'floating-num';
-  el.textContent = num;
-  el.style.left = (Math.random() * 80 + 10) + '%';
-  el.style.top = (Math.random() * 60 + 20) + '%';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+async function createRoom() {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const code = genCode();
+    try { peer = await initPeer(PEER_PREFIX + code); roomCode = code; isHost = true; return; }
+    catch (e) { if (e.retry && attempt < 7) continue; throw e; }
+  }
+  throw new Error('No se pudo generar código. Intenta de nuevo.');
 }
 
-function showNewFact() {
-  pressCount++;
-  const fact = pickRandomFact();
-  factEl.innerHTML = fact;
-  boxEl.classList.remove('entering');
-  void boxEl.offsetWidth;
-  boxEl.classList.add('entering');
-  counterEl.textContent = 'Dato #' + pressCount;
-  statsEl.textContent = '📚 ' + FACTS.length + ' datos en total · Has visto ' + Math.min(pressCount, FACTS.length);
-  spawnFloatingNum();
-  if (pressCount % 5 === 0) spawnFloatingNum();
+function joinRoom(code) {
+  const targetId = PEER_PREFIX + code;
+  return new Promise((resolve, reject) => {
+    initPeer().then(p => {
+      peer = p;
+      const c = peer.connect(targetId, { reliable: true });
+      let done = false;
+      const timeout = setTimeout(() => { if (done) return; done = true; try { c.close(); } catch (e) {} reject(new Error('No se encontró la partida.')); }, 12000);
+      c.on('open', () => { if (done) return; done = true; clearTimeout(timeout); conn = c; isHost = false; resolve(); });
+      c.on('error', (err) => { if (done) return; done = true; clearTimeout(timeout); reject(err); });
+    }).catch(reject);
+  });
 }
 
-btnEl.addEventListener('click', showNewFact);
+// ===== UI handlers =====
+$('btnCreate').onclick = async () => {
+  $('btnCreate').disabled = true; $('btnJoin').disabled = true;
+  $('lobbyTitle').textContent = '🎮 Creando duelo...';
+  $('lobbyContent').innerHTML = '<p>Reservando código...</p>';
+  showScreen('lobby');
+  try {
+    await createRoom();
+    $('lobbyTitle').textContent = '⚔️ DUELO CREADO';
+    $('lobbyContent').innerHTML = '<p>Comparte este código con tu rival:</p><div class="code-display">' + roomCode + '</div><button id="btnCopyCode" class="secondary">📋 Copiar</button><p style="margin-top:18px">Esperando rival...</p>';
+    $('btnCopyCode').onclick = () => { try { navigator.clipboard.writeText(roomCode); } catch (e) {} $('btnCopyCode').textContent = '✅ Copiado'; setTimeout(() => $('btnCopyCode').textContent = '📋 Copiar', 1500); };
+    status('', 0);
+    peer.on('connection', (c) => { conn = c; setupConn(); });
+  } catch (e) {
+    alert('Error: ' + e.message);
+    $('btnCreate').disabled = false; $('btnJoin').disabled = false;
+    showScreen('menu');
+  }
+};
+
+$('btnJoin').onclick = () => {
+  const hashCode = location.hash.replace('#', '').toUpperCase();
+  $('lobbyContent').innerHTML = '<p>Escribe el código del duelo:</p><input id="codeInput" maxlength="5" placeholder="ABCDE" autocomplete="off" value="' + hashCode + '" /><button id="btnConnect">🔗 Conectar</button><button class="secondary" id="btnBack">← Volver</button>';
+  $('lobbyTitle').textContent = '🔗 UNIRSE';
+  showScreen('lobby');
+  setTimeout(() => { $('codeInput').focus(); if (hashCode.length === 5) doJoin(); }, 100);
+  $('btnConnect').onclick = doJoin;
+  $('btnBack').onclick = () => showScreen('menu');
+  $('codeInput').onkeypress = (e) => { if (e.key === 'Enter') doJoin(); };
+};
+
+async function doJoin() {
+  const code = $('codeInput').value.trim().toUpperCase();
+  if (code.length !== 5) { alert('Código de 5 letras/números'); return; }
+  $('btnConnect').disabled = true;
+  $('lobbyTitle').textContent = '🔗 Conectando...';
+  $('lobbyContent').innerHTML = '<p>Buscando duelo <span id="dots">.</span></p>';
+  let n = 1;
+  const dotTimer = setInterval(() => { n = (n % 3) + 1; const d = $('dots'); if (d) d.textContent = '.'.repeat(n); }, 400);
+  try {
+    await joinRoom(code);
+    clearInterval(dotTimer);
+    status('¡Conectado!', 2000);
+    startGame();
+  } catch (e) {
+    clearInterval(dotTimer);
+    alert('❌ ' + e.message);
+    $('btnJoin').click();
+  }
+}
+
+function setupConn() {
+  conn.on('open', () => { status('¡Conectado!', 2000); startGame(); });
+  conn.on('data', (data) => {
+    if (data.type === 'hello') {} // handshake opcional
+    else if (data.type === 'answer') { handlePeerAnswer(data); }
+    else if (data.type === 'round') { receiveRound(data); }
+    else if (data.type === 'sync') { receiveSync(data); }
+    else if (data.type === 'rematch') { myScore = 0; peerScore = 0; currentRound = 0; startGame(); }
+  });
+  conn.on('close', () => {
+    alert('El rival se desconectó.');
+    showScreen('menu');
+    $('btnCreate').disabled = false; $('btnJoin').disabled = false;
+  });
+}
+
+function startGame() {
+  myScore = 0; peerScore = 0; currentRound = 0;
+  $('myPoints').textContent = '0';
+  $('peerPoints').textContent = '0';
+  showScreen('gameScreen');
+  nextRound();
+}
+
+function nextRound() {
+  currentRound++;
+  if (currentRound > TOTAL_ROUNDS) { endGame(); return; }
+  $('roundNum').textContent = currentRound;
+  $('feedback').innerHTML = '&nbsp;';
+  $('feedback').className = 'feedback';
+  $('myScore').className = 'player-score me';
+  $('peerScore').className = 'player-score peer';
+  $('peerStatus').textContent = 'Esperando...';
+
+  const q = genQuestion();
+  currentQuestion = q;
+  $('qEmoji').textContent = q.emoji;
+  $('qText').textContent = q.q + ' = ?';
+  const optsEl = $('options');
+  optsEl.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.dataset.value = opt;
+    btn.dataset.idx = i;
+    btn.onclick = () => answer(opt, btn);
+    optsEl.appendChild(btn);
+  });
+
+  // Enviar al peer
+  try { conn.send({ type: 'round', q: q.q, a: q.a, options: q.options, emoji: q.emoji, round: currentRound }); } catch (e) {}
+
+  startTimer();
+}
+
+function startTimer() {
+  roundActive = true; myAnswered = false; peerAnswered = false;
+  timeLeft = ROUND_TIME;
+  $('timerFill').style.width = '100%';
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.1;
+    $('timerFill').style.width = Math.max(0, (timeLeft / ROUND_TIME) * 100) + '%';
+    if (timeLeft <= 0) { clearInterval(timerInterval); endRound(null, null, true); }
+  }, 100);
+}
+
+function receiveRound(data) {
+  // Si soy host, ignoro; si soy peer, esto es mi pregunta
+  if (isHost) return; // host ya la generó, ignora
+  currentQuestion = { q: data.q, a: data.a, options: data.options, emoji: data.emoji };
+  currentRound = data.round;
+  $('roundNum').textContent = currentRound;
+  $('feedback').innerHTML = '&nbsp;';
+  $('feedback').className = 'feedback';
+  $('myScore').className = 'player-score me';
+  $('peerScore').className = 'player-score peer';
+  $('peerStatus').textContent = 'Pensando...';
+  $('qEmoji').textContent = data.emoji;
+  $('qText').textContent = data.q + ' = ?';
+  const optsEl = $('options');
+  optsEl.innerHTML = '';
+  data.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.dataset.value = opt;
+    btn.onclick = () => answer(opt, btn);
+    optsEl.appendChild(btn);
+  });
+  startTimer();
+}
+
+function answer(value, btnEl) {
+  if (!roundActive || myAnswered) return;
+  myAnswered = true;
+  clearInterval(timerInterval);
+  const correct = value === currentQuestion.a;
+  // Marcar UI
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.classList.add('disabled');
+    if (parseInt(b.dataset.value) === currentQuestion.a) b.classList.add('correct');
+  });
+  if (correct) {
+    btnEl.classList.add('correct');
+    myScore += 100;
+    $('myPoints').textContent = myScore;
+    $('myScore').classList.add('correct');
+    $('feedback').textContent = '✅ ¡Correcto! +100';
+    $('feedback').className = 'feedback good';
+  } else {
+    btnEl.classList.add('wrong');
+    myScore = Math.max(0, myScore - 25);
+    $('myPoints').textContent = myScore;
+    $('myScore').classList.add('wrong');
+    $('feedback').textContent = '❌ Incorrecto. -25';
+    $('feedback').className = 'feedback bad';
+  }
+  try { conn.send({ type: 'answer', correct, value }); } catch (e) {}
+  $('peerStatus').textContent = 'Esperando...';
+  if (peerAnswered) setTimeout(() => nextRound(), 1500);
+  else setTimeout(() => { if (peerAnswered) nextRound(); }, 1500);
+}
+
+function handlePeerAnswer(data) {
+  peerAnswered = true;
+  if (data.correct) {
+    peerScore += 100;
+    $('peerStatus').textContent = '✅ Acertó';
+    $('peerScore').classList.add('correct');
+  } else {
+    peerScore = Math.max(0, peerScore - 25);
+    $('peerStatus').textContent = '❌ Falló';
+    $('peerScore').classList.add('wrong');
+  }
+  $('peerPoints').textContent = peerScore;
+  // Si el peer responde primero pero el local no, también procesamos el resultado
+  if (!myAnswered && data.correct) {
+    // Mostrar feedback
+    $('feedback').textContent = '⚠️ El rival acertó primero. Responde rápido.';
+    $('feedback').className = 'feedback bad';
+  }
+  if (myAnswered) setTimeout(() => nextRound(), 1500);
+}
+
+function endRound(myAns, peerAns, byTimeout) {
+  // ya manejado en answer/handlePeerAnswer, si timeout
+  if (byTimeout && !myAnswered) {
+    myAnswered = true;
+    document.querySelectorAll('.option-btn').forEach(b => {
+      b.classList.add('disabled');
+      if (parseInt(b.dataset.value) === currentQuestion.a) b.classList.add('correct');
+    });
+    $('feedback').textContent = '⏱️ Tiempo agotado';
+    $('feedback').className = 'feedback bad';
+  }
+  setTimeout(() => nextRound(), 1500);
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  $('finalMy').textContent = myScore;
+  $('finalPeer').textContent = peerScore;
+  const wEl = $('winnerTitle');
+  if (myScore > peerScore) {
+    wEl.textContent = '🏆 ¡VICTORIA!';
+    wEl.className = 'winner-text win';
+  } else if (myScore < peerScore) {
+    wEl.textContent = '😢 Derrota';
+    wEl.className = 'winner-text lose';
+  } else {
+    wEl.textContent = '🤝 Empate';
+    wEl.className = 'winner-text tie';
+  }
+  showScreen('winnerScreen');
+}
+
+$('btnRematch').onclick = () => {
+  try { conn.send({ type: 'rematch' }); } catch (e) {}
+  startGame();
+};
+$('btnMenu').onclick = () => location.reload();
+
+// ===== Teclas 1-4 en PC =====
 window.addEventListener('keydown', (e) => {
-  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); showNewFact(); }
+  if (!$('gameScreen').classList.contains('active')) return;
+  if (['1', '2', '3', '4'].includes(e.key)) {
+    const idx = parseInt(e.key) - 1;
+    const btns = document.querySelectorAll('.option-btn');
+    if (btns[idx] && !myAnswered) btns[idx].click();
+  }
 });
 </script>
 </body>
