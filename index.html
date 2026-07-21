@@ -18,18 +18,15 @@
     --danger:#e5484d;
     --health:#3fce7c;
     --border:#2a3852;
-    --blue-ability: #4aa3ff; /* Nuevo color para habilidades */
+    --blue-ability: #4aa3ff;
     --blue-ability-ink: #eaf3ff;
-    --purple-ability: #c084fc; /* Color para habilidades de tiempo/control */
+    --purple-ability: #c084fc;
     --purple-ability-ink: #f3e8ff;
-    --diamond-shield: #67e8f9; /* Color para escudo de diamante */
-    --drone-body: #60a5fa; /* Color para el cuerpo del dron */
-    --drone-prop: #a78bfa; /* Color para las hélices del dron */
-    --enemy-color: #8b0000; /* Color para los enemigos */
-    --enemy-weapon-color: #a9a9a9; /* Color para el cuchillo del enemigo */
-    --shop-npc-color: #a86b3c; /* Color para el NPC de la tienda */
-    --shop-dialog-bg: #1e2b42; /* Fondo del diálogo de la tienda */
-    --shop-dialog-border: #f5b942; /* Borde del diálogo de la tienda */
+    --diamond-shield: #67e8f9;
+    --drone-body: #60a5fa;
+    --drone-prop: #a78bfa;
+    --enemy-color: #8b0000;
+    --enemy-weapon-color: #a9a9a9;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
@@ -71,14 +68,13 @@
   /* ---------- Juego ---------- */
   #game{position:absolute;inset:0;display:none}
   canvas{display:block;width:100%;height:100%;background:#0a0f19;touch-action:none}
-  .hud{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
+  .hud{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;pointer-events:none;z-index:2}
   .hud-inner{display:flex;gap:14px;align-items:center;background:rgba(14,20,32,.7);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:30px;padding:8px 18px;font-size:13px}
   .hud b{color:var(--amber)}
   .wave-timer{color:var(--muted)}
   .boss-wave-indicator{color:var(--danger);font-weight:bold;animation:pulse 1.5s infinite alternate;}
   @keyframes pulse { from { opacity: 0.7; } to { opacity: 1; } }
   .enemy-wave-indicator{color:var(--enemy-color);font-weight:bold;animation:pulse 1.5s infinite alternate;}
-
 
   /* Controles móviles */
   .touch{position:absolute;bottom:0;left:0;right:0;height:170px;display:none;pointer-events:none;z-index:5}
@@ -91,7 +87,7 @@
   #tAbility{right:140px;bottom:44px;width:74px;height:74px;background:var(--blue-ability);border-color:var(--blue-ability);color:var(--blue-ability-ink);font-size:12px;text-align:center;line-height:1.1;display:none}
   #tAbility.show{display:flex}
   #tAbility.cool{background:rgba(30,43,66,.7);border-color:var(--border);color:var(--muted)}
-  #tShop{left:22px; bottom:118px; width:60px; height:60px; font-size:20px; display:none; } /* Nuevo botón de tienda */
+  #tShop{left:22px; bottom:118px; width:60px; height:60px; font-size:20px; display:none; }
   #tShop.show{display:flex}
 
   /* ---------- Tienda de clases ---------- */
@@ -143,9 +139,9 @@
   .achv.done .arw{color:var(--health)}
 
   /* Overlays */
-  .overlay{position:absolute;inset:0;background:rgba(10,15,25,.82);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
-  .overlay.show{display:flex}
-  .up-card{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px}
+  .overlay{position:absolute;inset:0;background:rgba(10,15,25,.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+  .overlay.show{display:flex !important}
+  .up-card{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;position:relative}
   .up-card h2{text-align:center;font-size:22px;margin-bottom:4px}
   .up-card p.desc{text-align:center;color:var(--muted);font-size:13px;margin-bottom:18px}
   .ups{display:grid;grid-template-columns:1fr;gap:12px}
@@ -163,41 +159,18 @@
   .toast{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:rgba(30,43,66,.92);border:1px solid var(--amber);color:var(--ink);padding:10px 18px;border-radius:30px;font-size:13px;z-index:8;opacity:0;transition:opacity .3s;pointer-events:none}
   .toast.show{opacity:1}
 
-  /* --- NUEVO: Estilos para la tienda en partida --- */
+  /* --- Estilos para la tienda en partida --- */
   #inGameShopOverlay .up-card {
-    max-width: 560px; /* Ajustar tamaño para la tienda */
-    background: var(--shop-dialog-bg);
-    border: 2px solid var(--shop-dialog-border);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    max-width: 560px;
+    background: var(--panel);
+    border: 2px solid var(--amber);
+    box-shadow: 0 10px 40px rgba(245,185,66,.25);
   }
   #inGameShopOverlay .shop-head .logo b {
-    color: var(--amber); /* Asegurar color del título */
-  }
-  #inGameShopOverlay .shop-head .bolt {
-    filter: drop-shadow(0 0 8px rgba(245,185,66,.6));
+    color: var(--amber);
   }
   #inGameShopOverlay .class-grid {
-    max-height: 40vh; /* Ajustar altura para la tienda */
-  }
-  .shop-hint { /* Hint para abrir la tienda */
-    position: absolute;
-    bottom: 200px; /* Ajustar posición */
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(30,43,66,.9);
-    border: 1px solid var(--amber);
-    color: var(--amber);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    z-index: 7;
-    pointer-events: none;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .shop-hint.show {
-    opacity: 1;
+    max-height: 45vh;
   }
 </style>
 </head>
@@ -226,7 +199,7 @@
       <input id="joinCode" maxlength="5" placeholder="Ej: AB12X" style="text-transform:uppercase;letter-spacing:4px;font-weight:700" />
       <button class="btn btn-ghost" id="btnJoin">Unirse</button>
       <div class="err" id="menuErr"></div>
-      <p class="hint">Funciona entre dispositivos e internet distintos gracias a WebRTC (PeerJS). Solo comparte el código de sala.</p>
+      <p class="hint">Funciona entre dispositivos e internet distintos gracias a WebRTC (PeerJS). En partida pulsa <b>B</b> para abrir la tienda.</p>
     </div>
   </div>
 
@@ -254,7 +227,7 @@
         <div class="logo" style="margin:0"><span class="bolt">⚡</span><b>TIENDA DE CLASES</b></div>
         <span class="pts-pill"><span class="bolt">⚡</span> <b id="shopPoints">0</b></span>
       </div>
-      <p class="sub" style="margin-bottom:14px">Cada rayo que sobrevivas te da <b style="color:var(--amber)">1 punto</b>. Gasta tus puntos para desbloquear clases con habilidades únicas y elige con cuál jugar.</p>
+      <p class="sub" style="margin-bottom:14px">Cada rayo que sobrevivas te da <b style="color:var(--amber)">1 punto</b>. Gasta tus puntos para desbloquear clases con habilidades únicas.</p>
       <div class="class-grid" id="classGrid"></div>
       <div class="err" id="shopErr"></div>
       <button class="btn btn-primary" id="btnShopBack">Listo</button>
@@ -270,7 +243,7 @@
         <div class="logo" style="margin:0"><span class="bolt">🏆</span><b>LOGROS</b></div>
         <span class="pts-pill"><span class="bolt">⚡</span> <b id="achPoints">0</b></span>
       </div>
-      <p class="sub" style="margin-bottom:14px">Completa desafíos para ganar puntos ⚡ extra. ¡Sube tus récords y desbloquéalos todos!</p>
+      <p class="sub" style="margin-bottom:14px">Completa desafíos para ganar puntos ⚡ extra.</p>
       <div class="stat-row" id="achStats" style="margin-bottom:12px"></div>
       <div class="ach-grid" id="achGrid"></div>
       <button class="btn btn-primary" id="btnAchBack">Volver</button>
@@ -288,11 +261,9 @@
       <div class="tbtn" id="tRight">▶</div>
       <div class="tbtn" id="tAbility">HABILIDAD</div>
       <div class="tbtn" id="tAct">ACCIÓN</div>
-      <div class="tbtn" id="tShop">🛒</div> <!-- Nuevo botón de tienda móvil -->
+      <div class="tbtn" id="tShop">🛒</div>
     </div>
     <div class="ability-hint" id="abilityHint" style="display:none"></div>
-    <!-- NUEVO: Hint para la tienda en partida -->
-    <div class="shop-hint" id="shopHint" style="display:none">Pulsa B para abrir la tienda</div>
 
     <!-- Mejoras entre oleadas -->
     <div class="overlay" id="upOverlay">
@@ -304,16 +275,16 @@
       </div>
     </div>
 
-    <!-- Tienda en partida -->
-    <div class="overlay" id="inGameShopOverlay" style="display:none">
+    <!-- TIENDA EN PARTIDA (B) -->
+    <div class="overlay" id="inGameShopOverlay">
       <div class="up-card">
         <button class="close-x" id="btnInGameShopClose" aria-label="Cerrar tienda">✕</button>
         <div class="shop-head">
           <div class="logo" style="margin:0"><span class="bolt">🛒</span><b>TIENDA DE OBJETOS</b></div>
           <span class="pts-pill"><span class="bolt">⚡</span> <b id="inGameShopPoints">0</b></span>
         </div>
-        <p class="sub" style="margin-bottom:14px">Gasta tus puntos de rayo para obtener ventajas instantáneas o herramientas.</p>
-        <div class="class-grid" id="inGameShopGrid"></div> <!-- Reutilizamos class-grid para el estilo -->
+        <p class="sub" style="margin-bottom:14px">Gasta tus puntos de rayo ganados en esta partida. Pulsa <b>B</b> o <b>✕</b> para cerrar.</p>
+        <div class="class-grid" id="inGameShopGrid"></div>
         <div class="err" id="inGameShopErr"></div>
       </div>
     </div>
@@ -342,38 +313,37 @@
 
 // ---------- Constantes del mundo ----------
 const WORLD_W = 1200, WORLD_H = 640;
-const GROUND_Y = 540;         // suelo donde caminan los jugadores
-const ROOF_Y = 150;           // línea del tejado
+const GROUND_Y = 540;
+const ROOF_Y = 150;
 const ROOF_X0 = 110, ROOF_X1 = 1090;
 const SEG_COUNT = 20;
 const SEG_W = (ROOF_X1 - ROOF_X0) / SEG_COUNT;
 const P_W = 30, P_H = 46;
-const MOVE_SPEED = 235;        // px/seg base
-const REPAIR_RATE = 0.62;      // fracción/seg base (=> ~1.6s)
-const REVIVE_RATE = 0.5;       // fracción/seg base (=> 2s)
-const BLEEDOUT = 12;           // seg antes de morir estando derribado
+const MOVE_SPEED = 235;
+const REPAIR_RATE = 0.62;
+const REVIVE_RATE = 0.5;
+const BLEEDOUT = 12;
 const STRIKE_DMG = 34;
-const WAVE_DURATION = 26;      // seg por oleada
+const WAVE_DURATION = 26;
 const MAX_PLAYERS = 10;
-const TICK = 1/30;             // paso de simulación del host
-const BASE_PATCH_DURATION = 15; // Segundos que dura una reparación antes de poder reabrirse
+const TICK = 1/30;
+const BASE_PATCH_DURATION = 15;
 
-// ---------- Nuevas constantes para enemigos ----------
-const ENEMY_WAVE_INTERVAL = 3; // Cada cuántas oleadas aparecen enemigos
-const ENEMY_COUNT_BASE = 1;    // Número base de enemigos por oleada
-const ENEMY_COUNT_PER_WAVE = 0.5; // Incremento de enemigos por oleada
-const ENEMY_HP = 100;          // Vida de los enemigos
-const ENEMY_SPEED = 180;       // Velocidad de los enemigos
-const ENEMY_ATTACK_RANGE = 40; // Rango de ataque del enemigo
-const ENEMY_ATTACK_DAMAGE = 10; // Daño del ataque del enemigo
-const ENEMY_ATTACK_COOLDOWN = 1.5; // Cooldown de ataque del enemigo
-const PLAYER_ATTACK_DAMAGE = 20; // Daño del bate del jugador
-const PLAYER_ATTACK_COOLDOWN = 0.7; // Cooldown de ataque del jugador
+// ---------- Constantes para enemigos ----------
+const ENEMY_WAVE_INTERVAL = 3;
+const ENEMY_COUNT_BASE = 1;
+const ENEMY_COUNT_PER_WAVE = 0.5;
+const ENEMY_HP = 100;
+const ENEMY_SPEED = 180;
+const ENEMY_ATTACK_RANGE = 40;
+const ENEMY_ATTACK_DAMAGE = 10;
+const ENEMY_ATTACK_COOLDOWN = 1.5;
+const PLAYER_ATTACK_DAMAGE = 20;
+const PLAYER_ATTACK_COOLDOWN = 0.7;
 
 const COLORS = ["#f5b942","#3fce7c","#4aa3ff","#e5484d","#c084fc","#ff8f3f","#2dd4bf","#f472b6","#a3e635","#facc15"];
 
-// ---------- Catálogo de mejoras (más de 25) ----------
-// scope: 'self' aplica al jugador; 'team' a todo el equipo; 'once' efecto inmediato.
+// ---------- Catálogo de mejoras ----------
 const UPGRADES = [
   {id:"speed",   ic:"🏃", nm:"Piernas veloces",   ds:"Caminas 20% más rápido.",                 apply:p=>p.speedMult*=1.20},
   {id:"speed2",  ic:"💨", nm:"Ráfaga",            ds:"Caminas otro 15% más rápido.",            apply:p=>p.speedMult*=1.15},
@@ -390,15 +360,15 @@ const UPGRADES = [
   {id:"revNow",  ic:"🙌", nm:"¡Todos en pie!",    ds:"Revive a TODOS los aliados derribados.",  scope:"once", team:true, teamApply:g=>{g.players.forEach(q=>{if(q.state==="downed"){q.state="alive";q.hp=Math.max(q.hp,q.maxHp*0.5)}})}},
   {id:"revSpd",  ic:"⏱️", nm:"Médico rápido",     ds:"Revives aliados 40% más rápido.",         apply:p=>p.reviveMult*=1.40},
   {id:"dodge",   ic:"👻", nm:"Reflejos",          ds:"15% de probabilidad de esquivar un rayo.",apply:p=>p.dodge=Math.min(.6,p.dodge+.15)},
-  {id:"dodge3",  ic:"⚡", nm:"Reflejos Avanzados", ds:"10% más de probabilidad de esquivar un rayo.",apply:p=>p.dodge=Math.min(.8,p.dodge+.10)}, // Nueva mejora
+  {id:"dodge3",  ic:"⚡", nm:"Reflejos Avanzados", ds:"10% más de probabilidad de esquivar un rayo.",apply:p=>p.dodge=Math.min(.8,p.dodge+.10)},
   {id:"shield",  ic:"🔰", nm:"Escudo",            ds:"Bloquea por completo el próximo rayo.",   apply:p=>p.shield+=1},
   {id:"shield2", ic:"🔵", nm:"Escudo doble",      ds:"Bloquea los próximos 2 rayos.",           apply:p=>p.shield+=2},
-  {id:"diamondShield", ic:"💎", nm:"Escudo de Diamante", ds:"10% de probabilidad de bloquear el daño y ganar 5s de invulnerabilidad al ser golpeado.", apply:p=>p.diamondShieldChance+=0.10}, // Nueva mejora
+  {id:"diamondShield", ic:"💎", nm:"Escudo de Diamante", ds:"10% de probabilidad de bloquear el daño y ganar 5s de invulnerabilidad.", apply:p=>p.diamondShieldChance+=0.10},
   {id:"life",    ic:"➕", nm:"Vida extra",         ds:"Al morir, revives solo una vez.",         apply:p=>p.lives+=1},
   {id:"warn",    ic:"👁️", nm:"Sexto sentido",     ds:"Ves los avisos de rayo antes (más margen).",apply:p=>p.warnBonus+=0.4},
   {id:"thorns",  ic:"🌩️", nm:"Pararrayos",        ds:"El tejado aguanta más: menos agujeros.",  scope:"once", team:true, teamApply:g=>{g.roofArmor+=0.25}},
   {id:"calm",    ic:"🌤️", nm:"Ojo de la tormenta",ds:"La próxima oleada tiene menos rayos.",    scope:"once", team:true, teamApply:g=>{g.stormRelief+=0.18}},
-  {id:"seal",    ic:"🧷", nm:"Sellado firme",     ds:"Los agujeros que tapas tardan más en reabrirse.",scope:"once", team:true, teamApply:g=>{g.patchArmor+=0.30}},
+  {id:"seal",    ic:"🧷", nm:"Sellado firme",     ds:"Los agujeros tapados tardan más en reabrirse.",scope:"once", team:true, teamApply:g=>{g.patchArmor+=0.30}},
   {id:"teamspd", ic:"🏁", nm:"Moral de equipo",   ds:"TODO el equipo camina 10% más rápido.",   scope:"once", team:true, teamApply:g=>{g.players.forEach(q=>q.speedMult*=1.10)}},
   {id:"teamrep", ic:"🤝", nm:"Cooperación",       ds:"TODO el equipo repara 12% más rápido.",   scope:"once", team:true, teamApply:g=>{g.players.forEach(q=>q.repairMult*=1.12)}},
   {id:"teamheal",ic:"💞", nm:"Curación grupal",   ds:"Cura 40 de vida a todo el equipo ahora.", scope:"once", team:true, teamApply:g=>{g.players.forEach(q=>{if(q.state!=="dead")q.hp=Math.min(q.maxHp,q.hp+40)})}},
@@ -408,22 +378,19 @@ const UPGRADES = [
 ];
 const upById = id => UPGRADES.find(u=>u.id===id);
 
-// ---------- Catálogo de CLASES (tienda) ----------
-// passive: se aplica al empezar la partida. ability: habilidad activable (host).
-// abKind: identificador de la habilidad; cd: enfriamiento en segundos.
-// combatAbKind: habilidad activa durante oleadas de enemigos.
+// ---------- Catálogo de CLASES ----------
 const CLASSES = [
   {id:"survivor", ic:"🧍", nm:"Superviviente", cost:0,
    ds:"Equilibrado. Sin habilidad especial, pero sin debilidades.",
-   passive:p=>{p.maxHp+=10;p.hp+=10}, combatAbKind:"stunEnemy"}, // MODIFICADO: Añadido combatAbKind
+   passive:p=>{p.maxHp+=10;p.hp+=10}, combatAbKind:"stunEnemy"},
   {id:"tamer", ic:"⚡", nm:"Domador de rayos", cost:15,
-   ds:"HABILIDAD: invoca un rayo bendito que repara el techo y cura a los aliados que estén debajo.",
+   ds:"HABILIDAD: invoca un rayo bendito que repara el techo y cura a los aliados.",
    passive:p=>{p.resist=Math.min(.75,p.resist+.08)}, abKind:"bless", cd:14, combatAbKind:"stunEnemy"},
   {id:"builder", ic:"🔨", nm:"Constructor", cost:10,
-   ds:"Tapa agujeros mucho más rápido y repara los agujeros de al lado.",
+   ds:"Tapa agujeros mucho más rápido y repara los de al lado.",
    passive:p=>{p.repairMult*=1.4;p.repairRange+=1}, combatAbKind:"stunEnemy"},
   {id:"medic", ic:"⛑️", nm:"Médico de campo", cost:12,
-   ds:"Revive muy rápido y regenera vida. HABILIDAD: cura en área a los aliados cercanos.",
+   ds:"Revive muy rápido. HABILIDAD: cura en área a los aliados cercanos.",
    passive:p=>{p.reviveMult*=1.5;p.regen+=2}, abKind:"heal", cd:16, combatAbKind:"stunEnemy"},
   {id:"guardian", ic:"🛡️", nm:"Guardián", cost:12,
    ds:"Mucha vida y resistencia. Aguanta los rayos que otros no soportarían.",
@@ -438,45 +405,44 @@ const CLASSES = [
    ds:"HABILIDAD: repara al instante TODOS los agujeros del tejado.",
    passive:p=>{p.repairMult*=1.15}, abKind:"fixAll", cd:26, combatAbKind:"stunEnemy"},
   {id:"ninja", ic:"🥷", nm:"Ninja", cost:18,
-   ds:"Muy veloz y esquiva muchos rayos. HABILIDAD: parpadea (dash) tapando todos los agujeros que cruza.",
+   ds:"Muy veloz y esquiva muchos rayos. HABILIDAD: dash tapando agujeros que cruza.",
    passive:p=>{p.speedMult*=1.25;p.dodge=Math.min(.6,p.dodge+.25)}, abKind:"dash", cd:12, combatAbKind:"stunEnemy"},
   {id:"vampire", ic:"🧛", nm:"Vampiro", cost:20,
-   ds:"Cada reparación te cura. HABILIDAD: roba vida de la tormenta y la reparte al equipo herido.",
+   ds:"Cada reparación te cura. HABILIDAD: roba vida de la tormenta.",
    passive:p=>{p.repairHeal+=8;p.regen+=1}, abKind:"drain", cd:18, combatAbKind:"stunEnemy"},
   {id:"captain", ic:"🎖️", nm:"Capitán", cost:22,
-   ds:"Aura de equipo: todos reparan más rápido. HABILIDAD: grito que acelera a todo el equipo un momento.",
+   ds:"Aura de equipo: todos reparan más rápido. HABILIDAD: acelera a todo el equipo.",
    passive:p=>{p.maxHp+=30;p.hp+=30;p.teamRepair=(p.teamRepair||0)+.15}, abKind:"rally", cd:22, combatAbKind:"stunEnemy"},
   {id:"phoenix", ic:"🐦‍🔥", nm:"Fénix", cost:28,
-   ds:"Revives solo una vez al caer. HABILIDAD: explosión de fuego que revive a TODOS los aliados caídos.",
+   ds:"Revives solo una vez. HABILIDAD: revive a TODOS los aliados caídos.",
    passive:p=>{p.lives+=1;p.regen+=2}, abKind:"reviveAll", cd:30, combatAbKind:"stunEnemy"},
   {id:"storm", ic:"🌩️", nm:"Señor de la tormenta", cost:35,
-   ds:"Resistente y con escudo. HABILIDAD: calma la tormenta unos segundos (no caen rayos).",
+   ds:"Resistente y con escudo. HABILIDAD: calma la tormenta unos segundos.",
    passive:p=>{p.maxHp+=40;p.hp+=40;p.resist=Math.min(.75,p.resist+.15);p.shield+=1}, abKind:"calm", cd:34, combatAbKind:"stunEnemy"},
   {id:"alchemist", ic:"✨", nm:"Alquimista", cost:40,
-   ds:"Gana 2 puntos extra por cada rayo sobrevivido. HABILIDAD: Convierte 30 de tu vida en 15 puntos para el equipo.",
+   ds:"Gana 2 puntos extra por rayo. HABILIDAD: convierte vida en puntos.",
    passive:p=>{p.bonusPointsPerRay=2}, abKind:"transmute", cd:25, combatAbKind:"stunEnemy"},
   {id:"colossus", ic:"🗿", nm:"Coloso", cost:45,
-   ds:"Vida y resistencia masivas. HABILIDAD: Te vuelves invulnerable y atraes todos los rayos por 4 segundos.",
+   ds:"Vida y resistencia masivas. HABILIDAD: invulnerable y atrae rayos 4s.",
    passive:p=>{p.maxHp+=120;p.hp+=120;p.resist=Math.min(.75,p.resist+.35);p.shield+=1}, abKind:"invuln", cd:35, combatAbKind:"stunEnemy"},
   {id:"oracle", ic:"🔮", nm:"Oráculo", cost:38,
-   ds:"Ves los avisos de rayo mucho antes. HABILIDAD: Congela la tormenta, deteniendo todos los rayos por 6 segundos.",
+   ds:"Ves los avisos de rayo mucho antes. HABILIDAD: congela la tormenta 6s.",
    passive:p=>{p.warnBonus+=0.8;p.speedMult*=1.1}, abKind:"freezeStorm", cd:30, combatAbKind:"predictEnemyPath"},
-  // --- NUEVAS CLASES CARAS ---
   {id:"timelord", ic:"⏳", nm:"Maestro del Tiempo", cost:120,
-   ds:"HABILIDAD: Ralentiza el tiempo de la tormenta para todos durante 5 segundos. Tus habilidades se recargan 25% más rápido.",
+   ds:"HABILIDAD: ralentiza la tormenta 5s. Habilidades se recargan 25% más rápido.",
    passive:p=>{p.abCdMult=0.75}, abKind:"timeWarp", cd:40, combatAbKind:"stunEnemy"},
   {id:"chiefengineer", ic:"🏗️", nm:"Ingeniero Jefe", cost:150,
-   ds:"Reparas agujeros 50% más rápido. Los agujeros que tapas son 50% más resistentes. HABILIDAD: Despliega un dron de reparación.",
+   ds:"Repara 50% más rápido. Agujeros más resistentes. HABILIDAD: dron de reparación.",
    passive:p=>{p.repairMult*=1.5;p.patchArmorBonus=0.5}, abKind:"drone", cd:30, combatAbKind:"stunEnemy"},
   {id:"elementalguardian", ic:"🌀", nm:"Guardián Elemental", cost:180,
-   ds:"Resistencia masiva. 20% de probabilidad de reflejar un rayo, curando al equipo. HABILIDAD: Crea una Zona Segura.",
+   ds:"Resistencia masiva. 20% reflejar rayo y curar equipo. HABILIDAD: Zona Segura.",
    passive:p=>{p.maxHp+=100;p.hp+=100;p.resist=Math.min(.75,p.resist+.40);p.reflectChance=0.2}, abKind:"safeZone", cd:45, combatAbKind:"stunEnemy"},
 ];
 const classById = id => CLASSES.find(c=>c.id===id);
 
-// ---------- Catálogo de ítems de la tienda en partida ----------
+// ---------- Catálogo de ÍTEMS de la tienda en partida ----------
 const SHOP_ITEMS = [
-  {id:"lightningRod", ic:"⚡", nm:"Pararrayos", ds:"Crea un pararrayos que atrae los rayos a su posición por 5s. No crea agujeros.", cost:15,
+  {id:"lightningRod", ic:"⚡", nm:"Pararrayos", ds:"Crea un pararrayos que atrae rayos por 5s. No crea agujeros.", cost:15,
    apply: (p, game) => {
      game.lightningRods.push({id: uid(), x: p.x, y: ROOF_Y, timer: 5, ownerId: p.id});
      game.toastMsg={txt:`${p.name} desplegó un pararrayos!`,t:2};
@@ -485,12 +451,12 @@ const SHOP_ITEMS = [
    apply: (p, game) => {
      p.hp = Math.min(p.maxHp, p.hp + 50);
      game.heals.push({x:p.x,t:0.6, type:"heal"});
-     game.toastMsg={txt:`${p.name} se curó!`,t:2};
+     game.toastMsg={txt:`${p.name} se curó +50 HP!`,t:2};
    }},
-  {id:"teamBoost", ic:"🚀", nm:"Impulso de equipo", ds:"Aumenta la velocidad de movimiento de todo el equipo en 20% por 8s.", cost:25,
+  {id:"teamBoost", ic:"🚀", nm:"Impulso de equipo", ds:"+20% velocidad a TODO el equipo por 8s.", cost:25,
    apply: (p, game) => {
      game.players.forEach(q => { if(q.state !== "dead") q.rallyTimer = Math.max(q.rallyTimer || 0, 8); });
-     game.toastMsg={txt:`${p.name} dio un impulso al equipo!`,t:2};
+     game.toastMsg={txt:`${p.name} dio impulso al equipo!`,t:2};
    }},
   {id:"extraShield", ic:"🛡️", nm:"Escudo extra", ds:"Gana 1 escudo que bloquea el próximo rayo.", cost:8,
    apply: (p, game) => {
@@ -504,24 +470,32 @@ const SHOP_ITEMS = [
        const holes = []; for(let j=0;j<SEG_COUNT;j++) if(game.segments[j].state===1) holes.push(j);
        if(holes.length > 0){
          const segIdx = holes[Math.floor(Math.random() * holes.length)];
-         game.segments[segIdx].state = 0;
-         game.segments[segIdx].prog = 0;
-         // MODIFICADO: Aplicar patchArmorBonus del Ingeniero Jefe si existe
-         const chiefEngineer = Object.values(game.players).find(pl => pl.classId === "chiefengineer");
-         game.segments[segIdx].patchTimer = BASE_PATCH_DURATION * (1 + game.patchArmor + (chiefEngineer ? chiefEngineer.patchArmorBonus : 0));
+         game.segments[segIdx].state = 0; game.segments[segIdx].prog = 0;
+         const chief = Object.values(game.players).find(pl => pl.classId === "chiefengineer");
+         game.segments[segIdx].patchTimer = BASE_PATCH_DURATION * (1 + game.patchArmor + (chief ? chief.patchArmorBonus : 0));
          game.runHoles=(game.runHoles||0)+1;
          game.heals.push({x:segCenterX(segIdx),t:0.4, type:"repairSpark"});
          repairedCount++;
        }
      }
-     if(repairedCount > 0) game.toastMsg={txt:`${p.name} reparó ${repairedCount} agujeros!`,t:2};
-     else game.toastMsg={txt:`No hay agujeros que reparar.`,t:2};
+     game.toastMsg = repairedCount > 0
+       ? {txt:`${p.name} reparó ${repairedCount} agujeros!`,t:2}
+       : {txt:`No hay agujeros que reparar.`,t:2};
+   }},
+  {id:"fullRevive", ic:"🙌", nm:"Revivir aliados", ds:"Revive a todos los aliados derribados con media vida.", cost:20,
+   apply: (p, game) => {
+     let n = 0;
+     Object.values(game.players).forEach(q => {
+       if(q.state === "downed"){ q.state = "alive"; q.hp = q.maxHp * 0.5; q.bleedout = BLEEDOUT; q._rev = 0; n++; }
+     });
+     game.toastMsg = n > 0
+       ? {txt:`${p.name} revivió ${n} aliado${n===1?"":"s"}!`,t:2}
+       : {txt:`No hay aliados caídos.`,t:2};
    }},
 ];
 const shopItemById = id => SHOP_ITEMS.find(item => item.id === id);
 
-
-// ---------- Progreso persistente (puntos + clases) ----------
+// ---------- Progreso persistente ----------
 const LS_PTS="stormhouse-points", LS_OWN="stormhouse-owned", LS_SEL="stormhouse-selected";
 function getPoints(){ return parseInt(localStorage.getItem(LS_PTS)||"0",10)||0; }
 function setPoints(n){ localStorage.setItem(LS_PTS,String(Math.max(0,n))); }
@@ -530,7 +504,7 @@ function saveOwned(set){ localStorage.setItem(LS_OWN,JSON.stringify([...set].fil
 function getSelected(){ const s=localStorage.getItem(LS_SEL); return getOwned().has(s)?s:"survivor"; }
 function setSelected(id){ localStorage.setItem(LS_SEL,id); }
 
-// ---------- Sistema de guardado de rayos (estadísticas) ----------
+// ---------- Estadísticas ----------
 const LS_STATS="stormhouse-stats";
 function getStats(){
   try{ return Object.assign({totalRayos:0,bestRun:0,bestWave:0,games:0,revives:0,holes:0,enemiesKilled:0},JSON.parse(localStorage.getItem(LS_STATS)||"{}")); }
@@ -538,8 +512,7 @@ function getStats(){
 }
 function saveStats(s){ localStorage.setItem(LS_STATS,JSON.stringify(s)); }
 
-// ---------- LOGROS (función adictiva) ----------
-// Cada logro se cumple una vez y otorga puntos ⚡ de recompensa.
+// ---------- LOGROS ----------
 const ACHIEVEMENTS=[
   {id:"first",  ic:"⚡", nm:"Primer trueno",     ds:"Sobrevive tu primer rayo.",              rew:2,  test:s=>s.totalRayos>=1},
   {id:"r50",    ic:"🌩️", nm:"Cazatormentas",     ds:"Sobrevive 50 rayos en total.",           rew:5,  test:s=>s.totalRayos>=50},
@@ -550,38 +523,32 @@ const ACHIEVEMENTS=[
   {id:"rev10",  ic:"🤝", nm:"Buen compañero",     ds:"Revive a 10 aliados en total.",          rew:8,  test:s=>s.revives>=10},
   {id:"fix100", ic:"🔧", nm:"Manitas",            ds:"Tapa 100 agujeros en total.",            rew:8,  test:s=>s.holes>=100},
   {id:"games10",ic:"🎮", nm:"Habitual",           ds:"Juega 10 partidas.",                     rew:10, test:s=>s.games>=10},
-  {id:"kill1",  ic:"🔪", nm:"Primer golpe",       ds:"Derrota a tu primer enemigo.",            rew:5,  test:s=>s.enemiesKilled>=1}, // Nuevo logro
-  {id:"kill10", ic:"⚔️", nm:"Cazador",            ds:"Derrota a 10 enemigos.",                 rew:15, test:s=>s.enemiesKilled>=10}, // Nuevo logro
+  {id:"kill1",  ic:"🔪", nm:"Primer golpe",       ds:"Derrota a tu primer enemigo.",            rew:5,  test:s=>s.enemiesKilled>=1},
+  {id:"kill10", ic:"⚔️", nm:"Cazador",            ds:"Derrota a 10 enemigos.",                 rew:15, test:s=>s.enemiesKilled>=10},
 ];
 const LS_ACH="stormhouse-ach";
 function getAch(){ try{return new Set(JSON.parse(localStorage.getItem(LS_ACH)||"[]"));}catch(e){return new Set();} }
 function saveAch(set){ localStorage.setItem(LS_ACH,JSON.stringify([...set])); }
-// Comprueba logros nuevos, otorga recompensa y devuelve los recién desbloqueados
 function checkAchievements(){
   const stats=getStats(), have=getAch();
   const newlyUnlocked = [];
   ACHIEVEMENTS.forEach(a=>{
     if(!have.has(a.id) && a.test(stats)){
-      have.add(a.id);
-      setPoints(getPoints()+a.rew); // Add points for achievement
-      newlyUnlocked.push(a);
-      console.log(`Logro desbloqueado: ${a.nm}! (+${a.rew} puntos)`); // Debugging
+      have.add(a.id); setPoints(getPoints()+a.rew); newlyUnlocked.push(a);
     }
   });
-  if(newlyUnlocked.length > 0){ saveAch(have); } // Only save if something changed
+  if(newlyUnlocked.length > 0) saveAch(have);
   return newlyUnlocked;
 }
 
 // ---------- Estado global de red ----------
 let peer=null, myId=null, isHost=false, roomCode=null, myName="Jugador";
-const conns={};        // host: id -> DataConnection
-let hostConn=null;     // cliente: conexión al host
+const conns={};
+let hostConn=null;
 let inputState={left:false,right:false,action:false};
-let abilityQueued=false;   // se activa una vez al pulsar habilidad
-let lastSentInput="";
-let latestState=null;  // último estado recibido (cliente) o local (host)
-let renderPlayers={};  // interpolación de posiciones
-let renderEnemies={};  // interpolación de posiciones de enemigos
+let latestState=null;
+let renderPlayers={};
+let renderEnemies={};
 
 // =====================================================
 //  UTILIDADES
@@ -590,7 +557,6 @@ function $(id){return document.getElementById(id)}
 function randCode(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
 function uid(){return "p"+Math.random().toString(36).slice(2,9)}
 const PREFIX="stormhouse-v1-";
-
 function showToast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200)}
 
 // =====================================================
@@ -603,7 +569,7 @@ $("btnCreate").onclick=()=>{
   peer=new Peer(PREFIX+roomCode);
   peer.on("open",()=>{ setupHost(); enterLobby(); });
   peer.on("error",e=>{
-    if(e.type==="unavailable-id"){ // reintenta con otro código
+    if(e.type==="unavailable-id"){
       roomCode=randCode(); peer.destroy(); peer=new Peer(PREFIX+roomCode);
       peer.on("open",()=>{setupHost();enterLobby()});
       peer.on("error",err=>$("menuErr").textContent="Error de conexión: "+err.type);
@@ -611,12 +577,10 @@ $("btnCreate").onclick=()=>{
   });
 };
 
-// ---------- Tienda de clases ----------
 function refreshMenuProgress(){
   $("menuPoints").textContent=getPoints();
   const c=classById(getSelected())||CLASSES[0];
   $("menuClass").textContent=c.nm;
-  // estadísticas guardadas
   const st=getStats();
   $("menuStats").innerHTML=`
     <div class="stat"><b>${st.totalRayos}</b><small>puntos totales</small></div>
@@ -626,15 +590,12 @@ function refreshMenuProgress(){
 }
 function closeShop(){ $("shop").style.display="none"; $("menu").style.display="flex"; refreshMenuProgress(); }
 $("btnShop").onclick=()=>{ $("menu").style.display="none"; $("shop").style.display="flex"; renderShop(); };
-$("btnShopBack").onclick=closeShop;
-$("btnShopExit").onclick=closeShop;
-$("btnShopClose").onclick=closeShop;
+$("btnShopBack").onclick=closeShop; $("btnShopExit").onclick=closeShop; $("btnShopClose").onclick=closeShop;
 
-// ---------- Logros ----------
 function closeAch(){ $("ach").style.display="none"; $("menu").style.display="flex"; refreshMenuProgress(); }
 $("btnAch").onclick=()=>{ $("menu").style.display="none"; $("ach").style.display="flex"; renderAch(); };
-$("btnAchBack").onclick=closeAch;
-$("btnAchClose").onclick=closeAch;
+$("btnAchBack").onclick=closeAch; $("btnAchClose").onclick=closeAch;
+
 function renderAch(){
   $("achPoints").textContent=getPoints();
   const st=getStats(), have=getAch();
@@ -665,20 +626,18 @@ function renderShop(){
     const isOwned=owned.has(c.id), isSel=sel===c.id;
     const el=document.createElement("div");
     el.className="class"+(isSel?" selected":"")+(isOwned?"":" locked");
-    let foot;
-    if(isSel) foot='<span class="sel">✓ Seleccionada</span>';
-    else if(isOwned) foot='<span class="own">Seleccionar</span>';
-    else foot=`<span class="buy${getPoints()>=c.cost?"":" no"}">Comprar</span>`;
+    let foot = isSel ? '<span class="sel">✓ Seleccionada</span>'
+               : isOwned ? '<span class="own">Seleccionar</span>'
+               : `<span class="buy${getPoints()>=c.cost?"":" no"}">Comprar</span>`;
     el.innerHTML=`${c.cost>0&&!isOwned?`<span class="cost-tag">⚡ ${c.cost}</span>`:""}
       <div class="cic">${c.ic}</div><div class="cnm">${c.nm}</div>
       <div class="cds">${c.ds}</div><div class="cfoot">${foot}</div>`;
     el.onclick=()=>{
       const own=getOwned();
       if(own.has(c.id)){ setSelected(c.id); renderShop(); }
-      else {
-        if(getPoints()>=c.cost){ setPoints(getPoints()-c.cost); own.add(c.id); saveOwned(own); setSelected(c.id); renderShop(); }
-        else $("shopErr").textContent=`Te faltan ${c.cost-getPoints()} puntos para "${c.nm}". ¡Sobrevive a más rayos!`;
-      }
+      else if(getPoints()>=c.cost){
+        setPoints(getPoints()-c.cost); own.add(c.id); saveOwned(own); setSelected(c.id); renderShop();
+      } else $("shopErr").textContent=`Te faltan ${c.cost-getPoints()} puntos para "${c.nm}".`;
     };
     grid.appendChild(el);
   });
@@ -686,7 +645,7 @@ function renderShop(){
 
 $("btnJoin").onclick=()=>{
   const code=($("joinCode").value||"").trim().toUpperCase();
-  if(code.length<4){$("menuErr").textContent="Escribe un código de sala válido.";return;}
+  if(code.length<4){$("menuErr").textContent="Escribe un código válido.";return;}
   myName=($("name").value||"Jugador").trim().slice(0,12);
   isHost=false; roomCode=code; myId=uid();
   $("menuErr").textContent="Conectando…";
@@ -696,8 +655,8 @@ $("btnJoin").onclick=()=>{
     let opened=false;
     hostConn.on("open",()=>{ opened=true; hostConn.send({t:"join",name:myName,id:myId,classId:getSelected()}); enterLobby(); });
     hostConn.on("data",onClientData);
-    hostConn.on("close",()=>{ if(gameRunning) endToMenu("Se perdió la conexión con el anfitrión."); });
-    setTimeout(()=>{ if(!opened){$("menuErr").textContent="No se encontró la sala. Revisa el código.";} },6000);
+    hostConn.on("close",()=>{ if(gameRunning) endToMenu("Se perdió la conexión."); });
+    setTimeout(()=>{ if(!opened)$("menuErr").textContent="No se encontró la sala."; },6000);
   });
   peer.on("error",e=>{
     $("menuErr").textContent = e.type==="peer-unavailable" ? "No se encontró esa sala." : "Error: "+e.type;
@@ -705,144 +664,69 @@ $("btnJoin").onclick=()=>{
 };
 
 function enterLobby(){
-  $("menu").style.display="none";
-  $("lobby").style.display="flex";
+  $("menu").style.display="none"; $("lobby").style.display="flex";
   $("lobbyCode").textContent=roomCode;
   $("btnStart").style.display = isHost ? "block" : "none";
-  $("lobbyHint").textContent = isHost ? "Comparte el código. Puedes empezar cuando quieras." : "Esperando a que el anfitrión empiece…";
+  $("lobbyHint").textContent = isHost ? "Comparte el código. Puedes empezar cuando quieras." : "Esperando al anfitrión…";
 }
-
 $("btnCopy").onclick=()=>{ navigator.clipboard&&navigator.clipboard.writeText(roomCode); showToastLobby(); };
 function showToastLobby(){const b=$("btnCopy");b.textContent="¡Copiado!";setTimeout(()=>b.textContent="Copiar",1200);}
 $("btnLeave").onclick=()=>location.reload();
 $("btnAgain").onclick=()=>location.reload();
 
-// Lista de jugadores del lobby
 function renderLobby(){
   const list=$("playerList"); list.innerHTML="";
-  const arr=Object.values(GAME.players);
-  arr.forEach(p=>{
+  Object.values(GAME.players).forEach(p=>{
     const li=document.createElement("li");
     li.innerHTML=`<span class="dot" style="background:${p.color}"></span>${p.name}${p.id===GAME.hostId?'<span class="tag">ANFITRIÓN</span>':''}`;
     list.appendChild(li);
   });
-  $("pcount").textContent=`(${arr.length}/${MAX_PLAYERS})`;
+  $("pcount").textContent=`(${Object.keys(GAME.players).length}/${MAX_PLAYERS})`;
 }
 
 // =====================================================
-//  ESTADO DEL JUEGO (autoritativo en el host)
+//  ESTADO DEL JUEGO
 // =====================================================
 const GAME={
-  players:{},        // id -> objeto jugador
-  order:[],          // orden de ids
-  hostId:null,
-  segments:[],       // tejado: {state:0 intacto|1 agujero, prog, patchTimer}
-  strikes:[],        // rayos activos: {seg,x,phase,t,dur}
-  wave:0,
-  phase:"lobby",     // lobby | playing | intermission | over
-  waveTimer:0,
-  flash:0,
-  strikeTimer:0,
-  roofArmor:0,       // reduce prob. de crear agujeros
-  stormRelief:0,     // reduce rayos próxima oleada
-  patchArmor:0,      // agujeros tapados aguantan más (multiplicador de duración)
-  intermTimer:0,
-  heals:[],          // efectos visuales de curación {x,t,type}
-  toastMsg:null,     // aviso puntual {txt,t}
-  calmTimer:0,       // segundos sin caída de rayos (Señor de la tormenta, Oráculo)
-  invulnTimer:0,     // segundos de invulnerabilidad (Coloso)
-  safeZoneTimer:0,   // segundos de zona segura (Guardián Elemental)
-  droneTimer:0,      // duración del dron (Ingeniero Jefe)
-  droneStrikeTimer:0,// tiempo para el siguiente arreglo del dron
-  droneOwnerId:null, // ID del jugador que activó el dron
-  droneX:0, droneY:0, // Posición actual del dron
-  droneAnimFrame:0,  // Frame de animación del dron
-  timeWarpTimer:0,   // duración de ralentización (Maestro del Tiempo)
-  runRevives:0, runHoles:0,  // contadores de la partida actual
-  runPointsEarned:0, // Puntos ganados en esta partida (para estadísticas de fin de juego)
-  _bossWaveToastShown:false, // Para mostrar el toast de boss wave solo una vez
-
-  // ---------- Nuevos estados para enemigos ----------
-  isEnemyWave: false, // Indica si hay enemigos activos
-  enemies: [],        // Lista de objetos enemigos
-  runEnemiesKilled: 0, // Contador de enemigos eliminados en la partida actual
-  playerAttackCooldown: 0, // Cooldown de ataque del jugador
-
-  // ---------- Nuevos estados para la tienda en partida ----------
-  lightningRods: [], // {id, x, y, timer, ownerId}
-  inGameShopOpen: false, // Estado de la tienda en partida
-  // --- NUEVO: NPC de la tienda ---
-  shopNPC: {
-    x: WORLD_W / 2 + 200, // Posición del NPC de la tienda
-    y: GROUND_Y,
-    active: false, // Si el NPC está visible
-    facing: -1, // Dirección del NPC
-  },
-  shopHintTimer: 0, // Timer para mostrar el hint de la tienda
+  players:{}, order:[], hostId:null, segments:[], strikes:[],
+  wave:0, phase:"lobby", waveTimer:0, flash:0, strikeTimer:0,
+  roofArmor:0, stormRelief:0, patchArmor:0, intermTimer:0,
+  heals:[], toastMsg:null, calmTimer:0, invulnTimer:0, safeZoneTimer:0,
+  droneTimer:0, droneStrikeTimer:0, droneOwnerId:null, droneX:0, droneY:0, droneAnimFrame:0,
+  timeWarpTimer:0, runRevives:0, runHoles:0, runPointsEarned:0, _bossWaveToastShown:false,
+  isEnemyWave:false, enemies:[], runEnemiesKilled:0, playerAttackCooldown:0,
+  lightningRods:[], inGameShopOpen:false,
 };
 
 function makePlayer(id,name,color,classId){
   return {
-    id,name,color,
-    classId: classId||"survivor",
+    id,name,color,classId:classId||"survivor",
     x: ROOF_X0 + 100 + Math.random()*600,
     hp:100,maxHp:100,state:"alive",
     speedMult:1,repairMult:1,reviveMult:1,repairRange:0,
     resist:0,regen:0,dodge:0,shield:0,lives:0,warnBonus:0,repairHeal:0,
-    teamRepair:0,rallyTimer:0,   // aura de capitán / impulso temporal
-    bonusPointsPerRay:0, // Alquimista
-    abCdMult:1,          // Maestro del Tiempo
-    patchArmorBonus:0,   // Ingeniero Jefe
-    reflectChance:0,     // Guardián Elemental
-    diamondShieldChance:0, // Escudo de Diamante
-    diamondShieldTimer:0,  // Invulnerabilidad temporal
-    bleedout:BLEEDOUT,
-    abKind:null,abCd:0,abMax:0,abReq:false, // habilidad de clase
-    currentAbKind:null, // Habilidad activa actual (puede cambiar en oleadas de enemigos)
-    baseAbKind:null, baseAbMax:0, baseAbCd:0, baseWarnBonus:0, // MODIFICADO: para guardar la habilidad base
-    rayos:0,            // puntos de rayos sobrevividos en esta partida (para estadísticas)
-    walk:0,             // fase de animación al caminar
-    input:{left:false,right:false,action:false},
-    busy:null,          // "repair" | "revive" | "attack" | null (para animación)
-    facing:1,
-    ready:false,options:[],
-    // ---------- Nuevos atributos para combate ----------
-    weapon: "bat", // Por defecto, el martillo se convierte en bate en oleadas de enemigos
-    attackDamage: PLAYER_ATTACK_DAMAGE,
-    attackCooldown: 0,
-    attackAnim: 0, // Para animación de ataque
-    predictPathTimer: 0, // Para habilidad de Oráculo
+    teamRepair:0,rallyTimer:0,bonusPointsPerRay:0,abCdMult:1,patchArmorBonus:0,
+    reflectChance:0,diamondShieldChance:0,diamondShieldTimer:0,bleedout:BLEEDOUT,
+    abKind:null,abCd:0,abMax:0,abReq:false,currentAbKind:null,
+    baseAbKind:null,baseAbMax:0,baseAbCd:0,baseWarnBonus:0,
+    rayos:0,walk:0,input:{left:false,right:false,action:false},
+    busy:null,facing:1,ready:false,options:[],weapon:"bat",
+    attackDamage:PLAYER_ATTACK_DAMAGE,attackCooldown:0,attackAnim:0,predictPathTimer:0,
   };
 }
-
-// ---------- Nueva función: makeEnemy ----------
 function makeEnemy(id, x, y) {
-  return {
-    id,
-    x,
-    y,
-    hp: ENEMY_HP,
-    maxHp: ENEMY_HP,
-    state: "alive", // alive | dead | stunned
-    speed: ENEMY_SPEED,
-    attackCooldown: 0,
-    targetPlayerId: null,
-    facing: 1,
-    walkAnim: 0,
-    stunTimer: 0, // Para habilidad de aturdimiento
-    predictedPath: [], // Para habilidad de Oráculo
-    attackAnim: 0, // Animación de ataque del enemigo
-  };
+  return {id,x,y,hp:ENEMY_HP,maxHp:ENEMY_HP,state:"alive",speed:ENEMY_SPEED,
+    attackCooldown:0,targetPlayerId:null,facing:1,walkAnim:0,stunTimer:0,
+    predictedPath:[],attackAnim:0};
 }
 
-// ---------- HOST: aceptar conexiones ----------
+// ---------- HOST: conexiones ----------
 function setupHost(){
   GAME.hostId=myId;
   GAME.players[myId]=makePlayer(myId,myName,COLORS[0],getSelected());
   GAME.order=[myId];
   renderLobby();
   peer.on("connection",conn=>{
-    conn.on("open",()=>{});
     conn.on("data",d=>onHostData(conn,d));
     conn.on("close",()=>{
       const pid=conn._pid;
@@ -873,31 +757,20 @@ function onHostData(conn,d){
   } else if(d.t==="pick"){
     const p=GAME.players[conn._pid];
     if(p&&GAME.phase==="intermission"&&!p.ready) applyUpgrade(p,d.id);
-  } else if(d.t==="buyShopItem"){ // Nuevo: comprar ítem de la tienda en partida
+  } else if(d.t==="buyShopItem"){
     const p=GAME.players[conn._pid];
-    if(p && GAME.inGameShopOpen){
-      console.log(`Host: Jugador ${p.name} (${p.id}) intenta comprar ${d.itemId}. Rayos: ${p.rayos}`); // DEBUG
-      buyInGameShopItem(p, d.itemId);
-    } else {
-      console.log(`Host: Compra fallida. Tienda no abierta o jugador no válido. Jugador: ${p?.name}, Tienda abierta: ${GAME.inGameShopOpen}`); // DEBUG
-    }
-  } else if(d.t==="toggleShop"){ // Nuevo: abrir/cerrar tienda en partida
-    if(GAME.phase === "playing"){
-      GAME.inGameShopOpen = !GAME.inGameShopOpen;
-      console.log(`Host: Tienda en partida toggled a ${GAME.inGameShopOpen}`); // DEBUG
-      // La lógica del NPC se actualiza en el simulate loop
-    } else {
-      console.log(`Host: Intento de toggleShop fuera de fase 'playing'.`); // DEBUG
-    }
+    if(p && GAME.inGameShopOpen) buyInGameShopItem(p, d.itemId);
+  } else if(d.t==="toggleShop"){
+    if(GAME.phase === "playing") GAME.inGameShopOpen = !GAME.inGameShopOpen;
   }
 }
 
 // ---------- CLIENTE: recibir datos ----------
 function onClientData(d){
   if(d.t==="welcome"){ myId=d.id; GAME.hostId=d.host; }
-  else if(d.t==="full"){ $("menuErr").textContent="La sala está llena (10/10)."; location.hash=""; }
+  else if(d.t==="full"){ $("menuErr").textContent="La sala está llena."; }
   else if(d.t==="started"){ $("menuErr").textContent="La partida ya empezó."; }
-  else if(d.t==="lobby"){ // sincroniza lobby
+  else if(d.t==="lobby"){
     GAME.players={}; GAME.hostId=d.hostId;
     d.players.forEach(p=>GAME.players[p.id]={name:p.name,color:p.color,id:p.id});
     renderLobby();
@@ -906,256 +779,155 @@ function onClientData(d){
     latestState=d;
     if(!gameRunning) startClientGame();
     handlePhaseUI(d);
-    // DEBUG: Verificar el estado de la tienda en el cliente
-    if (d.inGameShopOpen) {
-      console.log(`Client: Recibido estado con inGameShopOpen: true`);
-    } else {
-      console.log(`Client: Recibido estado con inGameShopOpen: false`);
-    }
   }
   else if(d.t==="over"){ latestState=d.snapshot||latestState; showGameOver(d.wave); }
 }
 
-// Host: difunde a todos
 function broadcast(obj){ for(const id in conns){ try{conns[id].send(obj)}catch(e){} } }
-
+setInterval(()=>{ if(isHost&&GAME.phase==="lobby") pushLobby(); },700);
 function pushLobby(){
   if(!isHost) return;
   broadcast({t:"lobby",hostId:GAME.hostId,players:GAME.order.map(id=>{const p=GAME.players[id];return{id:p.id,name:p.name,color:p.color}})});
 }
-// refresca lobby de clientes cuando cambia
-const _origRenderLobby=renderLobby;
-setInterval(()=>{ if(isHost&&GAME.phase==="lobby") pushLobby(); },700);
 
 // =====================================================
 //  INICIO DE PARTIDA
 // =====================================================
-$("btnStart").onclick=()=>{
-  if(!isHost) return;
-  startWaveSystem();
-  startHostGame();
-};
+$("btnStart").onclick=()=>{ if(isHost){ startWaveSystem(); startHostGame(); } };
 
 function initRoof(){
   GAME.segments=[];
-  for(let i=0;i<SEG_COUNT;i++) GAME.segments.push({state:0,prog:0,patchTimer:0}); // patchTimer para Ingeniero Jefe
+  for(let i=0;i<SEG_COUNT;i++) GAME.segments.push({state:0,prog:0,patchTimer:0});
 }
-
 function applyClass(p){
   const c=classById(p.classId)||CLASSES[0];
   if(c.passive) c.passive(p);
-  // Asigna la habilidad base de la clase
   if(c.abKind){ p.abKind=c.abKind; p.abMax=c.cd * p.abCdMult; p.abCd=0; }
-  // Guarda la habilidad base para poder cambiarla en oleadas de enemigos
-  p.baseAbKind = p.abKind;
-  p.baseAbMax = p.abMax;
-  p.baseAbCd = p.abCd;
-  p.baseWarnBonus = p.warnBonus; // Guarda el warnBonus base para Oracle
+  p.baseAbKind=p.abKind; p.baseAbMax=p.abMax; p.baseAbCd=p.abCd; p.baseWarnBonus=p.warnBonus;
 }
-
 function startWaveSystem(){
   GAME.phase="playing"; GAME.wave=1; GAME.waveTimer=WAVE_DURATION;
   GAME.strikes=[]; GAME.flash=0; GAME.strikeTimer=1.2;
   GAME.runRevives=0; GAME.runHoles=0; GAME.calmTimer=0; GAME.invulnTimer=0;
   GAME.safeZoneTimer=0; GAME.droneTimer=0; GAME.droneStrikeTimer=0; GAME.timeWarpTimer=0;
-  GAME.runPointsEarned=0; // Resetear puntos ganados en esta partida
-  GAME._bossWaveToastShown=false; // Resetear para la nueva partida
-  GAME.isEnemyWave = false; // Resetear estado de oleada de enemigos
-  GAME.enemies = []; // Limpiar enemigos
-  GAME.runEnemiesKilled = 0; // Resetear contador de enemigos
-  GAME.lightningRods = []; // Limpiar pararrayos
-  GAME.inGameShopOpen = false; // Cerrar tienda en partida
-  GAME.shopNPC.active = false; // Ocultar NPC de la tienda
-  GAME.shopHintTimer = 0; // Ocultar hint de la tienda
+  GAME.runPointsEarned=0; GAME._bossWaveToastShown=false;
+  GAME.isEnemyWave=false; GAME.enemies=[]; GAME.runEnemiesKilled=0;
+  GAME.lightningRods=[]; GAME.inGameShopOpen=false;
   initRoof();
   for(const id in GAME.players){
     const p=GAME.players[id];
-    applyClass(p);
-    p.hp=p.maxHp; p.state="alive"; p.bleedout=BLEEDOUT;
-    p.rayos=0; // Resetear puntos de rayos para esta partida
-    p.diamondShieldTimer=0; // Resetear invulnerabilidad de diamante
-    p.attackCooldown = 0; // Resetear cooldown de ataque del jugador
-    p.attackAnim = 0; // Resetear animación de ataque
-    p.predictPathTimer = 0; // Resetear timer de predicción de Oráculo
+    applyClass(p); p.hp=p.maxHp; p.state="alive"; p.bleedout=BLEEDOUT;
+    p.rayos=0; p.diamondShieldTimer=0; p.attackCooldown=0; p.attackAnim=0; p.predictPathTimer=0;
   }
-  // Aura de equipo del Capitán: bonus de reparación a todos
   let aura=0; for(const id in GAME.players) aura+=GAME.players[id].teamRepair||0;
   if(aura>0) for(const id in GAME.players) GAME.players[id].repairMult*=(1+aura);
 }
 
 // =====================================================
-//  BUCLE DEL HOST (simulación)
+//  BUCLE DEL HOST
 // =====================================================
 let hostLoop=null, gameRunning=false;
 
 function startHostGame(){
-  gameRunning=true;
-  showGameScreen();
+  gameRunning=true; showGameScreen();
   let last=performance.now();
   hostLoop=setInterval(()=>{
-    const now=performance.now();
-    let dt=(now-last)/1000; last=now;
-    if(dt>0.1) dt=0.1;
-
-    // Aplicar ralentización de tiempo si Maestro del Tiempo está activo
-    const timeFactor = GAME.timeWarpTimer > 0 ? 0.35 : 1; // Ralentiza a 35%
-    simulate(dt * timeFactor);
-    
-    // Decrementar el timer de timeWarp por el tiempo real
-    if(GAME.timeWarpTimer > 0) GAME.timeWarpTimer = Math.max(0, GAME.timeWarpTimer - dt);
-
+    const now=performance.now(); let dt=(now-last)/1000; last=now; if(dt>0.1)dt=0.1;
+    const tf = GAME.timeWarpTimer>0 ? 0.35 : 1;
+    simulate(dt*tf);
+    if(GAME.timeWarpTimer>0) GAME.timeWarpTimer = Math.max(0, GAME.timeWarpTimer-dt);
     broadcastState();
   },1000*TICK);
   requestAnimationFrame(renderLoop);
 }
-
 function startClientGame(){ gameRunning=true; showGameScreen(); requestAnimationFrame(renderLoop); startClientInputSender(); }
-
 function startClientInputSender(){
+  let last="";
   setInterval(()=>{
     const s=JSON.stringify(inputState);
-    if(s!==lastSentInput && hostConn && hostConn.open){ hostConn.send({t:"input",...inputState}); lastSentInput=s; }
+    if(s!==last && hostConn && hostConn.open){ hostConn.send({t:"input",...inputState}); last=s; }
   },1000/30);
 }
-
 function showGameScreen(){
   $("menu").style.display="none"; $("lobby").style.display="none"; $("shop").style.display="none"; $("ach").style.display="none"; $("game").style.display="block";
   resizeCanvas();
   const touch = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
-  if(touch) {
-    $("touch").classList.add("show");
-    $("tShop").classList.add("show"); // Mostrar botón de tienda móvil
-  }
-  // habilidad de clase
+  if(touch){ $("touch").classList.add("show"); $("tShop").classList.add("show"); }
   const cls=classById(getSelected());
   if(cls&&cls.abKind){
     if(touch) $("tAbility").classList.add("show");
     const hint=$("abilityHint");
-    hint.textContent = touch ? `Toca HABILIDAD para: ${cls.nm}` : `Pulsa Q para tu habilidad: ${cls.nm}`;
-    hint.style.display="block";
-    setTimeout(()=>{ hint.style.display="none"; },5000);
+    hint.textContent = touch ? `Toca HABILIDAD · 🛒 tienda` : `Q = habilidad · B = tienda`;
+    hint.style.display="block"; setTimeout(()=>hint.style.display="none",6000);
   }
 }
 
-// ---------- Simulación (solo host) ----------
+// ---------- Simulación ----------
 function segCenterX(i){ return ROOF_X0 + SEG_W*i + SEG_W/2; }
 function playerSegIndex(p){ const rel=(p.x-ROOF_X0)/SEG_W; return Math.max(0,Math.min(SEG_COUNT-1,Math.floor(rel))); }
 
 function simulate(dt){
   const players=Object.values(GAME.players);
-  const isBossWave = (GAME.wave > 0 && GAME.wave % 5 === 0); // Oleada de jefe
-  GAME.isEnemyWave = (GAME.wave > 0 && GAME.wave % ENEMY_WAVE_INTERVAL === 0); // Oleada de enemigos
+  const isBossWave = (GAME.wave>0 && GAME.wave%5===0);
+  GAME.isEnemyWave = (GAME.wave>0 && GAME.wave%ENEMY_WAVE_INTERVAL===0);
 
   if(GAME.phase==="playing"){
-    // --- Lógica del NPC de la tienda ---
-    const shopNPC = GAME.shopNPC;
-    let playerNearShop = false;
-    players.forEach(p => {
-      if (p.state === "alive" && Math.abs(p.x - shopNPC.x) < 80) { // Rango de interacción
-        playerNearShop = true;
-      }
-    });
-
-    // Lógica para activar el NPC y el hint de la tienda
-    if (GAME.inGameShopOpen) {
-      shopNPC.active = true; // El NPC siempre está activo si la tienda está abierta
-      GAME.shopHintTimer = 0; // No mostrar hint si la tienda ya está abierta
-    } else if (playerNearShop) {
-      shopNPC.active = true; // Activar NPC si un jugador está cerca y la tienda no está abierta
-      GAME.shopHintTimer = 1; // Mostrar hint
-    } else {
-      shopNPC.active = false; // Desactivar NPC si no hay jugadores cerca y la tienda no está abierta
-      GAME.shopHintTimer = 0; // Ocultar hint
-    }
-
-    // --- Manejo de la tienda en partida ---
+    // Pausar controles si tienda abierta
     if(GAME.inGameShopOpen){
-      // Si la tienda está abierta, los jugadores no se mueven ni realizan acciones
-      players.forEach(p => {
-        p.input.left = false;
-        p.input.right = false;
-        p.input.action = false;
-        p.busy = null;
-      });
+      players.forEach(p=>{ p.input.left=false; p.input.right=false; p.input.action=false; p.busy=null; });
     }
 
-    // --- Movimiento y acciones de jugadores ---
     players.forEach(p=>{
       if(p.state==="dead"){p.busy=null;p.abReq=false;return;}
-      if(p.state==="downed"){
-        p.bleedout-=dt; p.busy=null; p.abReq=false;
-        if(p.bleedout<=0){ p.state="dead"; }
-        return;
-      }
-      // regen
+      if(p.state==="downed"){ p.bleedout-=dt; p.busy=null; p.abReq=false; if(p.bleedout<=0)p.state="dead"; return; }
       if(p.regen>0) p.hp=Math.min(p.maxHp,p.hp+p.regen*dt);
-      // habilidad de clase (enfriamiento + activación)
       if(p.abCd>0) p.abCd=Math.max(0,p.abCd-dt);
       if(p.abReq){ p.abReq=false; if(p.currentAbKind&&p.abCd<=0){ executeAbility(p); p.abCd=p.abMax; } }
-      // impulso temporal del Capitán (rally)
       if(p.rallyTimer>0) p.rallyTimer=Math.max(0,p.rallyTimer-dt);
-      // Invulnerabilidad de Escudo de Diamante
       if(p.diamondShieldTimer>0) p.diamondShieldTimer=Math.max(0,p.diamondShieldTimer-dt);
-      // Cooldown de ataque del jugador
-      if(p.attackCooldown > 0) p.attackCooldown = Math.max(0, p.attackCooldown - dt);
-      if(p.attackAnim > 0) p.attackAnim = Math.max(0, p.attackAnim - dt);
-      // Timer de predicción de Oráculo
-      if(p.predictPathTimer > 0) p.predictPathTimer = Math.max(0, p.predictPathTimer - dt);
-
+      if(p.attackCooldown>0) p.attackCooldown=Math.max(0,p.attackCooldown-dt);
+      if(p.attackAnim>0) p.attackAnim=Math.max(0,p.attackAnim-dt);
+      if(p.predictPathTimer>0) p.predictPathTimer=Math.max(0,p.predictPathTimer-dt);
 
       const spd = p.speedMult * (p.rallyTimer>0?1.6:1);
-      // mover
       let vx=0;
       if(p.input.left) vx-=1;
       if(p.input.right) vx+=1;
-      if(vx!==0){p.facing=vx;}
+      if(vx!==0) p.facing=vx;
       p.x += vx*MOVE_SPEED*spd*dt;
       p.x=Math.max(ROOF_X0+10,Math.min(ROOF_X1-10,p.x));
       p.busy=null;
 
-      // acción: atacar, revivir o reparar
       if(p.input.action){
-        // Prioridad 1: Atacar enemigos si hay una oleada de enemigos
-        if(GAME.isEnemyWave && p.attackCooldown <= 0){
-          let targetEnemy = null, bestD = ENEMY_ATTACK_RANGE + 20; // Rango de ataque del jugador
-          GAME.enemies.forEach(e => {
-            if(e.state === "alive" || e.state === "stunned"){
-              const d = Math.abs(e.x - p.x);
-              if(d < bestD){ bestD = d; targetEnemy = e; }
+        // Atacar enemigos
+        if(GAME.isEnemyWave && p.attackCooldown<=0){
+          let target=null, bestD=ENEMY_ATTACK_RANGE+20;
+          GAME.enemies.forEach(e=>{
+            if((e.state==="alive"||e.state==="stunned")){
+              const d=Math.abs(e.x-p.x); if(d<bestD){bestD=d;target=e;}
             }
           });
-
-          if(targetEnemy){
-            p.busy = "attack";
-            p.attackAnim = 0.2; // Duración de la animación de ataque
-            p.attackCooldown = PLAYER_ATTACK_COOLDOWN;
-            targetEnemy.hp -= p.attackDamage;
-            GAME.heals.push({x:targetEnemy.x, t:0.3, type:"damage"}); // Efecto visual de daño
-            if(targetEnemy.hp <= 0){
-              targetEnemy.state = "dead";
-              GAME.runEnemiesKilled++;
-            }
+          if(target){
+            p.busy="attack"; p.attackAnim=0.2; p.attackCooldown=PLAYER_ATTACK_COOLDOWN;
+            target.hp -= p.attackDamage;
+            GAME.heals.push({x:target.x,t:0.3,type:"damage"});
+            if(target.hp<=0){ target.state="dead"; GAME.runEnemiesKilled++; }
           }
         }
-
-        // Prioridad 2: Revivir aliado
-        if(p.busy !== "attack"){ // Si no está atacando, puede revivir
+        // Revivir aliado
+        if(p.busy!=="attack"){
           let target=null,bestD=70;
-          players.forEach(q=>{
-            if(q!==p&&q.state==="downed"){const d=Math.abs(q.x-p.x);if(d<bestD){bestD=d;target=q;}}
-          });
+          players.forEach(q=>{ if(q!==p&&q.state==="downed"){const d=Math.abs(q.x-p.x);if(d<bestD){bestD=d;target=q;}}});
           if(target){
             p.busy="revive";
             target._rev=(target._rev||0)+REVIVE_RATE*p.reviveMult*dt;
-            if(target._rev>=1){ target.state="alive"; target.hp=target.maxHp*0.5; target.bleedout=BLEEDOUT; target._rev=0; GAME.runRevives=(GAME.runRevives||0)+1; }
+            if(target._rev>=1){ target.state="alive"; target.hp=target.maxHp*0.5; target.bleedout=BLEEDOUT; target._rev=0; GAME.runRevives++; }
           }
         }
-
-        // Prioridad 3: Reparar agujero
-        if(p.busy !== "attack" && p.busy !== "revive"){ // Si no está atacando ni reviviendo
-          const idx=playerSegIndex(p);
-          let repaired=false;
-          for(let off=0;off<=p.repairRange&&!repaired;off++){
+        // Reparar
+        if(p.busy!=="attack" && p.busy!=="revive"){
+          const idx=playerSegIndex(p); let done=false;
+          for(let off=0;off<=p.repairRange&&!done;off++){
             for(const s of (off===0?[idx]:[idx-off,idx+off])){
               if(s<0||s>=SEG_COUNT) continue;
               const seg=GAME.segments[s];
@@ -1164,235 +936,161 @@ function simulate(dt){
                 seg.prog+=REPAIR_RATE*p.repairMult*dt;
                 if(seg.prog>=1){
                   seg.state=0; seg.prog=0;
-                  // MODIFICADO: Aplicar patchArmorBonus del Ingeniero Jefe si existe
-                  const chiefEngineer = Object.values(GAME.players).find(pl => pl.classId === "chiefengineer");
-                  seg.patchTimer = BASE_PATCH_DURATION * (1 + GAME.patchArmor + (chiefEngineer ? chiefEngineer.patchArmorBonus : 0));
+                  const chief=Object.values(GAME.players).find(pl=>pl.classId==="chiefengineer");
+                  seg.patchTimer=BASE_PATCH_DURATION*(1+GAME.patchArmor+(chief?chief.patchArmorBonus:0));
                   if(p.repairHeal>0)p.hp=Math.min(p.maxHp,p.hp+p.repairHeal);
-                  GAME.runHoles=(GAME.runHoles||0)+1;
+                  GAME.runHoles++;
                 }
-                repaired=true; break;
+                done=true; break;
               }
             }
           }
         }
       } else {
-        // reinicia progreso de revivir si nadie ayuda
-        players.forEach(q=>{ if(q.state==="downed"&&q._rev){ q._rev=Math.max(0,q._rev-dt*0.5);} });
+        players.forEach(q=>{ if(q.state==="downed"&&q._rev) q._rev=Math.max(0,q._rev-dt*0.5); });
       }
     });
 
-    // --- Lógica de enemigos ---
+    // Enemigos
     if(GAME.isEnemyWave){
-      // Spawneo de enemigos si no hay suficientes
-      const targetEnemyCount = Math.floor(ENEMY_COUNT_BASE + GAME.wave * ENEMY_COUNT_PER_WAVE);
-      if(GAME.enemies.filter(e => e.state !== "dead").length < targetEnemyCount && GAME.waveTimer > WAVE_DURATION / 2){ // Solo spawnea al inicio de la oleada
-        const spawnX = Math.random() < 0.5 ? ROOF_X0 - 50 : ROOF_X1 + 50; // Spawnea a los lados
-        GAME.enemies.push(makeEnemy(uid(), spawnX, GROUND_Y));
+      const tgt = Math.floor(ENEMY_COUNT_BASE + GAME.wave*ENEMY_COUNT_PER_WAVE);
+      if(GAME.enemies.filter(e=>e.state!=="dead").length < tgt && GAME.waveTimer > WAVE_DURATION/2){
+        const sx = Math.random()<0.5 ? ROOF_X0-50 : ROOF_X1+50;
+        GAME.enemies.push(makeEnemy(uid(), sx, GROUND_Y));
       }
-
-      GAME.enemies.forEach(e => {
-        if(e.state === "dead") return;
-
-        // Aturdimiento
-        if(e.stunTimer > 0){
-          e.stunTimer = Math.max(0, e.stunTimer - dt);
-          e.walkAnim = 0; // Detiene animación de caminar
-          e.attackAnim = 0; // Detiene animación de ataque
-          return; // No se mueve ni ataca si está aturdido
-        }
-
-        // Encontrar jugador más cercano
-        let closestPlayer = null;
-        let minDist = Infinity;
-        players.forEach(p => {
-          if(p.state === "alive"){
-            const dist = Math.abs(p.x - e.x);
-            if(dist < minDist){
-              minDist = dist;
-              closestPlayer = p;
+      GAME.enemies.forEach(e=>{
+        if(e.state==="dead") return;
+        if(e.stunTimer>0){ e.stunTimer=Math.max(0,e.stunTimer-dt); e.walkAnim=0; e.attackAnim=0; return; }
+        let closest=null, minD=Infinity;
+        players.forEach(p=>{ if(p.state==="alive"){const d=Math.abs(p.x-e.x);if(d<minD){minD=d;closest=p;}} });
+        if(closest){
+          e.targetPlayerId=closest.id;
+          const dir=Math.sign(closest.x-e.x); e.facing=dir;
+          e.x += dir*e.speed*dt; e.walkAnim += dt*8;
+          if(minD<ENEMY_ATTACK_RANGE && e.attackCooldown<=0){
+            e.attackAnim=0.2; closest.hp-=ENEMY_ATTACK_DAMAGE;
+            GAME.heals.push({x:closest.x,t:0.3,type:"damage"});
+            e.attackCooldown=ENEMY_ATTACK_COOLDOWN;
+            if(closest.hp<=0){
+              if(closest.lives>0){ closest.lives--; closest.hp=closest.maxHp*0.5; }
+              else { closest.state="downed"; closest.bleedout=BLEEDOUT; closest.hp=0; }
             }
+          } else if(e.attackCooldown>0){
+            e.attackCooldown=Math.max(0,e.attackCooldown-dt);
+            e.attackAnim=Math.max(0,e.attackAnim-dt);
           }
-        });
-
-        if(closestPlayer){
-          e.targetPlayerId = closestPlayer.id;
-          // Mover hacia el jugador
-          const dir = Math.sign(closestPlayer.x - e.x);
-          e.facing = dir;
-          e.x += dir * e.speed * dt;
-          e.walkAnim += dt * 8; // Animación de caminar
-
-          // Atacar si está en rango
-          if(minDist < ENEMY_ATTACK_RANGE && e.attackCooldown <= 0){
-            e.attackAnim = 0.2; // Animación de ataque del enemigo
-            closestPlayer.hp -= ENEMY_ATTACK_DAMAGE;
-            GAME.heals.push({x:closestPlayer.x, t:0.3, type:"damage"}); // Efecto visual de daño
-            e.attackCooldown = ENEMY_ATTACK_COOLDOWN;
-            if(closestPlayer.hp <= 0){
-              if(closestPlayer.lives > 0){ closestPlayer.lives--; closestPlayer.hp=closestPlayer.maxHp*0.5; }
-              else { closestPlayer.state="downed"; closestPlayer.bleedout=BLEEDOUT; closestPlayer.hp=0; }
-            }
-          } else if (e.attackCooldown > 0) {
-            e.attackCooldown = Math.max(0, e.attackCooldown - dt);
-            e.attackAnim = Math.max(0, e.attackAnim - dt); // Decrementar animación de ataque
-          }
-        } else {
-          e.targetPlayerId = null;
-          e.walkAnim = 0;
-          e.attackAnim = 0;
-        }
-
-        // Predicción de camino para Oracle
-        if(e.predictedPath.length > 0 && e.predictedPath[0].t <= 0){
-          e.predictedPath.shift();
-        }
-        e.predictedPath.forEach(pathPoint => pathPoint.t -= dt);
+        } else { e.targetPlayerId=null; e.walkAnim=0; e.attackAnim=0; }
+        if(e.predictedPath.length>0 && e.predictedPath[0].t<=0) e.predictedPath.shift();
+        e.predictedPath.forEach(pp=>pp.t-=dt);
       });
-      // Eliminar enemigos muertos
-      GAME.enemies = GAME.enemies.filter(e => e.state !== "dead");
+      GAME.enemies = GAME.enemies.filter(e=>e.state!=="dead");
     }
 
-    // --- Timers globales ---
+    // Timers globales
     GAME.flash=Math.max(0,GAME.flash-dt*3);
-    for(let i=GAME.heals.length-1;i>=0;i--){ GAME.heals[i].t-=dt; if(GAME.heals[i].t<=0) GAME.heals.splice(i,1); }
-    if(GAME.toastMsg){ GAME.toastMsg.t-=dt; if(GAME.toastMsg.t<=0) GAME.toastMsg=null; }
+    for(let i=GAME.heals.length-1;i>=0;i--){ GAME.heals[i].t-=dt; if(GAME.heals[i].t<=0)GAME.heals.splice(i,1); }
+    if(GAME.toastMsg){ GAME.toastMsg.t-=dt; if(GAME.toastMsg.t<=0)GAME.toastMsg=null; }
     if(GAME.calmTimer>0) GAME.calmTimer=Math.max(0,GAME.calmTimer-dt);
-    if(GAME.invulnTimer>0) GAME.invulnTimer=Math.max(0,GAME.invulnTimer-dt); // Coloso invulnerable
-    if(GAME.safeZoneTimer>0) GAME.safeZoneTimer=Math.max(0,GAME.safeZoneTimer-dt); // Guardián Elemental Safe Zone
-
-    // Dron de reparación (Ingeniero Jefe)
-    if(GAME.droneTimer > 0){
-      GAME.droneTimer = Math.max(0, GAME.droneTimer - dt);
-      GAME.droneAnimFrame += dt * 10; // Animate drone
-      
-      // Move drone towards its owner
-      const owner = GAME.players[GAME.droneOwnerId];
-      if (owner && owner.state === "alive") {
-        GAME.droneX += (owner.x - GAME.droneX) * 0.1;
-        GAME.droneY += ((ROOF_Y - 30) - GAME.droneY) * 0.1; // Keep it hovering above roof
-      } else {
-        // If owner is dead/downed, just keep it hovering at its last known position
-        // Or make it despawn faster, or return to a default spot. For now, just hover.
+    if(GAME.invulnTimer>0) GAME.invulnTimer=Math.max(0,GAME.invulnTimer-dt);
+    if(GAME.safeZoneTimer>0) GAME.safeZoneTimer=Math.max(0,GAME.safeZoneTimer-dt);
+    if(GAME.droneTimer>0){
+      GAME.droneTimer=Math.max(0,GAME.droneTimer-dt);
+      GAME.droneAnimFrame += dt*10;
+      const owner=GAME.players[GAME.droneOwnerId];
+      if(owner && owner.state==="alive"){
+        GAME.droneX += (owner.x-GAME.droneX)*0.1;
+        GAME.droneY += ((ROOF_Y-30)-GAME.droneY)*0.1;
       }
-
       GAME.droneStrikeTimer -= dt;
-      if(GAME.droneStrikeTimer <= 0){
-        GAME.droneStrikeTimer = 1.5; // Repara cada 1.5s
-        const holes = []; for(let i=0;i<SEG_COUNT;i++) if(GAME.segments[i].state===1) holes.push(i);
-        if(holes.length > 0){
-          const segIdx = holes[Math.floor(Math.random() * holes.length)];
-          GAME.segments[segIdx].state = 0;
-          GAME.segments[segIdx].prog = 0;
-          // MODIFICADO: Aplicar patchArmorBonus del Ingeniero Jefe si existe
-          const chiefEngineer = Object.values(GAME.players).find(p=>p.classId==="chiefengineer");
-          GAME.segments[segIdx].patchTimer = BASE_PATCH_DURATION * (1 + GAME.patchArmor + (chiefEngineer ? chiefEngineer.patchArmorBonus : 0));
-          GAME.runHoles=(GAME.runHoles||0)+1;
-          // Specific repair spark effect for drone
-          GAME.heals.push({x:segCenterX(segIdx),t:0.4, type:"repairSpark"});
+      if(GAME.droneStrikeTimer<=0){
+        GAME.droneStrikeTimer=1.5;
+        const holes=[]; for(let i=0;i<SEG_COUNT;i++) if(GAME.segments[i].state===1) holes.push(i);
+        if(holes.length>0){
+          const si=holes[Math.floor(Math.random()*holes.length)];
+          GAME.segments[si].state=0; GAME.segments[si].prog=0;
+          const chief=Object.values(GAME.players).find(p=>p.classId==="chiefengineer");
+          GAME.segments[si].patchTimer=BASE_PATCH_DURATION*(1+GAME.patchArmor+(chief?chief.patchArmorBonus:0));
+          GAME.runHoles++;
+          GAME.heals.push({x:segCenterX(si),t:0.4,type:"repairSpark"});
         }
       }
     }
-
-    // Agujeros se reabren
     GAME.segments.forEach(seg=>{
       if(seg.state===0 && seg.patchTimer>0){
-        seg.patchTimer-=dt;
-        if(seg.patchTimer<=0){ seg.state=1; seg.prog=0; } // Se reabre si no se repara a tiempo
+        seg.patchTimer-=dt; if(seg.patchTimer<=0){ seg.state=1; seg.prog=0; }
       }
     });
-
-    // Actualizar pararrayos
-    for(let i = GAME.lightningRods.length - 1; i >= 0; i--){
+    for(let i=GAME.lightningRods.length-1;i>=0;i--){
       GAME.lightningRods[i].timer -= dt;
-      if(GAME.lightningRods[i].timer <= 0){
-        GAME.lightningRods.splice(i, 1);
-      }
+      if(GAME.lightningRods[i].timer<=0) GAME.lightningRods.splice(i,1);
     }
-    
-    // --- Tormenta / rayos ---
-    const relief=1-Math.min(0.5,GAME.stormRelief);
-    let baseInterval=Math.max(0.55, 2.5 - GAME.wave*0.04) * relief; // Ajustado para que las oleadas no sean tan rápidas al principio
-    let maxConcurrent=1+Math.floor(GAME.wave/3);
 
-    if(isBossWave){ // Modificadores de oleada de jefe
-      baseInterval /= 3; // Rayos el triple de rápido
-      maxConcurrent += 4; // 4 rayos concurrentes adicionales
+    // Tormenta / rayos
+    const relief=1-Math.min(0.5,GAME.stormRelief);
+    let baseInt=Math.max(0.55, 2.5-GAME.wave*0.04)*relief;
+    let maxConc=1+Math.floor(GAME.wave/3);
+    if(isBossWave){
+      baseInt/=3; maxConc+=4;
       if(!GAME._bossWaveToastShown){
         GAME.toastMsg={txt:`¡OLEADA DE TORMENTA! ¡Aguanten! ⚡`,t:3};
         GAME._bossWaveToastShown=true;
       }
-    } else {
-      GAME._bossWaveToastShown=false;
-    }
+    } else GAME._bossWaveToastShown=false;
 
     GAME.strikeTimer-=dt;
-    if(GAME.calmTimer<=0 && GAME.safeZoneTimer<=0 && GAME.strikeTimer<=0 && GAME.strikes.length<maxConcurrent){
-      GAME.strikeTimer=baseInterval*(0.6+Math.random()*0.8);
+    if(GAME.calmTimer<=0 && GAME.safeZoneTimer<=0 && GAME.strikeTimer<=0 && GAME.strikes.length<maxConc){
+      GAME.strikeTimer=baseInt*(0.6+Math.random()*0.8);
       spawnStrike(isBossWave);
     }
-    // avanzar rayos
     for(let i=GAME.strikes.length-1;i>=0;i--){
       const st=GAME.strikes[i]; st.t-=dt;
       if(st.phase==="warn" && st.t<=0){ resolveStrike(st); st.phase="hit"; st.t=0.18; }
-      else if(st.phase==="hit" && st.t<=0){ GAME.strikes.splice(i,1); }
+      else if(st.phase==="hit" && st.t<=0) GAME.strikes.splice(i,1);
     }
 
-    // --- Fin de oleada ---
     GAME.waveTimer-=dt;
-    if(GAME.waveTimer<=0){ startIntermission(); }
-
-    // --- Derrota: todos muertos ---
-    if(players.length>0 && players.every(p=>p.state==="dead")){ triggerGameOver(); }
+    if(GAME.waveTimer<=0) startIntermission();
+    if(players.length>0 && players.every(p=>p.state==="dead")) triggerGameOver();
   }
   else if(GAME.phase==="intermission"){
     GAME.intermTimer-=dt;
-    const allReady=players.filter(p=>p.state!=="dead").every(p=>p.ready) && players.some(p=>p.state!=="dead");
-    if(allReady || GAME.intermTimer<=0){ nextWave(); }
+    const alive=players.filter(p=>p.state!=="dead");
+    if((alive.every(p=>p.ready) && alive.some(p=>p.state!=="dead")) || GAME.intermTimer<=0) nextWave();
   }
 }
 
-function spawnStrike(isBossWave = false){
-  // Si es oleada de enemigos, los rayos caen a los costados y no hacen daño
+function spawnStrike(isBossWave){
   if(GAME.isEnemyWave){
-    const xPos = Math.random() < 0.5 ? ROOF_X0 - 50 : ROOF_X1 + 50; // Fuera de la casa
-    GAME.strikes.push({seg:-1, x:xPos, phase:"warn", t:1.0, dur:1.0, kind:"ambient_storm"}); // kind "ambient_storm" para no dañar
+    const xp = Math.random()<0.5 ? ROOF_X0-50 : ROOF_X1+50;
+    GAME.strikes.push({seg:-1,x:xp,phase:"warn",t:1.0,dur:1.0,kind:"ambient_storm"});
     return;
   }
-
-  // Prioridad: Pararrayos
-  if(GAME.lightningRods.length > 0 && Math.random() < 0.8){ // 80% de probabilidad de golpear un pararrayos
-    const activeRods = GAME.lightningRods.filter(rod => rod.timer > 0);
-    if(activeRods.length > 0){
-      const rod = activeRods[Math.floor(Math.random() * activeRods.length)];
-      GAME.strikes.push({seg:-1, x:rod.x, phase:"warn", t:0.8, dur:0.8, kind:"lightning_rod"}); // kind "lightning_rod" para no dañar
+  if(GAME.lightningRods.length>0 && Math.random()<0.8){
+    const rods=GAME.lightningRods.filter(r=>r.timer>0);
+    if(rods.length>0){
+      const r=rods[Math.floor(Math.random()*rods.length)];
+      GAME.strikes.push({seg:-1,x:r.x,phase:"warn",t:0.8,dur:0.8,kind:"lightning_rod"});
       return;
     }
   }
-
-  // Preferimos a veces golpear agujeros existentes para presionar al equipo
   const holes=[]; for(let i=0;i<SEG_COUNT;i++) if(GAME.segments[i].state===1) holes.push(i);
   let seg;
-  if(holes.length && Math.random()<(isBossWave?0.7:0.45)) seg=holes[Math.floor(Math.random()*holes.length)]; // Más chance de golpear agujeros en boss wave
+  if(holes.length && Math.random()<(isBossWave?0.7:0.45)) seg=holes[Math.floor(Math.random()*holes.length)];
   else seg=Math.floor(Math.random()*SEG_COUNT);
-  
-  let warnTime = Math.max(0.55, 1.25 - GAME.wave*0.04);
-  // Ajustar tiempo de aviso según warnBonus de los jugadores
-  Object.values(GAME.players).forEach(p=>{ if(p.state==="alive") warnTime += p.warnBonus; });
-  warnTime = Math.max(0.55, warnTime); // Mínimo de tiempo de aviso
-
-  GAME.strikes.push({seg,x:segCenterX(seg),phase:"warn",t:warnTime,dur:warnTime,kind:"storm"});
+  let wt=Math.max(0.55,1.25-GAME.wave*0.04);
+  Object.values(GAME.players).forEach(p=>{ if(p.state==="alive") wt+=p.warnBonus; });
+  wt=Math.max(0.55,wt);
+  GAME.strikes.push({seg,x:segCenterX(seg),phase:"warn",t:wt,dur:wt,kind:"storm"});
 }
 
-// ---------- Habilidades de clase ----------
+// ---------- Habilidades ----------
 function executeAbility(p){
   const seg=playerSegIndex(p);
-  const currentAbKind = p.currentAbKind; // Usar la habilidad activa actual
-
-  if(currentAbKind==="bless"){
-    // rayo bendito: cae sobre la posición del jugador
+  const k=p.currentAbKind;
+  if(k==="bless"){
     GAME.strikes.push({seg,x:segCenterX(seg),phase:"warn",t:0.5,dur:0.5,kind:"bless",owner:p.id});
     GAME.toastMsg={txt:`${p.name} invocó un rayo bendito ⚡`,t:2};
-  } else if(currentAbKind==="heal"){
+  } else if(k==="heal"){
     let n=0;
     Object.values(GAME.players).forEach(q=>{
       if(q.state==="dead") return;
@@ -1402,159 +1100,128 @@ function executeAbility(p){
         n++;
       }
     });
-    GAME.heals.push({x:p.x,t:0.6, type:"heal"});
+    GAME.heals.push({x:p.x,t:0.6,type:"heal"});
     GAME.toastMsg={txt:`${p.name} curó al equipo ⛑️ (${n})`,t:2};
-  } else if(currentAbKind==="teamShield"){
+  } else if(k==="teamShield"){
     Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead") q.shield+=1; });
     GAME.toastMsg={txt:`${p.name} dio escudos al equipo 🔱`,t:2};
-  } else if(currentAbKind==="fixAll"){
-    GAME.segments.forEach(s=>{ s.state=0; s.prog=0;
-      // MODIFICADO: Aplicar patchArmorBonus del Ingeniero Jefe si existe
-      const chiefEngineer = Object.values(GAME.players).find(pl => pl.classId === "chiefengineer");
-      s.patchTimer = BASE_PATCH_DURATION * (1 + GAME.patchArmor + (chiefEngineer ? chiefEngineer.patchArmorBonus : 0));
+  } else if(k==="fixAll"){
+    GAME.segments.forEach(s=>{
+      s.state=0; s.prog=0;
+      const chief=Object.values(GAME.players).find(pl=>pl.classId==="chiefengineer");
+      s.patchTimer=BASE_PATCH_DURATION*(1+GAME.patchArmor+(chief?chief.patchArmorBonus:0));
     });
-    GAME.heals.push({x:p.x,t:0.6, type:"repairSpark"}); // Use repairSpark for visual
+    GAME.heals.push({x:p.x,t:0.6,type:"repairSpark"});
     GAME.toastMsg={txt:`${p.name} reparó todo el tejado ⚙️`,t:2};
-  } else if(currentAbKind==="dash"){
-    // Parpadeo: repara todos los agujeros entre la posición actual y el destino
+  } else if(k==="dash"){
     const dir=p.facing||1, dest=Math.max(ROOF_X0+20,Math.min(ROOF_X1-20,p.x+dir*260));
     const a=Math.min(p.x,dest), b=Math.max(p.x,dest);
     GAME.segments.forEach((s,i)=>{
       const cx=segCenterX(i);
       if(cx>=a-SEG_W&&cx<=b+SEG_W){
         s.state=0; s.prog=0;
-        // MODIFICADO: Aplicar patchArmorBonus del Ingeniero Jefe si existe
-        const chiefEngineer = Object.values(GAME.players).find(pl => pl.classId === "chiefengineer");
-        s.patchTimer = BASE_PATCH_DURATION * (1 + GAME.patchArmor + (chiefEngineer ? chiefEngineer.patchArmorBonus : 0));
+        const chief=Object.values(GAME.players).find(pl=>pl.classId==="chiefengineer");
+        s.patchTimer=BASE_PATCH_DURATION*(1+GAME.patchArmor+(chief?chief.patchArmorBonus:0));
       }
     });
-    p.x=dest; GAME.heals.push({x:dest,t:0.5, type:"repairSpark"}); // Use repairSpark for visual
+    p.x=dest; GAME.heals.push({x:dest,t:0.5,type:"repairSpark"});
     GAME.toastMsg={txt:`${p.name} cruzó el tejado 🥷`,t:2};
-  } else if(currentAbKind==="drain"){
-    // Roba vida de la tormenta y reparte a los heridos
+  } else if(k==="drain"){
     let n=0;
     Object.values(GAME.players).forEach(q=>{
       if(q.state==="dead") return;
       if(q.state==="downed"){ q.state="alive"; q.hp=q.maxHp*0.5; q.bleedout=BLEEDOUT; q._rev=0; n++; }
       else if(q.hp<q.maxHp){ q.hp=Math.min(q.maxHp,q.hp+35); n++; }
     });
-    GAME.heals.push({x:p.x,t:0.6, type:"heal"});
+    GAME.heals.push({x:p.x,t:0.6,type:"heal"});
     GAME.toastMsg={txt:`${p.name} drenó la tormenta 🧛 (${n})`,t:2};
-  } else if(currentAbKind==="rally"){
-    // Grito: acelera a todo el equipo unos segundos
-    Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead"){ q.rallyTimer=4; } });
-    GAME.heals.push({x:p.x,t:0.5, type:"heal"});
-    GAME.toastMsg={txt:`${p.name} dio la orden: ¡todos más rápido! 🎖️`,t:2};
-  } else if(currentAbKind==="reviveAll"){
+  } else if(k==="rally"){
+    Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead") q.rallyTimer=4; });
+    GAME.heals.push({x:p.x,t:0.5,type:"heal"});
+    GAME.toastMsg={txt:`${p.name} dio la orden: ¡más rápido! 🎖️`,t:2};
+  } else if(k==="reviveAll"){
     let n=0;
     Object.values(GAME.players).forEach(q=>{
       if(q.state==="downed"||q.state==="dead"){ q.state="alive"; q.hp=q.maxHp*0.6; q.bleedout=BLEEDOUT; q._rev=0; n++; }
     });
-    GAME.heals.push({x:p.x,t:0.8, type:"heal"});
-    GAME.toastMsg={txt:`${p.name} renació de las cenizas y revivió al equipo 🐦‍🔥 (${n})`,t:2.5};
-  } else if(currentAbKind==="calm"){
+    GAME.heals.push({x:p.x,t:0.8,type:"heal"});
+    GAME.toastMsg={txt:`${p.name} renació y revivió al equipo 🐦‍🔥 (${n})`,t:2.5};
+  } else if(k==="calm"){
     GAME.calmTimer=Math.max(GAME.calmTimer||0,5);
     GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless");
     GAME.toastMsg={txt:`${p.name} calmó la tormenta 🌩️ (5s)`,t:2.5};
-  } else if(currentAbKind==="transmute"){ // Alquimista
-    // MODIFICADO: Ahora cuesta vida y da puntos al equipo
-    if(p.hp > 30){
-      p.hp -= 30;
-      const pointsToAdd = 15;
-      // No se añaden puntos directamente al jugador local, sino al total de la partida
-      GAME.runPointsEarned += pointsToAdd;
-      setPoints(getPoints() + pointsToAdd); // Añade a los puntos globales inmediatamente
-      GAME.heals.push({x:p.x,t:0.6, type:"transmute"}); // Nuevo efecto visual
-      GAME.toastMsg={txt:`${p.name} transmutó 30 de vida en ${pointsToAdd} ⚡ para el equipo.`,t:2.5};
-    } else {
-      p.abCd = 0; // Resetea el cooldown si no tiene suficiente vida
-      GAME.toastMsg={txt:`${p.name} no tiene suficiente vida para transmutar.`,t:2.5};
-    }
-  } else if(currentAbKind==="invuln"){ // Coloso
-    GAME.invulnTimer=4; // 4 segundos de invulnerabilidad
-    GAME.toastMsg={txt:`${p.name} se volvió invulnerable y atrae los rayos 🗿 (4s)`,t:2.5};
-  } else if(currentAbKind==="freezeStorm"){ // Oráculo
-    GAME.calmTimer=Math.max(GAME.calmTimer||0,6); // 6 segundos sin rayos
-    GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless"); // Cancela rayos en aviso
+  } else if(k==="transmute"){
+    if(p.hp>30){
+      p.hp-=30; const pts=15; GAME.runPointsEarned+=pts; setPoints(getPoints()+pts);
+      GAME.heals.push({x:p.x,t:0.6,type:"transmute"});
+      GAME.toastMsg={txt:`${p.name} transmutó vida en ${pts} ⚡`,t:2.5};
+    } else { p.abCd=0; GAME.toastMsg={txt:`${p.name} no tiene vida suficiente.`,t:2.5}; }
+  } else if(k==="invuln"){
+    GAME.invulnTimer=4;
+    GAME.toastMsg={txt:`${p.name} es invulnerable y atrae rayos 🗿 (4s)`,t:2.5};
+  } else if(k==="freezeStorm"){
+    GAME.calmTimer=Math.max(GAME.calmTimer||0,6);
+    GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless");
     GAME.toastMsg={txt:`${p.name} congeló la tormenta 🔮 (6s)`,t:2.5};
-  } else if(currentAbKind==="timeWarp"){ // Maestro del Tiempo
-    GAME.timeWarpTimer=5; // 5 segundos de ralentización
+  } else if(k==="timeWarp"){
+    GAME.timeWarpTimer=5;
     GAME.toastMsg={txt:`${p.name} ralentizó la tormenta ⏳ (5s)`,t:2.5};
-  } else if(currentAbKind==="drone"){ // Ingeniero Jefe
-    GAME.droneTimer=8; // 8 segundos de duración del dron
-    GAME.droneStrikeTimer=0.1; // Primer arreglo casi inmediato
-    GAME.droneOwnerId = p.id; // Asignar el dueño
-    GAME.droneX = p.x; // Posición inicial cerca del jugador
-    GAME.droneY = ROOF_Y - 30; // Hovering above the roof
-    GAME.droneAnimFrame = 0; // Reset animation frame
-    GAME.toastMsg={txt:`${p.name} desplegó un dron de reparación 🏗️ (8s)`,t:2.5};
-  } else if(currentAbKind==="safeZone"){ // Guardián Elemental
-    GAME.safeZoneTimer=6; // 6 segundos de zona segura
-    GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless"); // Cancela rayos en aviso
-    GAME.heals.push({x:p.x,t:0.8, type:"safeZone"}); // Efecto visual de zona segura
+  } else if(k==="drone"){
+    GAME.droneTimer=8; GAME.droneStrikeTimer=0.1;
+    GAME.droneOwnerId=p.id; GAME.droneX=p.x; GAME.droneY=ROOF_Y-30; GAME.droneAnimFrame=0;
+    GAME.toastMsg={txt:`${p.name} desplegó un dron 🏗️ (8s)`,t:2.5};
+  } else if(k==="safeZone"){
+    GAME.safeZoneTimer=6;
+    GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless");
+    GAME.heals.push({x:p.x,t:0.8,type:"safeZone"});
     GAME.toastMsg={txt:`${p.name} creó una Zona Segura 🌀 (6s)`,t:2.5};
   }
-  // ---------- Nuevas habilidades de combate ----------
-  else if(currentAbKind==="predictEnemyPath"){ // Oráculo
-    GAME.enemies.forEach(e => {
-      if(e.state === "alive"){
-        e.predictedPath = [];
-        let currentX = e.x;
-        let currentY = e.y;
-        let targetPlayer = GAME.players[e.targetPlayerId];
-        if(!targetPlayer || targetPlayer.state !== "alive"){
-          targetPlayer = players.find(pl => pl.state === "alive"); // Encuentra cualquier jugador vivo
-        }
-        if(targetPlayer){
-          for(let i=0; i<60; i++){ // Predice 2 segundos (60 frames a 30fps)
-            const dir = Math.sign(targetPlayer.x - currentX);
-            currentX += dir * ENEMY_SPEED * TICK;
-            e.predictedPath.push({x: currentX, y: currentY, t: (i+1) * TICK});
+  // Combate
+  else if(k==="predictEnemyPath"){
+    GAME.enemies.forEach(e=>{
+      if(e.state==="alive"){
+        e.predictedPath=[];
+        let cx=e.x, cy=e.y;
+        let tp=GAME.players[e.targetPlayerId];
+        if(!tp||tp.state!=="alive") tp=Object.values(GAME.players).find(pl=>pl.state==="alive");
+        if(tp){
+          for(let i=0;i<60;i++){
+            const dir=Math.sign(tp.x-cx); cx += dir*ENEMY_SPEED*TICK;
+            e.predictedPath.push({x:cx,y:cy,t:(i+1)*TICK});
           }
         }
       }
     });
-    p.predictPathTimer = 2; // Duración de la predicción
-    GAME.toastMsg={txt:`${p.name} predijo el movimiento enemigo 🔮 (2s)`,t:2};
-  } else if(currentAbKind==="stunEnemy"){ // Habilidad genérica de aturdimiento
-    let stunnedCount = 0;
-    GAME.enemies.forEach(e => {
-      if(e.state === "alive" && Math.abs(e.x - p.x) < 150){ // Rango de aturdimiento
-        e.stunTimer = 2; // Aturde por 2 segundos
-        GAME.heals.push({x:e.x, t:0.5, type:"stun"}); // Efecto visual de aturdimiento
-        stunnedCount++;
+    p.predictPathTimer=2;
+    GAME.toastMsg={txt:`${p.name} predijo movimiento enemigo 🔮 (2s)`,t:2};
+  } else if(k==="stunEnemy"){
+    let n=0;
+    GAME.enemies.forEach(e=>{
+      if(e.state==="alive" && Math.abs(e.x-p.x)<150){
+        e.stunTimer=2; GAME.heals.push({x:e.x,t:0.5,type:"stun"}); n++;
       }
     });
-    if(stunnedCount > 0){
-      GAME.toastMsg={txt:`${p.name} aturdió a ${stunnedCount} enemigo${stunnedCount===1?"":"s"}! 💥`,t:2};
-    } else {
-      p.abCd = 0; // Resetea el cooldown si no aturde a nadie
-      GAME.toastMsg={txt:`No hay enemigos cerca para aturdir.`,t:2};
-    }
+    if(n>0) GAME.toastMsg={txt:`${p.name} aturdió ${n} enemigo${n===1?"":"s"}! 💥`,t:2};
+    else { p.abCd=0; GAME.toastMsg={txt:`No hay enemigos cerca.`,t:2}; }
   }
 }
 
 function resolveStrike(st){
-  // Si es un rayo ambiental (durante oleada de enemigos) o de pararrayos, no hace daño ni crea agujeros
-  if(st.kind === "ambient_storm" || st.kind === "lightning_rod") {
-    GAME.flash=0.8; // Solo un flash visual
-    return;
-  }
-
+  if(st.kind==="ambient_storm" || st.kind==="lightning_rod"){ GAME.flash=0.8; return; }
   const seg=GAME.segments[st.seg];
-  // --- Rayo bendito (Domador de rayos): repara y cura, no daña ---
   if(st.kind==="bless"){
-    GAME.flash=0.8;
-    const cx=segCenterX(st.seg);
-    for(let o=-1;o<=1;o++){ const s=GAME.segments[st.seg+o]; if(s){ s.state=0; s.prog=0;
-      // MODIFICADO: Aplicar patchArmorBonus del Ingeniero Jefe si existe
-      const chiefEngineer = Object.values(GAME.players).find(pl => pl.classId === "chiefengineer");
-      s.patchTimer = BASE_PATCH_DURATION * (1 + GAME.patchArmor + (chiefEngineer ? chiefEngineer.patchArmorBonus : 0));
-    } }
-    GAME.heals.push({x:cx,t:0.7, type:"heal"});
+    GAME.flash=0.8; const cx=segCenterX(st.seg);
+    for(let o=-1;o<=1;o++){
+      const s=GAME.segments[st.seg+o]; if(s){
+        s.state=0; s.prog=0;
+        const chief=Object.values(GAME.players).find(pl=>pl.classId==="chiefengineer");
+        s.patchTimer=BASE_PATCH_DURATION*(1+GAME.patchArmor+(chief?chief.patchArmorBonus:0));
+      }
+    }
+    GAME.heals.push({x:cx,t:0.7,type:"heal"});
     Object.values(GAME.players).forEach(p=>{
       if(p.state==="dead") return;
-      if(Math.abs(p.x-cx) < SEG_W*1.6){
+      if(Math.abs(p.x-cx)<SEG_W*1.6){
         if(p.state==="downed"){ p.state="alive"; p.hp=p.maxHp*0.5; p.bleedout=BLEEDOUT; p._rev=0; }
         else p.hp=Math.min(p.maxHp,p.hp+40);
       }
@@ -1563,156 +1230,105 @@ function resolveStrike(st){
   }
   GAME.flash=1;
 
-  // Si hay una Zona Segura activa, los rayos no caen en ella
-  if(GAME.safeZoneTimer > 0){
-    const guardianPlayer = Object.values(GAME.players).find(p => p.abKind === "safeZone" && p.state === "alive");
-    if(guardianPlayer && Math.abs(guardianPlayer.x - segCenterX(st.seg)) < 200){ // Área de 200px alrededor del Guardián
-      GAME.toastMsg={txt:`Zona Segura activa, rayo desviado 🌀`,t:1.5};
-      return; // Rayo desviado
+  if(GAME.safeZoneTimer>0){
+    const g=Object.values(GAME.players).find(p=>p.abKind==="safeZone" && p.state==="alive");
+    if(g && Math.abs(g.x-segCenterX(st.seg))<200){
+      GAME.toastMsg={txt:`Zona Segura activa, rayo desviado 🌀`,t:1.5}; return;
+    }
+  }
+  let colossus=false;
+  if(GAME.invulnTimer>0){
+    const c=Object.values(GAME.players).find(p=>p.abKind==="invuln" && p.state==="alive");
+    if(c && Math.abs(c.x-segCenterX(st.seg))<SEG_W*1.5){
+      colossus=true;
+      GAME.toastMsg={txt:`El Coloso ${c.name} absorbió el rayo 🗿`,t:1.5};
     }
   }
 
-  // Si el Coloso está invulnerable y atrae rayos, no se crea agujero ni se daña a nadie más
-  let colossusAttracting = false;
-  if(GAME.invulnTimer > 0){
-    const colossusPlayer = Object.values(GAME.players).find(p => p.abKind === "invuln" && p.state === "alive");
-    if(colossusPlayer && Math.abs(colossusPlayer.x - segCenterX(st.seg)) < SEG_W * 1.5){ // Coloso cerca del rayo
-      colossusAttracting = true;
-      // El coloso es invulnerable, no toma daño
-      GAME.toastMsg={txt:`El Coloso ${colossusPlayer.name} absorbió el rayo 🗿`,t:1.5};
-    }
-  }
-
-  // Actualizar puntos y estadísticas para jugadores vivos
   Object.values(GAME.players).forEach(p=>{
-    if(p.state==="alive") {
-      const pointsForThisRay = 1 + (p.bonusPointsPerRay || 0);
-      p.rayos += pointsForThisRay; // Acumula puntos ganados en esta partida
-      GAME.runPointsEarned += pointsForThisRay; // Acumula puntos totales de la partida
-      setPoints(getPoints() + pointsForThisRay); // Añade a los puntos globales inmediatamente
+    if(p.state==="alive"){
+      const pts=1+(p.bonusPointsPerRay||0);
+      p.rayos+=pts; GAME.runPointsEarned+=pts; setPoints(getPoints()+pts);
     }
   });
 
   if(seg.state===0){
-    // tejado intacto: puede crear agujero (armadura reduce probabilidad)
-    let chance=Math.max(0.25, 0.85 - GAME.roofArmor);
-    if(GAME.wave > 0 && GAME.wave % 5 === 0) chance = Math.min(0.95, chance + 0.3); // Más chance en boss wave
+    let chance=Math.max(0.25, 0.85-GAME.roofArmor);
+    if(GAME.wave>0 && GAME.wave%5===0) chance=Math.min(0.95,chance+0.3);
     if(Math.random()<chance){ seg.state=1; seg.prog=0; }
   } else {
-    // agujero abierto: el rayo entra y golpea a quien esté debajo
     const cx=segCenterX(st.seg);
     Object.values(GAME.players).forEach(p=>{
       if(p.state==="dead"||p.state==="downed") return;
-      if(Math.abs(p.x-cx) < SEG_W*0.75){
-        if(colossusAttracting && p.abKind !== "invuln") return; // Si el Coloso atrae, otros no son golpeados
-        if(colossusAttracting && p.abKind === "invuln") return; // El Coloso es invulnerable
-
-        // Guardián Elemental: reflejar rayo
-        if(p.reflectChance > 0 && Math.random() < p.reflectChance){
+      if(Math.abs(p.x-cx)<SEG_W*0.75){
+        if(colossus && p.abKind!=="invuln") return;
+        if(colossus && p.abKind==="invuln") return;
+        if(p.reflectChance>0 && Math.random()<p.reflectChance){
           GAME.toastMsg={txt:`${p.name} reflejó el rayo! 🌀`,t:1.5};
-          Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead")q.hp=Math.min(q.maxHp,q.hp+20); }); // Cura al equipo
-          GAME.heals.push({x:p.x,t:0.5, type:"reflect"}); // Nuevo efecto visual
-          return;
+          Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead") q.hp=Math.min(q.maxHp,q.hp+20); });
+          GAME.heals.push({x:p.x,t:0.5,type:"reflect"}); return;
         }
-
-        // Escudo de Diamante: invulnerabilidad temporal
-        if(p.diamondShieldTimer > 0) return; // Ya es invulnerable
-
-        // Escudo de Diamante: probabilidad de activarse
-        if(p.diamondShieldChance > 0 && Math.random() < p.diamondShieldChance){
-          p.diamondShieldTimer = 5; // 5 segundos de invulnerabilidad
+        if(p.diamondShieldTimer>0) return;
+        if(p.diamondShieldChance>0 && Math.random()<p.diamondShieldChance){
+          p.diamondShieldTimer=5;
           GAME.toastMsg={txt:`${p.name} activó Escudo de Diamante! 💎`,t:1.5};
-          GAME.heals.push({x:p.x,t:0.5, type:"diamondShield"}); // Nuevo efecto visual
-          return; // Bloquea el daño de este rayo
+          GAME.heals.push({x:p.x,t:0.5,type:"diamondShield"}); return;
         }
-
-        // esquivar
         if(Math.random()<p.dodge) return;
-        // escudo
         if(p.shield>0){ p.shield--; return; }
-        const dmg=STRIKE_DMG*(1-p.resist);
-        p.hp-=dmg;
+        const dmg=STRIKE_DMG*(1-p.resist); p.hp-=dmg;
         if(p.hp<=0){
           if(p.lives>0){ p.lives--; p.hp=p.maxHp*0.5; }
           else { p.state="downed"; p.bleedout=BLEEDOUT; p.hp=0; }
         }
       }
     });
-    // el agujero puede empezar a "cerrarse" un poco si tiene patchArmor... lo dejamos abierto
   }
 }
 
 function startIntermission(){
   GAME.phase="intermission"; GAME.intermTimer=30; GAME.strikes=[];
-  GAME.enemies = []; // Limpiar enemigos al final de la oleada
-  GAME.isEnemyWave = false; // Desactivar oleada de enemigos
-  GAME.lightningRods = []; // Limpiar pararrayos
-  GAME.inGameShopOpen = false; // Cerrar tienda en partida
-  GAME.shopNPC.active = false; // Ocultar NPC de la tienda
-  GAME.shopHintTimer = 0; // Ocultar hint de la tienda
-
-  // resucita a los muertos con media vida para volver a jugar; limpia derribados
+  GAME.enemies=[]; GAME.isEnemyWave=false;
+  GAME.lightningRods=[]; GAME.inGameShopOpen=false;
   Object.values(GAME.players).forEach(p=>{
     if(p.state==="dead"){ p.state="alive"; p.hp=p.maxHp*0.5; }
     if(p.state==="downed"){ p.state="alive"; p.hp=Math.max(p.hp,p.maxHp*0.4); }
-    p.bleedout=BLEEDOUT; p.ready=false;
-    // genera 3 opciones aleatorias
-    p.options=pick3();
+    p.bleedout=BLEEDOUT; p.ready=false; p.options=pick3();
   });
 }
-
 function pick3(){
-  const pool=[...UPGRADES];
-  const out=[];
+  const pool=[...UPGRADES]; const out=[];
   for(let i=0;i<3&&pool.length;i++){ const k=Math.floor(Math.random()*pool.length); out.push(pool[k].id); pool.splice(k,1); }
   return out;
 }
-
 function applyUpgrade(p,id){
   const u=upById(id); if(!u) return;
   if(u.team && u.teamApply) u.teamApply(GAME);
   else if(u.apply) u.apply(p);
   p.ready=true;
 }
-
 function nextWave(){
-  GAME.wave++;
-  GAME.phase="playing";
-  GAME.waveTimer=WAVE_DURATION;
-  GAME.strikeTimer=1.0;
-  GAME.stormRelief=0; // el alivio solo dura una oleada
+  GAME.wave++; GAME.phase="playing"; GAME.waveTimer=WAVE_DURATION;
+  GAME.strikeTimer=1.0; GAME.stormRelief=0;
   Object.values(GAME.players).forEach(p=>{p.ready=false;p.options=[];});
-
-  // ---------- Lógica de cambio de habilidad para oleadas de enemigos ----------
-  const isNextWaveEnemyWave = (GAME.wave > 0 && GAME.wave % ENEMY_WAVE_INTERVAL === 0);
-  Object.values(GAME.players).forEach(p => {
-    const cls = classById(p.classId);
-    if(isNextWaveEnemyWave){
-      // Si es oleada de enemigos, cambia la habilidad si aplica
+  const enemyW = (GAME.wave>0 && GAME.wave%ENEMY_WAVE_INTERVAL===0);
+  Object.values(GAME.players).forEach(p=>{
+    const cls=classById(p.classId);
+    if(enemyW){
       if(cls.combatAbKind){
-        p.currentAbKind = cls.combatAbKind;
-        // Cooldowns específicos para habilidades de combate
-        if(cls.combatAbKind === "predictEnemyPath") p.abMax = 15 * p.abCdMult; // Oráculo
-        else if(cls.combatAbKind === "stunEnemy") p.abMax = 10 * p.abCdMult; // Genérica
-        else p.abMax = cls.cd * p.abCdMult; // Mantiene el cooldown original si es una habilidad existente
-      } else {
-        // Si no tiene combatAbKind definido, mantiene su abKind original
-        p.currentAbKind = p.baseAbKind;
-        p.abMax = p.baseAbMax;
-      }
-      // Oracle: su warnBonus se convierte en habilidad activa, así que se resetea a 0 como pasiva
-      if(p.classId === "oracle") p.warnBonus = 0;
+        p.currentAbKind=cls.combatAbKind;
+        if(cls.combatAbKind==="predictEnemyPath") p.abMax=15*p.abCdMult;
+        else if(cls.combatAbKind==="stunEnemy") p.abMax=10*p.abCdMult;
+        else p.abMax=cls.cd*p.abCdMult;
+      } else { p.currentAbKind=p.baseAbKind; p.abMax=p.baseAbMax; }
+      if(p.classId==="oracle") p.warnBonus=0;
     } else {
-      // Si no es oleada de enemigos, vuelve a la habilidad base
-      p.currentAbKind = p.baseAbKind;
-      p.abMax = p.baseAbMax;
-      // Oracle: su warnBonus vuelve a ser pasiva
-      if(p.classId === "oracle") p.warnBonus = p.baseWarnBonus;
+      p.currentAbKind=p.baseAbKind; p.abMax=p.baseAbMax;
+      if(p.classId==="oracle") p.warnBonus=p.baseWarnBonus;
     }
-    p.abCd = 0; // Resetea el cooldown al inicio de cada oleada
+    p.abCd=0;
   });
 }
-
 function triggerGameOver(){
   GAME.phase="over";
   const snap=buildStatePayload();
@@ -1721,19 +1337,15 @@ function triggerGameOver(){
   clearInterval(hostLoop);
 }
 
-// ---------- Lógica de la tienda en partida (Host) ----------
+// ---------- Tienda en partida (Host) ----------
 function buyInGameShopItem(player, itemId){
   const item = shopItemById(itemId);
   if(!item) return;
-
   if(player.rayos >= item.cost){
     player.rayos -= item.cost;
-    item.apply(player, GAME); // Aplica el efecto del ítem
-    console.log(`Host: ${player.name} compró ${item.nm}. Rayos restantes: ${player.rayos}`); // DEBUG
+    item.apply(player, GAME);
   } else {
-    // Podríamos enviar un mensaje al cliente para mostrar un error de "no tienes suficientes puntos"
     GAME.toastMsg={txt:`${player.name} no tiene suficientes ⚡ para ${item.nm}.`,t:2};
-    console.log(`Host: ${player.name} no tiene suficientes rayos para ${item.nm}.`); // DEBUG
   }
 }
 
@@ -1741,96 +1353,83 @@ function buyInGameShopItem(player, itemId){
 //  ENVÍO / RECEPCIÓN DE ESTADO
 // =====================================================
 function buildStatePayload(){
-  const isBossWave = (GAME.wave > 0 && GAME.wave % 5 === 0);
+  const isBossWave=(GAME.wave>0 && GAME.wave%5===0);
   return {
-    t:"state",
-    phase:GAME.phase, wave:GAME.wave, waveTimer:GAME.waveTimer, flash:GAME.flash,
+    t:"state", phase:GAME.phase, wave:GAME.wave, waveTimer:GAME.waveTimer, flash:GAME.flash,
     hostId:GAME.hostId,
     players:GAME.order.filter(id=>GAME.players[id]).map(id=>{const p=GAME.players[id];return{
       id:p.id,name:p.name,color:p.color,classId:p.classId,x:Math.round(p.x),hp:Math.round(p.hp),maxHp:p.maxHp,
       state:p.state,facing:p.facing,busy:p.busy,bleedout:Math.round(p.bleedout*10)/10,
       ready:p.ready,options:p.options, rev:p._rev?Math.round(p._rev*100)/100:0,
-      shield:p.shield, rayos:p.rayos, // rayos ahora son puntos ganados en esta partida
-      abKind:p.currentAbKind, abCd:Math.round(p.abCd*10)/10, abMax:p.abMax, // currentAbKind
-      diamondShieldTimer:Math.round(p.diamondShieldTimer*10)/10, // Escudo de Diamante
-      attackAnim:Math.round(p.attackAnim*10)/10, // Animación de ataque
-      predictPathTimer:Math.round(p.predictPathTimer*10)/10, // Oráculo
+      shield:p.shield, rayos:p.rayos,
+      abKind:p.currentAbKind, abCd:Math.round(p.abCd*10)/10, abMax:p.abMax,
+      diamondShieldTimer:Math.round(p.diamondShieldTimer*10)/10,
+      attackAnim:Math.round(p.attackAnim*10)/10,
+      predictPathTimer:Math.round(p.predictPathTimer*10)/10,
     }}),
     segments:GAME.segments.map(s=>({s:s.state,p:Math.round(s.prog*100)/100})),
     strikes:GAME.strikes.map(s=>({seg:s.seg,x:s.x,phase:s.phase,kind:s.kind||"storm",t:Math.round((s.t/(s.dur||1))*100)/100})),
-    heals:GAME.heals.map(h=>({x:h.x,t:Math.round(h.t*100)/100, type:h.type||"heal"})), // Include type
+    heals:GAME.heals.map(h=>({x:h.x,t:Math.round(h.t*100)/100, type:h.type||"heal"})),
     toast:GAME.toastMsg?GAME.toastMsg.txt:null,
     calm:GAME.calmTimer>0?Math.round(GAME.calmTimer*10)/10:0,
-    invuln:GAME.invulnTimer>0?Math.round(GAME.invulnTimer*10)/10:0, // Coloso invulnerable
-    safeZone:GAME.safeZoneTimer>0?Math.round(GAME.safeZoneTimer*10)/10:0, // Guardián Elemental Safe Zone
-    drone:GAME.droneTimer>0?Math.round(GAME.droneTimer*10)/10:0, // Ingeniero Jefe Drone
-    droneX:Math.round(GAME.droneX), droneY:Math.round(GAME.droneY), // Drone position
-    droneAnimFrame:Math.round(GAME.droneAnimFrame*10)/10, // Drone animation frame
-    timeWarp:GAME.timeWarpTimer>0?Math.round(GAME.timeWarpTimer*10)/10:0, // Maestro del Tiempo
+    invuln:GAME.invulnTimer>0?Math.round(GAME.invulnTimer*10)/10:0,
+    safeZone:GAME.safeZoneTimer>0?Math.round(GAME.safeZoneTimer*10)/10:0,
+    drone:GAME.droneTimer>0?Math.round(GAME.droneTimer*10)/10:0,
+    droneX:Math.round(GAME.droneX), droneY:Math.round(GAME.droneY),
+    droneAnimFrame:Math.round(GAME.droneAnimFrame*10)/10,
+    timeWarp:GAME.timeWarpTimer>0?Math.round(GAME.timeWarpTimer*10)/10:0,
     revives:GAME.runRevives||0, holes:GAME.runHoles||0,
-    isBossWave: isBossWave, // Añadir estado de oleada de jefe
-    // ---------- Nuevos estados para enemigos ----------
-    isEnemyWave: GAME.isEnemyWave,
-    enemies: GAME.enemies.map(e => ({
-      id: e.id, x: Math.round(e.x), y: Math.round(e.y), hp: Math.round(e.hp), maxHp: e.maxHp,
-      state: e.state, facing: e.facing, walkAnim: Math.round(e.walkAnim*10)/10,
-      stunTimer: Math.round(e.stunTimer*10)/10,
-      predictedPath: e.predictedPath.map(p => ({x:Math.round(p.x), y:Math.round(p.y), t:Math.round(p.t*10)/10})),
-      attackAnim: Math.round(e.attackAnim*10)/10, // Animación de ataque del enemigo
+    isBossWave, isEnemyWave:GAME.isEnemyWave,
+    enemies: GAME.enemies.map(e=>({
+      id:e.id,x:Math.round(e.x),y:Math.round(e.y),hp:Math.round(e.hp),maxHp:e.maxHp,
+      state:e.state,facing:e.facing,walkAnim:Math.round(e.walkAnim*10)/10,
+      stunTimer:Math.round(e.stunTimer*10)/10,
+      predictedPath:e.predictedPath.map(pp=>({x:Math.round(pp.x),y:Math.round(pp.y),t:Math.round(pp.t*10)/10})),
+      attackAnim:Math.round(e.attackAnim*10)/10,
     })),
-    enemiesKilled: GAME.runEnemiesKilled,
-    // ---------- Nuevos estados para la tienda en partida ----------
-    lightningRods: GAME.lightningRods.map(rod => ({x:Math.round(rod.x), y:Math.round(rod.y), timer:Math.round(rod.timer*10)/10})),
-    inGameShopOpen: GAME.inGameShopOpen,
-    // --- NUEVO: Estado del NPC de la tienda ---
-    shopNPC: {
-      x: Math.round(GAME.shopNPC.x),
-      y: Math.round(GAME.shopNPC.y),
-      active: GAME.shopNPC.active,
-      facing: GAME.shopNPC.facing,
-    },
-    shopHintTimer: GAME.shopHintTimer, // Estado del hint de la tienda
+    enemiesKilled:GAME.runEnemiesKilled,
+    lightningRods:GAME.lightningRods.map(r=>({x:Math.round(r.x),y:Math.round(r.y),timer:Math.round(r.timer*10)/10})),
+    inGameShopOpen:GAME.inGameShopOpen,
   };
 }
 function broadcastState(){ const p=buildStatePayload(); latestState=p; broadcast(p); handlePhaseUI(p); }
 
 // =====================================================
-//  UI DE FASES (mejoras / game over) — común host y cliente
+//  UI DE FASES
 // =====================================================
-let currentOverlay=null;
 function handlePhaseUI(s){
-  if(s.phase==="intermission"){ showUpgrades(s); }
-  else { hideUpgrades(); }
+  if(s.phase==="intermission") showUpgrades(s);
+  else hideUpgrades();
 
-  // Manejar la visibilidad de la tienda en partida
-  if(s.inGameShopOpen){ openInGameShop(s); }
-  else { closeInGameShop(); }
-
-  // Manejar la visibilidad del hint de la tienda
-  if(s.shopHintTimer > 0 && !s.inGameShopOpen){
-    $("shopHint").classList.add("show");
+  // CORRECCIÓN: mostrar/ocultar tienda con estilo inline directo
+  const shopEl=$("inGameShopOverlay");
+  if(s.inGameShopOpen){
+    shopEl.style.setProperty("display","flex","important");
+    shopEl.classList.add("show");
+    openInGameShop(s);
   } else {
-    $("shopHint").classList.remove("show");
+    shopEl.style.setProperty("display","none","important");
+    shopEl.classList.remove("show");
+    closeInGameShop();
   }
 }
-
 function myPlayerState(s){ return s.players.find(p=>p.id===myId); }
 
 function showUpgrades(s){
   const me=myPlayerState(s);
+  $("upOverlay").style.setProperty("display","flex","important");
   $("upOverlay").classList.add("show");
   $("upTitle").textContent=`Oleada ${s.wave} superada`;
-  const list=$("upList"); 
+  const list=$("upList");
   if(!me){ list.innerHTML=""; return; }
   if(me.ready || me.state==="dead"){
     list.innerHTML="";
-    const readyN=s.players.filter(p=>p.state!=="dead" && p.ready).length;
-    const totN=s.players.filter(p=>p.state!=="dead").length;
-    $("upWaiting").textContent = me.state==="dead" ? "Reaparecerás en la próxima oleada…" : `Elegido. Esperando al equipo… (${readyN}/${totN})`;
+    const rn=s.players.filter(p=>p.state!=="dead" && p.ready).length;
+    const tn=s.players.filter(p=>p.state!=="dead").length;
+    $("upWaiting").textContent = me.state==="dead" ? "Reaparecerás en la próxima oleada…" : `Elegido. Esperando… (${rn}/${tn})`;
     return;
   }
   $("upWaiting").textContent="";
-  // sólo re-render si cambian las opciones
   const sig=me.options.join(",");
   if(list._sig===sig && list.children.length) return;
   list._sig=sig; list.innerHTML="";
@@ -1842,49 +1441,50 @@ function showUpgrades(s){
     list.appendChild(b);
   });
 }
-function hideUpgrades(){ $("upOverlay").classList.remove("show"); $("upList")._sig=null; }
-
+function hideUpgrades(){
+  $("upOverlay").style.setProperty("display","none","important");
+  $("upOverlay").classList.remove("show");
+  $("upList")._sig=null;
+}
 function pickUpgrade(id){
   if(isHost){ const p=GAME.players[myId]; if(p&&!p.ready) applyUpgrade(p,id); }
   else if(hostConn&&hostConn.open){ hostConn.send({t:"pick",id}); }
-  $("upList").innerHTML=""; $("upWaiting").textContent="Elegido. Esperando al equipo…";
+  $("upList").innerHTML=""; $("upWaiting").textContent="Elegido. Esperando…";
 }
 
 // ---------- Tienda en partida (Cliente) ----------
 function openInGameShop(s){
   const me = myPlayerState(s);
   if(!me) return;
-  console.log(`Client: Abriendo tienda en partida. Jugador: ${me.name}, Rayos: ${me.rayos}`); // DEBUG
-  $("inGameShopOverlay").classList.add("show");
   $("inGameShopPoints").textContent = me.rayos;
   $("inGameShopErr").textContent = "";
 
   const grid = $("inGameShopGrid");
-  // Solo re-renderizar si el contenido ha cambiado o si es la primera vez
-  const currentItems = SHOP_ITEMS.map(item => item.id).join(',');
-  if (grid._lastRenderedItems === currentItems && grid.children.length > 0) {
-      console.log(`Client: Tienda ya renderizada, saltando re-render.`); // DEBUG
-      return;
-  }
-  grid._lastRenderedItems = currentItems;
+  const sig = SHOP_ITEMS.map(i=>i.id+":"+me.rayos).join(",");
+  if(grid._sig === sig && grid.children.length > 0) return;
+  grid._sig = sig;
   grid.innerHTML = "";
 
   SHOP_ITEMS.forEach(item => {
     const el = document.createElement("div");
-    el.className = "class"; // Reutilizamos el estilo de 'class'
+    el.className = "class";
     const canAfford = me.rayos >= item.cost;
-    const foot = `<span class="buy${canAfford ? "" : " no"}">Comprar</span>`;
+    const foot = `<span class="buy${canAfford ? "" : " no"}">${canAfford ? "Comprar" : "Faltan "+(item.cost-me.rayos)+" ⚡"}</span>`;
     el.innerHTML = `<span class="cost-tag">⚡ ${item.cost}</span>
       <div class="cic">${item.ic}</div><div class="cnm">${item.nm}</div>
       <div class="cds">${item.ds}</div><div class="cfoot">${foot}</div>`;
+
     el.onclick = () => {
-      if(canAfford){
-        console.log(`Client: Intentando comprar ${item.nm}.`); // DEBUG
-        if(isHost){ buyInGameShopItem(me, item.id); }
-        else if(hostConn && hostConn.open){ hostConn.send({t:"buyShopItem", itemId:item.id}); }
-      } else {
+      if(!canAfford){
         $("inGameShopErr").textContent = `Te faltan ${item.cost - me.rayos} puntos para "${item.nm}".`;
-        console.log(`Client: No tiene suficientes rayos para ${item.nm}.`); // DEBUG
+        return;
+      }
+      // ✅ FIX: cuando es host, comprar sobre el JUGADOR REAL de GAME.players, no la copia del snapshot
+      if(isHost){
+        const realPlayer = GAME.players[myId];
+        if(realPlayer) buyInGameShopItem(realPlayer, item.id);
+      } else if(hostConn && hostConn.open){
+        hostConn.send({t:"buyShopItem", itemId: item.id});
       }
     };
     grid.appendChild(el);
@@ -1892,55 +1492,48 @@ function openInGameShop(s){
 }
 
 function closeInGameShop(){
-  console.log(`Client: Cerrando tienda en partida.`); // DEBUG
-  $("inGameShopOverlay").classList.remove("show");
-  $("inGameShopGrid")._lastRenderedItems = null; // Reset para forzar re-render en la próxima apertura
+  $("inGameShopGrid")._sig = null;
 }
 
-$("btnInGameShopClose").onclick = () => {
-  toggleInGameShop();
-};
-
+$("btnInGameShopClose").onclick = () => toggleInGameShop();
 
 function showGameOver(wave){
+  $("goOverlay").style.setProperty("display","flex","important");
   $("goOverlay").classList.add("show");
   gameRunning=false;
-  if(GAME._awarded) return; // evita duplicar al recibir más estados
+  if(GAME._awarded) return;
   GAME._awarded=true;
-  
-  const me = latestState && latestState.players ? latestState.players.find(p=>p.id===myId) : null;
-  const pointsEarnedInThisRun = GAME.runPointsEarned; // Usar el total acumulado en GAME.runPointsEarned
+
+  const pointsEarned = GAME.runPointsEarned;
   const revives = latestState ? (latestState.revives||0) : 0;
   const holes = latestState ? (latestState.holes||0) : 0;
-  const enemiesKilled = latestState ? (latestState.enemiesKilled||0) : 0; // Enemigos eliminados
+  const enemiesKilled = latestState ? (latestState.enemiesKilled||0) : 0;
 
-  // Actualizar estadísticas persistentes
   const st=getStats();
-  st.totalRayos+= pointsEarnedInThisRun; // totalRayos ahora es puntos totales
-  st.bestRun=Math.max(st.bestRun,pointsEarnedInThisRun); // bestRun ahora es puntos en una partida
-  st.bestWave=Math.max(st.bestWave,wave);
-  st.games+=1; st.revives+=revives; st.holes+=holes;
-  st.enemiesKilled+=enemiesKilled; // Actualizar enemigos eliminados
+  st.totalRayos += pointsEarned;
+  st.bestRun = Math.max(st.bestRun, pointsEarned);
+  st.bestWave = Math.max(st.bestWave, wave);
+  st.games += 1; st.revives += revives; st.holes += holes;
+  st.enemiesKilled += enemiesKilled;
   saveStats(st);
 
-  // Comprobar y otorgar logros (los puntos de logros se manejan dentro de checkAchievements)
   const newAch = checkAchievements();
-  const bonusPointsFromAch = newAch.reduce((a,x)=>a+x.rew,0);
+  const bonusAch = newAch.reduce((a,x)=>a+x.rew,0);
 
   $("goBadge").textContent=`Sobrevivieron ${wave} oleada${wave===1?"":"s"}`;
-  let sub = `Ganaste ${pointsEarnedInThisRun} puntos de rayos en esta partida. Récord de partida: ${st.bestRun} puntos · Mejor oleada: ${st.bestWave}.`;
-  if(enemiesKilled > 0) sub += `<br>Derrotaste a ${enemiesKilled} enemigo${enemiesKilled===1?"":"s"}.`;
+  let sub = `Ganaste ${pointsEarned} puntos ⚡ en esta partida. Récord: ${st.bestRun} · Mejor oleada: ${st.bestWave}.`;
+  if(enemiesKilled>0) sub += `<br>Derrotaste a ${enemiesKilled} enemigo${enemiesKilled===1?"":"s"}.`;
   if(newAch.length){
-    sub += `<br><span style="color:var(--amber)">🏆 ${newAch.length} logro${newAch.length===1?"":"s"} desbloqueado${newAch.length===1?"":"s"} (+${bonusPointsFromAch} ⚡): ${newAch.map(a=>a.ic+" "+a.nm).join(", ")}</span>`;
-  } else if (pointsEarnedInThisRun === 0 && enemiesKilled === 0) {
+    sub += `<br><span style="color:var(--amber)">🏆 ${newAch.length} logro${newAch.length===1?"":"s"} (+${bonusAch} ⚡): ${newAch.map(a=>a.ic+" "+a.nm).join(", ")}</span>`;
+  } else if(pointsEarned===0 && enemiesKilled===0){
     sub = "Todo el equipo fue derribado por la tormenta.";
   }
-  $("goSub").innerHTML=sub;
+  $("goSub").innerHTML = sub;
 }
 function endToMenu(msg){ alert(msg); location.reload(); }
 
 // =====================================================
-//  ENTRADAS (teclado + táctil)
+//  ENTRADAS
 // =====================================================
 window.addEventListener("keydown",e=>{
   if(e.repeat) return;
@@ -1949,9 +1542,9 @@ window.addEventListener("keydown",e=>{
   if(e.key===" "||e.key==="e"||e.key==="E"||e.key==="ArrowUp"||e.key==="w"||e.key==="W"){inputState.action=true;e.preventDefault();}
   if(e.key==="q"||e.key==="Q"||e.key==="Shift"||e.key==="f"||e.key==="F"){ triggerAbility(); e.preventDefault(); }
   if(e.key==="b"||e.key==="B"){ toggleInGameShop(); e.preventDefault(); }
+  if(e.key==="Escape"){ if(latestState && latestState.inGameShopOpen) toggleInGameShop(); }
   if(isHost) syncHostInput();
 });
-
 function triggerAbility(){
   if(isHost){ const p=GAME.players[myId]; if(p) p.abReq=true; }
   else if(hostConn&&hostConn.open){ hostConn.send({t:"ability"}); }
@@ -1973,14 +1566,14 @@ function bindTouch(el,key){
   el.addEventListener("mousedown",on); el.addEventListener("mouseup",off); el.addEventListener("mouseleave",off);
 }
 bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"),"action");
-// Botón de habilidad: dispara una sola vez al pulsar
+
 (function(){
   const el=$("tAbility");
   const fire=e=>{e.preventDefault(); triggerAbility();};
   el.addEventListener("touchstart",fire,{passive:false});
   el.addEventListener("mousedown",fire);
 })();
-// Botón de tienda móvil
+
 (function(){
   const el=$("tShop");
   const fire=e=>{e.preventDefault(); toggleInGameShop();};
@@ -1989,12 +1582,11 @@ bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"
 })();
 
 function toggleInGameShop(){
-  console.log(`Client: Botón de tienda pulsado. Enviando toggleShop.`); // DEBUG
   if(isHost){
     GAME.inGameShopOpen = !GAME.inGameShopOpen;
-    console.log(`Host (self-toggle): Tienda en partida toggled a ${GAME.inGameShopOpen}`); // DEBUG
+  } else if(hostConn && hostConn.open){
+    hostConn.send({t:"toggleShop"});
   }
-  else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
 }
 
 // =====================================================
@@ -2012,177 +1604,186 @@ function resizeCanvas(){
 }
 window.addEventListener("resize",resizeCanvas);
 
-function w2s(x,y){ return [offX+x*scale, offY+y*scale]; }
-
 function renderLoop(){
-  if(!gameRunning){ return; }
+  if(!gameRunning) return;
   const s = isHost ? buildStatePayload() : latestState;
   if(s) drawWorld(s);
   requestAnimationFrame(renderLoop);
 }
-
 function drawRoundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 
-// --- NUEVA FUNCIÓN: DIBUJAR DRON ---
-function drawDrone(x, y, frame) {
-  ctx.save();
-  ctx.translate(x, y);
-
-  const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--drone-body');
-  const propColor = getComputedStyle(document.documentElement).getPropertyValue('--drone-prop');
-
-  // Body
-  ctx.fillStyle = bodyColor;
-  ctx.fillRect(-8, -4, 16, 8); // Main body
-  ctx.fillRect(-6, -6, 12, 2); // Top part
-  ctx.fillRect(-6, 4, 12, 2);  // Bottom part
-
-  // Propellers (simple rotation for animation)
-  const propOffset = Math.sin(frame * 0.2) * 2; // Slight hover effect
-  const propSpin = (frame * 0.5) % (Math.PI * 2); // Continuous spin
-
-  // Left propeller
-  ctx.fillStyle = propColor;
-  ctx.fillRect(-12, -8 + propOffset, 4, 2);
-  ctx.fillRect(-14, -7 + propOffset, 2, 4);
-
-  // Right propeller
-  ctx.fillStyle = propColor;
-  ctx.fillRect(8, -8 + propOffset, 4, 2);
-  ctx.fillRect(12, -7 + propOffset, 2, 4);
-
-  // Small light
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
-  ctx.fill();
-
+function drawDrone(x,y,frame){
+  ctx.save(); ctx.translate(x,y);
+  const bc=getComputedStyle(document.documentElement).getPropertyValue('--drone-body');
+  const pc=getComputedStyle(document.documentElement).getPropertyValue('--drone-prop');
+  ctx.fillStyle=bc; ctx.fillRect(-8,-4,16,8); ctx.fillRect(-6,-6,12,2); ctx.fillRect(-6,4,12,2);
+  const po=Math.sin(frame*0.2)*2;
+  ctx.fillStyle=pc;
+  ctx.fillRect(-12,-8+po,4,2); ctx.fillRect(-14,-7+po,2,4);
+  ctx.fillRect(8,-8+po,4,2); ctx.fillRect(12,-7+po,2,4);
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(0,0,1.5,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
-// --- FIN NUEVA FUNCIÓN ---
-
-// --- NUEVA FUNCIÓN: DIBUJAR ENEMIGO ---
-function drawEnemy(e, x, walk, s) {
-  const y = GROUND_Y;
-  const dead = e.state === "dead";
-  ctx.save();
-  ctx.globalAlpha = dead ? 0.22 : 1;
-
-  // sombra
+function drawEnemy(e,x,walk,s){
+  const y=GROUND_Y;
+  ctx.save(); ctx.globalAlpha = e.state==="dead" ? 0.22 : 1;
   ctx.fillStyle="rgba(0,0,0,.32)"; ctx.beginPath();ctx.ellipse(x,y+2,17,5,0,0,7);ctx.fill();
-
-  if(e.state === "stunned"){
+  if(e.state==="stunned"){
     ctx.fillStyle="rgba(255,255,0,0.5)"; ctx.beginPath();ctx.arc(x,y-50,15,0,7);ctx.fill();
     ctx.fillStyle="yellow"; ctx.font="bold 18px sans-serif"; ctx.textAlign="center"; ctx.fillText("⚡",x,y-45);
   }
-
-  const sw = Math.sin(walk)*5; // balanceo de piernas
-  const bodyTop=y-40, headY=y-48;
-
-  // Piernas
+  const sw=Math.sin(walk)*5;
+  const bt=y-40, hy=y-48;
   ctx.fillStyle="#333";
-  ctx.fillRect(x-9, y-16, 7, 16+Math.min(0,sw));
-  ctx.fillRect(x+2, y-16, 7, 16+Math.min(0,-sw));
-  // Pies
+  ctx.fillRect(x-9,y-16,7,16+Math.min(0,sw));
+  ctx.fillRect(x+2,y-16,7,16+Math.min(0,-sw));
   ctx.fillStyle="#222"; ctx.fillRect(x-11,y-3,10,3); ctx.fillRect(x+2,y-3,10,3);
-  // Torso
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--enemy-color');
-  drawRoundRect(x-13,bodyTop,26,26,7); ctx.fill();
-  ctx.fillStyle=shade(getComputedStyle(document.documentElement).getPropertyValue('--enemy-color'),0.8); ctx.fillRect(x-13,bodyTop+18,26,8); // sombra inferior
-  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5); // brillo
-  // Brazos
+  drawRoundRect(x-13,bt,26,26,7); ctx.fill();
+  ctx.fillStyle=shade(getComputedStyle(document.documentElement).getPropertyValue('--enemy-color'),0.8);
+  ctx.fillRect(x-13,bt+18,26,8);
+  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bt,26,5);
   ctx.fillStyle=shade(getComputedStyle(document.documentElement).getPropertyValue('--enemy-color'),0.85);
-  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
-  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
-  // Cuello + Cabeza
-  ctx.fillStyle="#444"; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
-  ctx.fillStyle="#333"; ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
-  // Ojos
-  ctx.fillStyle="#111"; const ex=e.facing>0?2:-2;
-  ctx.beginPath();ctx.arc(x+ex-2,headY-1,1.4,0,7);ctx.arc(x+ex+3,headY-1,1.4,0,7);ctx.fill();
-  // Cuchillo (con animación de ataque)
+  ctx.save();ctx.translate(x-13,bt+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x+13,bt+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
+  ctx.fillStyle="#444"; ctx.beginPath();ctx.arc(x,hy,9,0,7);ctx.fill();
+  ctx.fillStyle="#333"; ctx.beginPath();ctx.arc(x,hy+2,9,0.15,Math.PI-0.15);ctx.fill();
+  ctx.fillStyle="#111"; const exx=e.facing>0?2:-2;
+  ctx.beginPath();ctx.arc(x+exx-2,hy-1,1.4,0,7);ctx.arc(x+exx+3,hy-1,1.4,0,7);ctx.fill();
   ctx.save();
-  ctx.translate(x + e.facing * 10, bodyTop + 10);
-  ctx.rotate(e.facing * (e.attackAnim > 0 ? -Math.PI/4 : 0)); // Animación de swing
+  ctx.translate(x+e.facing*10,bt+10);
+  ctx.rotate(e.facing*(e.attackAnim>0?-Math.PI/4:0));
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--enemy-weapon-color');
-  ctx.fillRect(0, 0, 3, 18); // Mango
-  ctx.fillRect(3, -2, 3, 22); // Hoja
+  ctx.fillRect(0,0,3,18); ctx.fillRect(3,-2,3,22);
   ctx.restore();
-
   ctx.restore();
-
-  // barra de vida
   const bw=40,pct=Math.max(0,e.hp/e.maxHp);
   ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-20,bw,6);
   ctx.fillStyle= pct>0.5?"#3fce7c":pct>0.25?"#f5b942":"#e5484d";
   ctx.fillRect(x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
 }
-// --- FIN NUEVA FUNCIÓN ---
-
-// --- NUEVO: DIBUJAR NPC DE LA TIENDA ---
-function drawShopNPC(npc, s) {
-  if (!npc.active) return;
-  const x = npc.x, y = npc.y;
-  const skin = "#f2d6b3";
-  const bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--shop-npc-color');
-
-  ctx.save();
-  // Sombra
-  ctx.fillStyle="rgba(0,0,0,.32)"; ctx.beginPath();ctx.ellipse(x,y+2,17,5,0,0,7);ctx.fill();
-
-  const bodyTop = y - 40, headY = y - 48;
-
-  // Piernas
-  ctx.fillStyle="#2c3345";
-  ctx.fillRect(x-9, y-16, 7, 16);
-  ctx.fillRect(x+2, y-16, 7, 16);
-  // Pies
-  ctx.fillStyle="#1b2130"; ctx.fillRect(x-11,y-3,10,3); ctx.fillRect(x+2,y-3,10,3);
-  // Torso
-  ctx.fillStyle=bodyColor; drawRoundRect(x-13,bodyTop,26,26,7); ctx.fill();
-  ctx.fillStyle=shade(bodyColor,0.8); ctx.fillRect(x-13,bodyTop+18,26,8);
-  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5);
-  // Brazos
-  ctx.fillStyle=shade(bodyColor,0.85);
-  ctx.fillRect(x-17,bodyTop+5,5,17);
-  ctx.fillRect(x+12,bodyTop+5,5,17);
-  // Cuello + Cabeza
-  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
-  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
-  // Ojos
-  ctx.fillStyle="#2a2018"; const ex=npc.facing>0?2:-2;
-  ctx.beginPath();ctx.arc(x+ex-2,headY-1,1.4,0,7);ctx.arc(x+ex+3,headY-1,1.4,0,7);ctx.fill();
-  // Sombrero de mercader
-  ctx.fillStyle="#6b4a2a"; ctx.beginPath();
-  ctx.moveTo(x-15, headY-5); ctx.lineTo(x+15, headY-5); ctx.lineTo(x+10, headY-15); ctx.lineTo(x-10, headY-15); ctx.closePath(); ctx.fill();
-  ctx.fillStyle="#a86b3c"; ctx.fillRect(x-10, headY-15, 20, 5);
-
-  ctx.restore();
+function shade(hex,f){
+  const n=parseInt(hex.slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  const c=v=>Math.max(0,Math.min(255,Math.round(v*f)));
+  return `rgb(${c(r)},${c(g)},${c(b)})`;
 }
-// --- FIN NUEVO NPC ---
-
+function drawHat(x,topY,classId,skin){
+  switch(classId){
+    case "builder": case "engineer": case "chiefengineer":
+      ctx.fillStyle="#f5b942"; drawRoundRect(x-11,topY-4,22,8,3);ctx.fill();
+      ctx.fillRect(x-13,topY+3,26,3); ctx.fillStyle="#c88f1e"; ctx.fillRect(x-2,topY-8,4,5); break;
+    case "guardian": case "elementalguardian":
+      ctx.fillStyle="#9aa7bd"; ctx.beginPath();ctx.arc(x,topY+2,11,Math.PI,0);ctx.fill();
+      ctx.fillRect(x-11,topY+1,22,4); ctx.fillStyle="#c3cede"; ctx.fillRect(x-1,topY-8,2,10); break;
+    case "medic":
+      ctx.fillStyle="#f4f7fb"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
+      ctx.fillStyle="#e5484d"; ctx.fillRect(x-4,topY-4,8,3);ctx.fillRect(x-1.5,topY-7,3,8); break;
+    case "runner": ctx.fillStyle="#4aa3ff"; ctx.fillRect(x-11,topY-2,22,5); break;
+    case "rod":
+      ctx.strokeStyle="#4aa3ff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,topY-2);ctx.lineTo(x,topY-14);ctx.stroke();
+      ctx.fillStyle="#4aa3ff";ctx.beginPath();ctx.arc(x,topY-15,3,0,7);ctx.fill(); break;
+    case "tamer":
+      ctx.fillStyle="#f5b942"; ctx.beginPath();
+      ctx.moveTo(x-11,topY+2);ctx.lineTo(x-11,topY-8);ctx.lineTo(x-5,topY-2);ctx.lineTo(x,topY-11);
+      ctx.lineTo(x+5,topY-2);ctx.lineTo(x+11,topY-8);ctx.lineTo(x+11,topY+2);ctx.closePath();ctx.fill(); break;
+    case "alchemist":
+      ctx.fillStyle="#c084fc"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
+      ctx.fillStyle="#8b5cf6"; ctx.beginPath();ctx.arc(x,topY-4,4,0,7);ctx.fill(); break;
+    case "colossus":
+      ctx.fillStyle="#94a3b8"; ctx.beginPath();ctx.arc(x,topY+2,12,Math.PI,0);ctx.fill();
+      ctx.fillStyle="#64748b"; ctx.fillRect(x-12,topY-2,24,4); break;
+    case "oracle":
+      ctx.fillStyle="#2dd4bf"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
+      ctx.fillStyle="#0f766e"; ctx.beginPath();ctx.arc(x,topY-4,3,0,7);ctx.fill(); break;
+    case "timelord":
+      ctx.fillStyle="#8b5cf6"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
+      ctx.fillStyle="#c084fc"; ctx.beginPath();ctx.arc(x,topY-4,3,0,7);ctx.fill();
+      ctx.strokeStyle="#c084fc"; ctx.lineWidth=1.5; ctx.beginPath();ctx.arc(x,topY-4,6,0,7);ctx.stroke(); break;
+    default:
+      ctx.fillStyle="#6b4a2a"; ctx.beginPath();ctx.arc(x,topY+1,10,Math.PI,0);ctx.fill();
+  }
+}
+function drawPlayer(p,x,walk,s){
+  const y=GROUND_Y;
+  const down=p.state==="downed", dead=p.state==="dead";
+  const skin="#f2d6b3";
+  ctx.save(); ctx.globalAlpha=dead?0.22:1;
+  ctx.fillStyle="rgba(0,0,0,.32)"; ctx.beginPath();ctx.ellipse(x,y+2,17,5,0,0,7);ctx.fill();
+  if(down){
+    ctx.save(); ctx.translate(x,y-8); ctx.rotate(-Math.PI/2*0.92);
+    ctx.fillStyle=p.color; drawRoundRect(-P_H/2+6,-P_W/2,P_H-6,P_W,7); ctx.fill();
+    ctx.fillStyle=skin; ctx.beginPath();ctx.arc(P_H/2-2,0,9,0,7);ctx.fill();
+    ctx.restore();
+    if(p.rev>0){ ctx.fillStyle="rgba(0,0,0,.5)";ctx.fillRect(x-22,y-58,44,7);ctx.fillStyle="#3fce7c";ctx.fillRect(x-21,y-57,42*p.rev,5); }
+    ctx.fillStyle="#e5484d";ctx.font="bold 12px sans-serif";ctx.textAlign="center";ctx.fillText("¡SOS! "+p.name,x,y-64);
+    ctx.restore(); return;
+  }
+  const bob=Math.sin(walk*0.5)*2, sw=Math.sin(walk)*5;
+  const bt=y-40+bob, hy=y-48+bob;
+  ctx.fillStyle="#2c3345";
+  ctx.fillRect(x-9,y-16,7,16+Math.min(0,sw));
+  ctx.fillRect(x+2,y-16,7,16+Math.min(0,-sw));
+  ctx.fillStyle="#1b2130"; ctx.fillRect(x-11,y-3,10,3); ctx.fillRect(x+2,y-3,10,3);
+  ctx.fillStyle=p.color; drawRoundRect(x-13,bt,26,26,7); ctx.fill();
+  ctx.fillStyle=shade(p.color,0.8); ctx.fillRect(x-13,bt+18,26,8);
+  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bt,26,5);
+  ctx.fillStyle=shade(p.color,0.85);
+  ctx.save();ctx.translate(x-13,bt+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x+13,bt+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
+  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(x,hy,9,0,7);ctx.fill();
+  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(x,hy+2,9,0.15,Math.PI-0.15);ctx.fill();
+  ctx.fillStyle="#2a2018"; const exx=p.facing>0?2:-2;
+  ctx.beginPath();ctx.arc(x+exx-2,hy-1,1.4,0,7);ctx.arc(x+exx+3,hy-1,1.4,0,7);ctx.fill();
+  drawHat(x,hy-9,p.classId,skin);
+  if(p.shield>0){ ctx.strokeStyle="#4aa3ff";ctx.lineWidth=2.5;ctx.globalAlpha=dead?0.2:0.85;ctx.beginPath();ctx.arc(x,y-24,25,0,7);ctx.stroke();ctx.globalAlpha=dead?0.22:1; }
+  if(p.busy==="repair"){ ctx.font="15px sans-serif";ctx.textAlign="center";ctx.fillText("🔧",x+(p.facing>0?18:-18),bt+8); }
+  if(p.busy==="revive"){ ctx.font="15px sans-serif";ctx.textAlign="center";ctx.fillText("➕",x,hy-18); }
+  if(s.isEnemyWave){
+    ctx.save();
+    ctx.translate(x+p.facing*10, bt+10);
+    ctx.rotate(p.facing*(p.attackAnim>0?-Math.PI/4:0));
+    ctx.fillStyle="#8B4513"; ctx.fillRect(0,0,5,25);
+    ctx.restore();
+  }
+  ctx.restore();
+  const bw=40,pct=Math.max(0,p.hp/p.maxHp);
+  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-20,bw,6);
+  ctx.fillStyle= pct>0.5?"#3fce7c":pct>0.25?"#f5b942":"#e5484d";
+  ctx.fillRect(x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
+  if(p.id===myId && p.abKind && p.abMax){
+    const cd=p.abCd||0, ready=cd<=0;
+    ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-13,bw,4);
+    ctx.fillStyle=ready?"var(--blue-ability)":"var(--muted)";
+    ctx.fillRect(x-bw/2+1,y-P_H-12,(bw-2)*(ready?1:1-cd/p.abMax),2);
+  }
+  ctx.fillStyle= p.id===myId?"#f5b942":"#e8edf6"; ctx.font="bold 11px sans-serif";ctx.textAlign="center";
+  ctx.fillText(p.name+(p.id===myId?" (tú)":""),x,y-P_H-24);
+  if(p.abKind==="invuln" && s.invuln>0){
+    ctx.strokeStyle="rgba(192,132,252,0.8)"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(x,y-24,30,0,7); ctx.stroke();
+  }
+  if(p.abKind==="safeZone" && s.safeZone>0){
+    ctx.strokeStyle="rgba(45,212,191,0.8)"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(x,y-24,100,0,7); ctx.stroke();
+  }
+  if(p.diamondShieldTimer>0){
+    ctx.strokeStyle="var(--diamond-shield)"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(x,y-24,28,0,7); ctx.stroke();
+  }
+}
 
 function drawWorld(s){
   ctx.setTransform(1,0,0,1,0,0);
-  // Fondo tormenta
   ctx.fillStyle="#080c14"; ctx.fillRect(0,0,cv.width,cv.height);
+  if(s.timeWarp>0) ctx.filter=`hue-rotate(${Math.sin(performance.now()/100)*5}deg) saturate(0.8) brightness(0.8)`;
+  else ctx.filter='none';
 
-  // --- NUEVO: Efecto de tiempo lento (Maestro del Tiempo) ---
-  if(s.timeWarp > 0){
-    ctx.filter = `hue-rotate(${Math.sin(performance.now()/100)*5}deg) saturate(0.8) brightness(0.8)`;
-  } else {
-    ctx.filter = 'none';
-  }
+  ctx.save(); ctx.translate(offX,offY); ctx.scale(scale,scale);
 
-  ctx.save();
-  ctx.translate(offX,offY); ctx.scale(scale,scale);
-
-  // Cielo
   const sky=ctx.createLinearGradient(0,0,0,GROUND_Y);
   sky.addColorStop(0,"#0c1526"); sky.addColorStop(1,"#152034");
   ctx.fillStyle=sky; ctx.fillRect(0,0,WORLD_W,GROUND_Y);
 
-  // Lluvia
   ctx.strokeStyle="rgba(120,150,190,.18)"; ctx.lineWidth=1.5;
   const rt=(performance.now()/40)%40;
   ctx.beginPath();
@@ -2192,28 +1793,22 @@ function drawWorld(s){
   const wallTop=ROOF_Y+26, wallH=GROUND_Y-wallTop;
   const wx0=ROOF_X0-14, wx1=ROOF_X1+14;
 
-  // Suelo (tierra + césped)
   ctx.fillStyle="#241a10"; ctx.fillRect(0,GROUND_Y,WORLD_W,WORLD_H-GROUND_Y);
   ctx.fillStyle="#3f6b2e"; ctx.fillRect(0,GROUND_Y,WORLD_W,7);
   ctx.fillStyle="#2f5222"; ctx.fillRect(0,GROUND_Y+7,WORLD_W,3);
 
-  // ---- Casa ----
-  // interior
+  // Casa
   ctx.fillStyle="#241d16"; ctx.fillRect(wx0,wallTop,wx1-wx0,wallH);
-  // pared con tablones verticales
   for(let x=wx0;x<wx1;x+=26){
     ctx.fillStyle=((x/26)|0)%2===0?"#5d4327":"#553c22";
     ctx.fillRect(x,wallTop,25,wallH);
     ctx.fillStyle="rgba(0,0,0,.18)"; ctx.fillRect(x+23,wallTop,2,wallH);
   }
-  // rodapié
   ctx.fillStyle="#3a2a18"; ctx.fillRect(wx0,GROUND_Y-14,wx1-wx0,14);
-  // puerta
   const doorW=70,doorX=WORLD_W/2-doorW/2;
   ctx.fillStyle="#3a2614"; ctx.fillRect(doorX,GROUND_Y-118,doorW,118);
   ctx.fillStyle="#4b3319"; ctx.fillRect(doorX+6,GROUND_Y-112,doorW-12,112);
   ctx.fillStyle="#f5b942"; ctx.beginPath();ctx.arc(doorX+doorW-16,GROUND_Y-58,4,0,7);ctx.fill();
-  // ventanas con luz cálida
   [wx0+70, wx1-70-56].forEach(vx=>{
     ctx.fillStyle="#2a1d10"; ctx.fillRect(vx-4,wallTop+40,64,64);
     ctx.fillStyle="#f6d38a"; ctx.fillRect(vx,wallTop+44,56,56);
@@ -2221,22 +1816,17 @@ function drawWorld(s){
     ctx.beginPath();ctx.moveTo(vx+28,wallTop+44);ctx.lineTo(vx+28,wallTop+100);
     ctx.moveTo(vx,wallTop+72);ctx.lineTo(vx+56,wallTop+72);ctx.stroke();
   });
-  // vigas laterales
   ctx.fillStyle="#41301c"; ctx.fillRect(wx0-4,wallTop,6,wallH); ctx.fillRect(wx1-2,wallTop,6,wallH);
 
-  // ---- Tejado (segmentos / tejas) ----
+  // Tejado
   for(let i=0;i<SEG_COUNT;i++){
     const seg=s.segments[i]; const x=ROOF_X0+SEG_W*i;
     if(seg.s===0){
-      // teja base
       ctx.fillStyle=(i%2===0)?"#8a5a30":"#794d27";
       ctx.fillRect(x,ROOF_Y,SEG_W-1.5,26);
-      // borde inferior de teja
       ctx.fillStyle="rgba(0,0,0,.25)"; ctx.fillRect(x,ROOF_Y+21,SEG_W-1.5,5);
-      // brillo superior
       ctx.fillStyle="rgba(255,255,255,.09)"; ctx.fillRect(x,ROOF_Y,SEG_W-1.5,5);
     } else {
-      // agujero irregular oscuro
       ctx.fillStyle="#080c14"; ctx.fillRect(x,ROOF_Y,SEG_W-1.5,26);
       ctx.fillStyle="#1a120a";
       ctx.beginPath();ctx.moveTo(x+2,ROOF_Y+3);ctx.lineTo(x+SEG_W*0.5,ROOF_Y+1);ctx.lineTo(x+SEG_W-3,ROOF_Y+5);
@@ -2246,89 +1836,84 @@ function drawWorld(s){
       if(seg.p>0){ ctx.fillStyle="#3fce7c"; ctx.fillRect(x+2,ROOF_Y+20,(SEG_W-5)*seg.p,4); }
     }
   }
-  // canaleta / viga inferior del tejado
   ctx.fillStyle="#4a3218"; ctx.fillRect(ROOF_X0-8,ROOF_Y+24,ROOF_X1-ROOF_X0+16,6);
-  // caballete / viga superior con alero
   ctx.fillStyle="#5a3c22"; ctx.fillRect(ROOF_X0-14,ROOF_Y-8,ROOF_X1-ROOF_X0+28,9);
   ctx.fillStyle="rgba(255,255,255,.08)"; ctx.fillRect(ROOF_X0-14,ROOF_Y-8,ROOF_X1-ROOF_X0+28,3);
 
   // Pararrayos
-  s.lightningRods.forEach(rod => {
+  s.lightningRods.forEach(rod=>{
     ctx.strokeStyle="#4aa3ff"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(rod.x, ROOF_Y); ctx.lineTo(rod.x, ROOF_Y - 30); ctx.stroke();
-    ctx.fillStyle="#4aa3ff"; ctx.beginPath(); ctx.arc(rod.x, ROOF_Y - 35, 5, 0, 7); ctx.fill();
-    ctx.fillStyle=`rgba(74,163,255,${rod.timer/5 * 0.5})`; ctx.beginPath(); ctx.arc(rod.x, ROOF_Y, 40, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(rod.x, ROOF_Y); ctx.lineTo(rod.x, ROOF_Y-30); ctx.stroke();
+    ctx.fillStyle="#4aa3ff"; ctx.beginPath(); ctx.arc(rod.x, ROOF_Y-35, 5, 0, 7); ctx.fill();
+    ctx.fillStyle=`rgba(74,163,255,${rod.timer/5*0.5})`; ctx.beginPath(); ctx.arc(rod.x, ROOF_Y, 40, 0, 7); ctx.fill();
   });
 
-  // Rayos (aviso + impacto)
+  // Rayos
   s.strikes.forEach(st=>{
     const cx=st.x;
     const bless=st.kind==="bless";
-    const ambient=st.kind==="ambient_storm"; // Nuevo tipo de rayo
-    const lightningRodStrike = st.kind === "lightning_rod"; // Rayo atraído por pararrayos
+    const ambient=st.kind==="ambient_storm";
+    const lr=st.kind==="lightning_rod";
     const col = bless ? "63,206,124" : "245,185,66";
     if(st.phase==="warn"){
-      const a=0.25+0.55*(1-st.t); // parpadea al acercarse
+      const a=0.25+0.55*(1-st.t);
       ctx.fillStyle=`rgba(${col},${0.10+0.14*(1-st.t)})`;
       ctx.fillRect(cx-SEG_W/2,0,SEG_W,GROUND_Y);
       ctx.strokeStyle=`rgba(${col},${a})`; ctx.lineWidth=3; ctx.setLineDash([8,8]);
-      ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,GROUND_Y); ctx.stroke(); ctx.setLineDash([]); // Rayos ambientales llegan al suelo
-      // triángulo de aviso (solo para rayos que caen en el tejado)
-      if(!ambient && !lightningRodStrike) {
+      ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,GROUND_Y); ctx.stroke(); ctx.setLineDash([]);
+      if(!ambient && !lr){
         ctx.fillStyle=`rgba(${col},${0.5+0.5*(1-st.t)})`;
         ctx.beginPath(); ctx.moveTo(cx,26);ctx.lineTo(cx-9,10);ctx.lineTo(cx+9,10);ctx.closePath();ctx.fill();
       }
     } else {
-      // impacto: bolt
       const seg=s.segments[st.seg];
-      const bottom = (bless || ambient || lightningRodStrike || (seg && seg.s===1)) ? GROUND_Y : ROOF_Y; // Rayos ambientales y de pararrayos llegan al suelo
-      ctx.strokeStyle= bless ? "#daffe9" : "#fff7dd"; ctx.lineWidth=5;
-      ctx.shadowColor= bless ? "#3fce7c" : "#f5b942"; ctx.shadowBlur=25;
+      const bottom=(bless||ambient||lr||(seg&&seg.s===1))?GROUND_Y:ROOF_Y;
+      ctx.strokeStyle=bless?"#daffe9":"#fff7dd"; ctx.lineWidth=5;
+      ctx.shadowColor=bless?"#3fce7c":"#f5b942"; ctx.shadowBlur=25;
       ctx.beginPath(); let yy=0,xx=cx; ctx.moveTo(xx,yy);
       while(yy<bottom){ yy+=28; xx=cx+(Math.random()*30-15); ctx.lineTo(xx,Math.min(yy,bottom)); }
       ctx.stroke(); ctx.shadowBlur=0;
     }
   });
 
-  // Efectos visuales (curación, reparación de dron, etc.)
+  // Efectos
   (s.heals||[]).forEach(h=>{
     const k=1-h.t/0.7, r=20+k*90;
-    if (h.type === "repairSpark") { // Efecto de reparación del dron
+    if(h.type==="repairSpark"){
       ctx.strokeStyle=`rgba(245,185,66,${Math.max(0,h.t)})`; ctx.lineWidth=3;
       ctx.beginPath(); ctx.arc(h.x,ROOF_Y+13,r*0.5,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(245,185,66,${Math.max(0,h.t)*0.9})`; ctx.font="bold 16px sans-serif";
       ctx.textAlign="center"; ctx.fillText("🛠️",h.x,ROOF_Y+10-k*20);
-    } else if (h.type === "damage") { // Efecto de daño
+    } else if(h.type==="damage"){
       ctx.strokeStyle=`rgba(229,72,77,${Math.max(0,h.t)})`; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*0.6,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(229,72,77,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("-",h.x,GROUND_Y-24-k*40);
-    } else if (h.type === "stun") { // Efecto de aturdimiento
+    } else if(h.type==="stun"){
       ctx.strokeStyle=`rgba(255,255,0,${Math.max(0,h.t)})`; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*0.6,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(255,255,0,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("⚡",h.x,GROUND_Y-24-k*40);
-    } else if (h.type === "transmute") { // Efecto de Alquimista
+    } else if(h.type==="transmute"){
       ctx.strokeStyle=`rgba(192,132,252,${Math.max(0,h.t)})`; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(192,132,252,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("✨",h.x,GROUND_Y-24-k*40);
-    } else if (h.type === "safeZone") { // Efecto de Zona Segura
+    } else if(h.type==="safeZone"){
       ctx.strokeStyle=`rgba(45,212,191,${Math.max(0,h.t)})`; ctx.lineWidth=5;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*1.5,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(45,212,191,${Math.max(0,h.t)*0.3})`; ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*1.5,0,7); ctx.fill();
-    } else if (h.type === "reflect") { // Efecto de reflejo
+    } else if(h.type==="reflect"){
       ctx.strokeStyle=`rgba(45,212,191,${Math.max(0,h.t)})`; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*0.8,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(45,212,191,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("↩️",h.x,GROUND_Y-24-k*40);
-    } else if (h.type === "diamondShield") { // Efecto de Escudo de Diamante
+    } else if(h.type==="diamondShield"){
       ctx.strokeStyle="var(--diamond-shield)"; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*0.7,0,7); ctx.stroke();
       ctx.fillStyle="var(--diamond-shield)"; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("💎",h.x,GROUND_Y-24-k*40);
-    }
-    else { // Efecto de curación por defecto
+    } else {
       ctx.strokeStyle=`rgba(63,206,124,${Math.max(0,h.t)})`; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r,0,7); ctx.stroke();
       ctx.fillStyle=`rgba(63,206,124,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
@@ -2336,198 +1921,39 @@ function drawWorld(s){
     }
   });
 
-  // Dibujar el dron si está activo
-  if(s.drone > 0){
-    drawDrone(s.droneX, s.droneY, s.droneAnimFrame);
-  }
+  if(s.drone>0) drawDrone(s.droneX, s.droneY, s.droneAnimFrame);
 
   // Enemigos
   s.enemies.forEach(e=>{
     if(!renderEnemies[e.id]) renderEnemies[e.id]={x:e.x,walk:0};
     const re=renderEnemies[e.id];
-    const prev=re.x;
-    re.x += (e.x-re.x)*0.35;
+    const prev=re.x; re.x += (e.x-re.x)*0.35;
     const moving=Math.abs(e.x-prev)>0.4 && e.state==="alive";
     re.walk = moving ? re.walk+0.35 : re.walk*0.7;
     drawEnemy(e,re.x,re.walk,s);
-
-    // Dibujar camino predicho para Oracle
-    const me = myPlayerState(s);
-    if(me && me.id === myId && me.predictPathTimer > 0 && e.predictedPath && e.predictedPath.length > 0){
+    const me=myPlayerState(s);
+    if(me && me.id===myId && me.predictPathTimer>0 && e.predictedPath && e.predictedPath.length>0){
       ctx.strokeStyle="rgba(128,128,128,0.5)"; ctx.lineWidth=2; ctx.setLineDash([5,5]);
-      ctx.beginPath();
-      ctx.moveTo(re.x, GROUND_Y - 20);
-      e.predictedPath.forEach(pathPoint => {
-        ctx.lineTo(pathPoint.x, GROUND_Y - 20);
-      });
-      ctx.stroke();
-      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(re.x, GROUND_Y-20);
+      e.predictedPath.forEach(pp=>ctx.lineTo(pp.x, GROUND_Y-20));
+      ctx.stroke(); ctx.setLineDash([]);
     }
   });
 
   // Jugadores
   s.players.forEach(p=>{
-    // interpolación suave de x + animación de caminar
     if(!renderPlayers[p.id]) renderPlayers[p.id]={x:p.x,walk:0};
     const rp=renderPlayers[p.id];
-    const prev=rp.x;
-    rp.x += (p.x-rp.x)*0.35;
+    const prev=rp.x; rp.x += (p.x-rp.x)*0.35;
     const moving=Math.abs(p.x-prev)>0.4 && p.state==="alive";
     rp.walk = moving ? rp.walk+0.35 : rp.walk*0.7;
-    drawPlayer(p,rp.x,rp.walk,s); // Pasar el estado global para invuln/safezone
+    drawPlayer(p,rp.x,rp.walk,s);
   });
 
-  // --- NUEVO: Dibujar NPC de la tienda ---
-  drawShopNPC(s.shopNPC, s);
-
   ctx.restore();
 
-  // Flash de rayo (pantalla)
   if(s.flash>0){ ctx.fillStyle=`rgba(255,255,255,${s.flash*0.35})`; ctx.fillRect(0,0,cv.width,cv.height); }
-
-  // HUD
   drawHUD(s);
-}
-
-// Sombras/tonos derivados del color de la clase
-function shade(hex,f){
-  const n=parseInt(hex.slice(1),16), r=(n>>16)&255,g=(n>>8)&255,b=n&255;
-  const c=v=>Math.max(0,Math.min(255,Math.round(v*f)));
-  return `rgb(${c(r)},${c(g)},${c(b)})`;
-}
-function drawHat(x,topY,classId,skin){
-  switch(classId){
-    case "builder": case "engineer": case "chiefengineer": // Ingeniero Jefe también usa casco
-      ctx.fillStyle="#f5b942"; drawRoundRect(x-11,topY-4,22,8,3);ctx.fill();
-      ctx.fillRect(x-13,topY+3,26,3); ctx.fillStyle="#c88f1e"; ctx.fillRect(x-2,topY-8,4,5); break;
-    case "guardian": case "elementalguardian": // Guardián Elemental también usa casco
-      ctx.fillStyle="#9aa7bd"; ctx.beginPath();ctx.arc(x,topY+2,11,Math.PI,0);ctx.fill();
-      ctx.fillRect(x-11,topY+1,22,4); ctx.fillStyle="#c3cede"; ctx.fillRect(x-1,topY-8,2,10); break;
-    case "medic":
-      ctx.fillStyle="#f4f7fb"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
-      ctx.fillStyle="#e5484d"; ctx.fillRect(x-4,topY-4,8,3);ctx.fillRect(x-1.5,topY-7,3,8); break;
-    case "runner":
-      ctx.fillStyle="#4aa3ff"; ctx.fillRect(x-11,topY-2,22,5); break;
-    case "rod":
-      ctx.strokeStyle="#4aa3ff";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,topY-2);ctx.lineTo(x,topY-14);ctx.stroke();
-      ctx.fillStyle="#4aa3ff";ctx.beginPath();ctx.arc(x,topY-15,3,0,7);ctx.fill(); break;
-    case "tamer":
-      ctx.fillStyle="#f5b942"; ctx.beginPath();
-      ctx.moveTo(x-11,topY+2);ctx.lineTo(x-11,topY-8);ctx.lineTo(x-5,topY-2);ctx.lineTo(x,topY-11);
-      ctx.lineTo(x+5,topY-2);ctx.lineTo(x+11,topY-8);ctx.lineTo(x+11,topY+2);ctx.closePath();ctx.fill(); break;
-    case "alchemist": // Alquimista
-      ctx.fillStyle="#c084fc"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
-      ctx.fillStyle="#8b5cf6"; ctx.beginPath();ctx.arc(x,topY-4,4,0,7);ctx.fill(); break;
-    case "colossus": // Coloso
-      ctx.fillStyle="#94a3b8"; ctx.beginPath();ctx.arc(x,topY+2,12,Math.PI,0);ctx.fill();
-      ctx.fillStyle="#64748b"; ctx.fillRect(x-12,topY-2,24,4); break;
-    case "oracle": // Oráculo
-      ctx.fillStyle="#2dd4bf"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
-      ctx.fillStyle="#0f766e"; ctx.beginPath();ctx.arc(x,topY-4,3,0,7);ctx.fill(); break;
-    case "timelord": // Maestro del Tiempo
-      ctx.fillStyle="#8b5cf6"; ctx.beginPath();ctx.arc(x,topY+2,10,Math.PI,0);ctx.fill();
-      ctx.fillStyle="#c084fc"; ctx.beginPath();ctx.arc(x,topY-4,3,0,7);ctx.fill();
-      ctx.strokeStyle="#c084fc"; ctx.lineWidth=1.5; ctx.beginPath();ctx.arc(x,topY-4,6,0,7);ctx.stroke(); break;
-    default:
-      ctx.fillStyle="#6b4a2a"; ctx.beginPath();ctx.arc(x,topY+1,10,Math.PI,0);ctx.fill();
-  }
-}
-
-function drawPlayer(p,x,walk,s){
-  const y=GROUND_Y;
-  const down = p.state==="downed", dead=p.state==="dead";
-  const skin="#f2d6b3";
-  ctx.save();
-  ctx.globalAlpha = dead?0.22:1;
-
-  // sombra
-  ctx.fillStyle="rgba(0,0,0,.32)"; ctx.beginPath();ctx.ellipse(x,y+2,17,5,0,0,7);ctx.fill();
-
-  if(down){
-    // tumbado (cuerpo horizontal)
-    ctx.save(); ctx.translate(x,y-8); ctx.rotate(-Math.PI/2*0.92);
-    ctx.fillStyle=p.color; drawRoundRect(-P_H/2+6,-P_W/2,P_H-6,P_W,7); ctx.fill();
-    ctx.fillStyle=skin; ctx.beginPath();ctx.arc(P_H/2-2,0,9,0,7);ctx.fill();
-    ctx.restore();
-    if(p.rev>0){ ctx.fillStyle="rgba(0,0,0,.5)";ctx.fillRect(x-22,y-58,44,7);ctx.fillStyle="#3fce7c";ctx.fillRect(x-21,y-57,42*p.rev,5); }
-    ctx.fillStyle="#e5484d";ctx.font="bold 12px sans-serif";ctx.textAlign="center";ctx.fillText("¡SOS! "+p.name,x,y-64);
-    ctx.restore();
-    return;
-  }
-
-  const bob = Math.sin(walk * 0.5) * 2; // Sutil bob al caminar
-  const sw = Math.sin(walk)*5; // balanceo de piernas
-  const bodyTop=y-40 + bob, headY=y-48 + bob;
-  // piernas
-  ctx.fillStyle="#2c3345";
-  ctx.fillRect(x-9, y-16, 7, 16+Math.min(0,sw));
-  ctx.fillRect(x+2, y-16, 7, 16+Math.min(0,-sw));
-  // pies
-  ctx.fillStyle="#1b2130"; ctx.fillRect(x-11,y-3,10,3); ctx.fillRect(x+2,y-3,10,3);
-  // torso (color de clase)
-  ctx.fillStyle=p.color; drawRoundRect(x-13,bodyTop,26,26,7); ctx.fill();
-  ctx.fillStyle=shade(p.color,0.8); ctx.fillRect(x-13,bodyTop+18,26,8); // sombra inferior
-  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5); // brillo
-  // brazos (balanceo opuesto)
-  ctx.fillStyle=shade(p.color,0.85);
-  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
-  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
-  // cuello + cabeza
-  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
-  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
-  // ojos (según dirección)
-  ctx.fillStyle="#2a2018"; const ex=p.facing>0?2:-2;
-  ctx.beginPath();ctx.arc(x+ex-2,headY-1,1.4,0,7);ctx.arc(x+ex+3,headY-1,1.4,0,7);ctx.fill();
-  // gorro/casco de clase
-  drawHat(x,headY-9,p.classId,skin);
-  // escudo
-  if(p.shield>0){ ctx.strokeStyle="#4aa3ff";ctx.lineWidth=2.5;ctx.globalAlpha=dead?0.2:0.85;ctx.beginPath();ctx.arc(x,y-24,25,0,7);ctx.stroke();ctx.globalAlpha=dead?0.22:1; }
-  // acción
-  if(p.busy==="repair"){ ctx.font="15px sans-serif";ctx.textAlign="center";ctx.fillText("🔧",x+(p.facing>0?18:-18),bodyTop+8); }
-  if(p.busy==="revive"){ ctx.font="15px sans-serif";ctx.textAlign="center";ctx.fillText("➕",x,headY-18); }
-  // Arma del jugador (bate)
-  if(s.isEnemyWave){
-    ctx.save();
-    ctx.translate(x + p.facing * 10, bodyTop + 10);
-    ctx.rotate(p.facing * (p.attackAnim > 0 ? -Math.PI/4 : 0)); // Animación de swing
-    ctx.fillStyle="#8B4513"; // Color del bate
-    ctx.fillRect(0, 0, 5, 25); // Bate
-    ctx.restore();
-  }
-
-  ctx.restore();
-
-  // barra de vida
-  const bw=40,pct=Math.max(0,p.hp/p.maxHp);
-  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-20,bw,6);
-  ctx.fillStyle= pct>0.5?"#3fce7c":pct>0.25?"#f5b942":"#e5484d";
-  ctx.fillRect(x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
-  // enfriamiento de habilidad (sobre la barra de vida) para mí
-  if(p.id===myId && p.currentAbKind && p.abMax){ // Usar currentAbKind
-    const cd=p.abCd||0, ready=cd<=0;
-    ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-13,bw,4);
-    ctx.fillStyle=ready?"var(--blue-ability)":"var(--muted)";
-    ctx.fillRect(x-bw/2+1,y-P_H-12,(bw-2)*(ready?1:1-cd/p.abMax),2);
-  }
-  // nombre
-  ctx.fillStyle= p.id===myId?"#f5b942":"#e8edf6"; ctx.font="bold 11px sans-serif";ctx.textAlign="center";
-  ctx.fillText(p.name+(p.id===myId?" (tú)":""),x,y-P_H-24);
-
-  // Indicador de invulnerabilidad (Coloso)
-  if(p.abKind === "invuln" && s.invuln > 0){
-    ctx.strokeStyle="rgba(192,132,252,0.8)"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.arc(x,y-24,30,0,7); ctx.stroke();
-  }
-  // Indicador de Zona Segura (Guardián Elemental)
-  if(p.abKind === "safeZone" && s.safeZone > 0){
-    ctx.strokeStyle="rgba(45,212,191,0.8)"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.arc(x,y-24,100,0,7); ctx.stroke();
-  }
-  // Indicador de Escudo de Diamante
-  if(p.diamondShieldTimer > 0){
-    ctx.strokeStyle="var(--diamond-shield)"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.arc(x,y-24,28,0,7); ctx.stroke();
-  }
 }
 
 let _lastToast=null;
@@ -2537,11 +1963,11 @@ function drawHUD(s){
   const me=myPlayerState(s);
   const holes=s.segments.filter(g=>g.s===1).length;
   let mid = s.phase==="intermission" ? "Elijan mejora" : `⏱ ${Math.max(0,Math.ceil(s.waveTimer))}s`;
-  if(s.isBossWave) mid = `<span class="boss-wave-indicator">¡TORMENTA!</span> ${mid}`; // Indicador de oleada de jefe
-  else if(s.isEnemyWave) mid = `<span class="enemy-wave-indicator">¡ENEMIGOS!</span> ${mid}`; // Indicador de oleada de enemigos
+  if(s.isBossWave) mid = `<span class="boss-wave-indicator">¡TORMENTA!</span> ${mid}`;
+  else if(s.isEnemyWave) mid = `<span class="enemy-wave-indicator">¡ENEMIGOS!</span> ${mid}`;
 
   let ab="";
-  if(me&&me.currentAbKind){ // Usar currentAbKind
+  if(me&&me.abKind){
     const ready=(me.abCd||0)<=0;
     ab=`<span style="color:${ready?'var(--blue-ability)':'var(--muted)'}">${ready?'⚡ Habilidad lista':'⏳ '+Math.ceil(me.abCd)+'s'}</span>`;
   }
@@ -2551,7 +1977,7 @@ function drawHUD(s){
     <span>🕳️ ${holes}</span>
     ${s.isEnemyWave?`<span>🔪 ${s.enemies.filter(e=>e.state!=="dead").length}</span>`:""}
     ${me?`<span>❤️ <b style="color:${me.hp/me.maxHp>0.3?'#3fce7c':'#e5484d'}">${me.hp}</b></span>`:""}
-    ${me?`<span title="Puntos de rayos en esta partida">⚡ <b>${me.rayos||0}</b></span>`:""}
+    ${me?`<span title="Puntos de esta partida">⚡ <b>${me.rayos||0}</b></span>`:""}
     ${s.calm>0?`<span style="color:#4aa3ff">🌩️ Calma ${Math.ceil(s.calm)}s</span>`:""}
     ${s.invuln>0?`<span style="color:#c084fc">🗿 Invulnerable ${Math.ceil(s.invuln)}s</span>`:""}
     ${s.safeZone>0?`<span style="color:#2dd4bf">🌀 Zona Segura ${Math.ceil(s.safeZone)}s</span>`:""}
@@ -2560,20 +1986,14 @@ function drawHUD(s){
     ${me && me.diamondShieldTimer > 0 ? `<span style="color:var(--diamond-shield)">💎 Diamante ${Math.ceil(me.diamondShieldTimer)}s</span>`:""}
     ${me && me.predictPathTimer > 0 ? `<span style="color:var(--purple-ability)">🔮 Predicción ${Math.ceil(me.predictPathTimer)}s</span>`:""}
     ${ab}
-    ${me && me.id === myId ? `<button class="tbtn" id="hudShopBtn" style="position:static; width:auto; height:auto; font-size:12px; padding:4px 8px; margin-left:10px; pointer-events:auto; background:var(--panel-2); border-color:var(--border); color:var(--ink);">🛒 Tienda (B)</button>` : ''}`;
-  
-  // Bind the HUD shop button if it exists
-  const hudShopBtn = $("hudShopBtn");
-  if (hudShopBtn) {
-    hudShopBtn.onclick = toggleInGameShop;
-  }
+    ${me && me.id === myId ? `<button class="tbtn" id="hudShopBtn" style="position:static; width:auto; height:auto; font-size:12px; padding:4px 10px; margin-left:10px; pointer-events:auto; background:var(--amber); border-color:var(--amber); color:var(--amber-ink); font-weight:800;">🛒 TIENDA (B)</button>` : ''}`;
 
-  // aviso puntual (habilidades)
+  const b=$("hudShopBtn"); if(b) b.onclick=toggleInGameShop;
+
   if(s.toast && s.toast!==_lastToast){ _lastToast=s.toast; showToast(s.toast); }
   if(!s.toast) _lastToast=null;
 }
 
-// Ajuste inicial del nombre y progreso
 $("name").value = "Jugador"+Math.floor(Math.random()*90+10);
 refreshMenuProgress();
 </script>
