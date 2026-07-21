@@ -359,8 +359,9 @@ const TICK = 1/30;             // paso de simulación del host
 const BASE_PATCH_DURATION = 15; // Segundos que dura una reparación antes de poder reabrirse
 
 // ---------- Nuevas constantes para enemigos ----------
-const ENEMY_WAVE_INTERVAL = 6; // Cada cuántas oleadas aparecen enemigos
-const ENEMY_COUNT = 3;         // Número de enemigos por oleada
+const ENEMY_WAVE_INTERVAL = 3; // Cada cuántas oleadas aparecen enemigos
+const ENEMY_COUNT_BASE = 1;    // Número base de enemigos por oleada
+const ENEMY_COUNT_PER_WAVE = 0.5; // Incremento de enemigos por oleada
 const ENEMY_HP = 100;          // Vida de los enemigos
 const ENEMY_SPEED = 180;       // Velocidad de los enemigos
 const ENEMY_ATTACK_RANGE = 40; // Rango de ataque del enemigo
@@ -417,59 +418,59 @@ const CLASSES = [
    passive:p=>{p.maxHp+=10;p.hp+=10}, combatAbKind:"stunEnemy"}, // MODIFICADO: Añadido combatAbKind
   {id:"tamer", ic:"⚡", nm:"Domador de rayos", cost:15,
    ds:"HABILIDAD: invoca un rayo bendito que repara el techo y cura a los aliados que estén debajo.",
-   passive:p=>{p.resist=Math.min(.75,p.resist+.08)}, abKind:"bless", cd:14},
+   passive:p=>{p.resist=Math.min(.75,p.resist+.08)}, abKind:"bless", cd:14, combatAbKind:"stunEnemy"},
   {id:"builder", ic:"🔨", nm:"Constructor", cost:10,
    ds:"Tapa agujeros mucho más rápido y repara los agujeros de al lado.",
-   passive:p=>{p.repairMult*=1.4;p.repairRange+=1}, combatAbKind:"stunEnemy"}, // MODIFICADO: Añadido combatAbKind
+   passive:p=>{p.repairMult*=1.4;p.repairRange+=1}, combatAbKind:"stunEnemy"},
   {id:"medic", ic:"⛑️", nm:"Médico de campo", cost:12,
    ds:"Revive muy rápido y regenera vida. HABILIDAD: cura en área a los aliados cercanos.",
-   passive:p=>{p.reviveMult*=1.5;p.regen+=2}, abKind:"heal", cd:16},
+   passive:p=>{p.reviveMult*=1.5;p.regen+=2}, abKind:"heal", cd:16, combatAbKind:"stunEnemy"},
   {id:"guardian", ic:"🛡️", nm:"Guardián", cost:12,
    ds:"Mucha vida y resistencia. Aguanta los rayos que otros no soportarían.",
-   passive:p=>{p.maxHp+=70;p.hp+=70;p.resist=Math.min(.75,p.resist+.22)}, combatAbKind:"stunEnemy"}, // MODIFICADO: Añadido combatAbKind
+   passive:p=>{p.maxHp+=70;p.hp+=70;p.resist=Math.min(.75,p.resist+.22)}, combatAbKind:"stunEnemy"},
   {id:"runner", ic:"🏃", nm:"Velocista", cost:8,
    ds:"Corre mucho más rápido para llegar a cualquier agujero al instante.",
-   passive:p=>{p.speedMult*=1.4;p.dodge=Math.min(.6,p.dodge+.08)}, combatAbKind:"stunEnemy"}, // MODIFICADO: Añadido combatAbKind
+   passive:p=>{p.speedMult*=1.4;p.dodge=Math.min(.6,p.dodge+.08)}, combatAbKind:"stunEnemy"},
   {id:"rod", ic:"🔱", nm:"Pararrayos", cost:14,
    ds:"Empiezas con escudos. HABILIDAD: reparte un escudo a todo el equipo.",
-   passive:p=>{p.shield+=2;p.dodge=Math.min(.6,p.dodge+.12)}, abKind:"teamShield", cd:20},
+   passive:p=>{p.shield+=2;p.dodge=Math.min(.6,p.dodge+.12)}, abKind:"teamShield", cd:20, combatAbKind:"stunEnemy"},
   {id:"engineer", ic:"⚙️", nm:"Ingeniera", cost:16,
    ds:"HABILIDAD: repara al instante TODOS los agujeros del tejado.",
-   passive:p=>{p.repairMult*=1.15}, abKind:"fixAll", cd:26},
+   passive:p=>{p.repairMult*=1.15}, abKind:"fixAll", cd:26, combatAbKind:"stunEnemy"},
   {id:"ninja", ic:"🥷", nm:"Ninja", cost:18,
    ds:"Muy veloz y esquiva muchos rayos. HABILIDAD: parpadea (dash) tapando todos los agujeros que cruza.",
-   passive:p=>{p.speedMult*=1.25;p.dodge=Math.min(.6,p.dodge+.25)}, abKind:"dash", cd:12},
+   passive:p=>{p.speedMult*=1.25;p.dodge=Math.min(.6,p.dodge+.25)}, abKind:"dash", cd:12, combatAbKind:"stunEnemy"},
   {id:"vampire", ic:"🧛", nm:"Vampiro", cost:20,
    ds:"Cada reparación te cura. HABILIDAD: roba vida de la tormenta y la reparte al equipo herido.",
-   passive:p=>{p.repairHeal+=8;p.regen+=1}, abKind:"drain", cd:18},
+   passive:p=>{p.repairHeal+=8;p.regen+=1}, abKind:"drain", cd:18, combatAbKind:"stunEnemy"},
   {id:"captain", ic:"🎖️", nm:"Capitán", cost:22,
    ds:"Aura de equipo: todos reparan más rápido. HABILIDAD: grito que acelera a todo el equipo un momento.",
-   passive:p=>{p.maxHp+=30;p.hp+=30;p.teamRepair=(p.teamRepair||0)+.15}, abKind:"rally", cd:22},
+   passive:p=>{p.maxHp+=30;p.hp+=30;p.teamRepair=(p.teamRepair||0)+.15}, abKind:"rally", cd:22, combatAbKind:"stunEnemy"},
   {id:"phoenix", ic:"🐦‍🔥", nm:"Fénix", cost:28,
    ds:"Revives solo una vez al caer. HABILIDAD: explosión de fuego que revive a TODOS los aliados caídos.",
-   passive:p=>{p.lives+=1;p.regen+=2}, abKind:"reviveAll", cd:30},
+   passive:p=>{p.lives+=1;p.regen+=2}, abKind:"reviveAll", cd:30, combatAbKind:"stunEnemy"},
   {id:"storm", ic:"🌩️", nm:"Señor de la tormenta", cost:35,
    ds:"Resistente y con escudo. HABILIDAD: calma la tormenta unos segundos (no caen rayos).",
-   passive:p=>{p.maxHp+=40;p.hp+=40;p.resist=Math.min(.75,p.resist+.15);p.shield+=1}, abKind:"calm", cd:34},
+   passive:p=>{p.maxHp+=40;p.hp+=40;p.resist=Math.min(.75,p.resist+.15);p.shield+=1}, abKind:"calm", cd:34, combatAbKind:"stunEnemy"},
   {id:"alchemist", ic:"✨", nm:"Alquimista", cost:40,
    ds:"Gana 2 puntos extra por cada rayo sobrevivido. HABILIDAD: Convierte 30 de tu vida en 15 puntos para el equipo.",
-   passive:p=>{p.bonusPointsPerRay=2}, abKind:"transmute", cd:25},
+   passive:p=>{p.bonusPointsPerRay=2}, abKind:"transmute", cd:25, combatAbKind:"stunEnemy"},
   {id:"colossus", ic:"🗿", nm:"Coloso", cost:45,
    ds:"Vida y resistencia masivas. HABILIDAD: Te vuelves invulnerable y atraes todos los rayos por 4 segundos.",
-   passive:p=>{p.maxHp+=120;p.hp+=120;p.resist=Math.min(.75,p.resist+.35);p.shield+=1}, abKind:"invuln", cd:35},
+   passive:p=>{p.maxHp+=120;p.hp+=120;p.resist=Math.min(.75,p.resist+.35);p.shield+=1}, abKind:"invuln", cd:35, combatAbKind:"stunEnemy"},
   {id:"oracle", ic:"🔮", nm:"Oráculo", cost:38,
    ds:"Ves los avisos de rayo mucho antes. HABILIDAD: Congela la tormenta, deteniendo todos los rayos por 6 segundos.",
-   passive:p=>{p.warnBonus+=0.8;p.speedMult*=1.1}, abKind:"freezeStorm", cd:30, combatAbKind:"predictEnemyPath"}, // MODIFICADO: Añadido combatAbKind
+   passive:p=>{p.warnBonus+=0.8;p.speedMult*=1.1}, abKind:"freezeStorm", cd:30, combatAbKind:"predictEnemyPath"},
   // --- NUEVAS CLASES CARAS ---
   {id:"timelord", ic:"⏳", nm:"Maestro del Tiempo", cost:120,
    ds:"HABILIDAD: Ralentiza el tiempo de la tormenta para todos durante 5 segundos. Tus habilidades se recargan 25% más rápido.",
-   passive:p=>{p.abCdMult=0.75}, abKind:"timeWarp", cd:40},
+   passive:p=>{p.abCdMult=0.75}, abKind:"timeWarp", cd:40, combatAbKind:"stunEnemy"},
   {id:"chiefengineer", ic:"🏗️", nm:"Ingeniero Jefe", cost:150,
    ds:"Reparas agujeros 50% más rápido. Los agujeros que tapas son 50% más resistentes. HABILIDAD: Despliega un dron de reparación.",
-   passive:p=>{p.repairMult*=1.5;p.patchArmorBonus=0.5}, abKind:"drone", cd:30}, // MODIFICADO: repairMult*=1.5
+   passive:p=>{p.repairMult*=1.5;p.patchArmorBonus=0.5}, abKind:"drone", cd:30, combatAbKind:"stunEnemy"},
   {id:"elementalguardian", ic:"🌀", nm:"Guardián Elemental", cost:180,
    ds:"Resistencia masiva. 20% de probabilidad de reflejar un rayo, curando al equipo. HABILIDAD: Crea una Zona Segura.",
-   passive:p=>{p.maxHp+=100;p.hp+=100;p.resist=Math.min(.75,p.resist+.40);p.reflectChance=0.2}, abKind:"safeZone", cd:45},
+   passive:p=>{p.maxHp+=100;p.hp+=100;p.resist=Math.min(.75,p.resist+.40);p.reflectChance=0.2}, abKind:"safeZone", cd:45, combatAbKind:"stunEnemy"},
 ];
 const classById = id => CLASSES.find(c=>c.id===id);
 
@@ -575,7 +576,7 @@ function checkAchievements(){
 let peer=null, myId=null, isHost=false, roomCode=null, myName="Jugador";
 const conns={};        // host: id -> DataConnection
 let hostConn=null;     // cliente: conexión al host
-let inputState={left:false,right:false,action:false}; // MODIFICADO: Eliminado 'shop' de inputState
+let inputState={left:false,right:false,action:false};
 let abilityQueued=false;   // se activa una vez al pulsar habilidad
 let lastSentInput="";
 let latestState=null;  // último estado recibido (cliente) o local (host)
@@ -801,7 +802,7 @@ function makePlayer(id,name,color,classId){
     baseAbKind:null, baseAbMax:0, baseAbCd:0, baseWarnBonus:0, // MODIFICADO: para guardar la habilidad base
     rayos:0,            // puntos de rayos sobrevividos en esta partida (para estadísticas)
     walk:0,             // fase de animación al caminar
-    input:{left:false,right:false,action:false}, // MODIFICADO: Eliminado 'shop' de input
+    input:{left:false,right:false,action:false},
     busy:null,          // "repair" | "revive" | "attack" | null (para animación)
     facing:1,
     ready:false,options:[],
@@ -866,7 +867,7 @@ function onHostData(conn,d){
     conn.send({t:"welcome",id:d.id,host:GAME.hostId});
     renderLobby();
   } else if(d.t==="input"){
-    const p=GAME.players[conn._pid]; if(p){p.input.left=d.left;p.input.right=d.right;p.input.action=d.action;} // MODIFICADO: Eliminado 'shop'
+    const p=GAME.players[conn._pid]; if(p){p.input.left=d.left;p.input.right=d.right;p.input.action=d.action;}
   } else if(d.t==="ability"){
     const p=GAME.players[conn._pid]; if(p) p.abReq=true;
   } else if(d.t==="pick"){
@@ -876,7 +877,6 @@ function onHostData(conn,d){
     const p=GAME.players[conn._pid];
     if(p && GAME.inGameShopOpen){ buyInGameShopItem(p, d.itemId); }
   } else if(d.t==="toggleShop"){ // Nuevo: abrir/cerrar tienda en partida
-    // MODIFICADO: Ahora el host controla el estado de la tienda
     if(GAME.phase === "playing"){
       GAME.inGameShopOpen = !GAME.inGameShopOpen;
       // Si se cierra, el NPC también se desactiva
@@ -1036,15 +1036,16 @@ function simulate(dt){
     players.forEach(p => {
       if (p.state === "alive" && Math.abs(p.x - shopNPC.x) < 80) { // Rango de interacción
         playerNearShop = true;
-        // MODIFICADO: Eliminada la lógica de `p.input.shop` aquí, ya que el toggle se maneja por evento.
       }
     });
 
     // MODIFICADO: La lógica del hint ahora solo depende de la proximidad y si la tienda está cerrada.
     if (playerNearShop && !GAME.inGameShopOpen) {
       GAME.shopHintTimer = 1; // Mostrar hint
+      shopNPC.active = true; // Activar NPC
     } else {
       GAME.shopHintTimer = 0; // Ocultar hint
+      shopNPC.active = false; // Desactivar NPC
     }
 
     // --- Manejo de la tienda en partida ---
@@ -1163,7 +1164,8 @@ function simulate(dt){
     // --- Lógica de enemigos ---
     if(GAME.isEnemyWave){
       // Spawneo de enemigos si no hay suficientes
-      if(GAME.enemies.length < ENEMY_COUNT && GAME.waveTimer > WAVE_DURATION / 2){ // Solo spawnea al inicio de la oleada
+      const targetEnemyCount = Math.floor(ENEMY_COUNT_BASE + GAME.wave * ENEMY_COUNT_PER_WAVE);
+      if(GAME.enemies.filter(e => e.state !== "dead").length < targetEnemyCount && GAME.waveTimer > WAVE_DURATION / 2){ // Solo spawnea al inicio de la oleada
         const spawnX = Math.random() < 0.5 ? ROOF_X0 - 50 : ROOF_X1 + 50; // Spawnea a los lados
         GAME.enemies.push(makeEnemy(uid(), spawnX, GROUND_Y));
       }
@@ -1707,8 +1709,6 @@ function buyInGameShopItem(player, itemId){
   if(player.rayos >= item.cost){
     player.rayos -= item.cost;
     item.apply(player, GAME); // Aplica el efecto del ítem
-    // No es necesario actualizar los puntos globales aquí, ya se actualizan con los rayos
-    // setPoints(getPoints() - item.cost); // Esto restaría de los puntos globales, lo cual no es deseado para la moneda de la partida
   } else {
     // Podríamos enviar un mensaje al cliente para mostrar un error de "no tienes suficientes puntos"
     GAME.toastMsg={txt:`${player.name} no tiene suficientes ⚡ para ${item.nm}.`,t:2};
@@ -1868,11 +1868,10 @@ function openInGameShop(s){
 function closeInGameShop(){
   $("inGameShopOverlay").classList.remove("show");
   $("inGameShopGrid")._lastRenderedItems = null; // Reset para forzar re-render en la próxima apertura
-  // MODIFICADO: Eliminada la lógica redundante de `inputState.shop` aquí.
 }
 
 $("btnInGameShopClose").onclick = () => {
-  toggleInGameShop(); // MODIFICADO: Llama a la función centralizada
+  toggleInGameShop();
 };
 
 
@@ -1922,7 +1921,7 @@ window.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight"||e.key==="d"||e.key==="D") inputState.right=true;
   if(e.key===" "||e.key==="e"||e.key==="E"||e.key==="ArrowUp"||e.key==="w"||e.key==="W"){inputState.action=true;e.preventDefault();}
   if(e.key==="q"||e.key==="Q"||e.key==="Shift"||e.key==="f"||e.key==="F"){ triggerAbility(); e.preventDefault(); }
-  if(e.key==="b"||e.key==="B"){ toggleInGameShop(); e.preventDefault(); } // MODIFICADO: Llama a la función centralizada
+  if(e.key==="b"||e.key==="B"){ toggleInGameShop(); e.preventDefault(); }
   if(isHost) syncHostInput();
 });
 
@@ -1934,7 +1933,6 @@ window.addEventListener("keyup",e=>{
   if(e.key==="ArrowLeft"||e.key==="a"||e.key==="A") inputState.left=false;
   if(e.key==="ArrowRight"||e.key==="d"||e.key==="D") inputState.right=false;
   if(e.key===" "||e.key==="e"||e.key==="E"||e.key==="ArrowUp"||e.key==="w"||e.key==="W") inputState.action=false;
-  // MODIFICADO: Eliminado el manejo de 'B' en keyup, ya no es necesario para inputState.shop
   if(isHost) syncHostInput();
 });
 function syncHostInput(){ const p=GAME.players[myId]; if(p) p.input={...inputState}; }
@@ -1958,13 +1956,12 @@ bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"
 // Botón de tienda móvil
 (function(){
   const el=$("tShop");
-  const fire=e=>{e.preventDefault(); toggleInGameShop();}; // MODIFICADO: Llama a la función centralizada
+  const fire=e=>{e.preventDefault(); toggleInGameShop();};
   el.addEventListener("touchstart",fire,{passive:false});
   el.addEventListener("mousedown",fire);
 })();
 
 function toggleInGameShop(){
-  // MODIFICADO: El cliente solo envía la intención al host
   if(isHost){ GAME.inGameShopOpen = !GAME.inGameShopOpen; }
   else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
 }
@@ -2295,9 +2292,9 @@ function drawWorld(s){
       ctx.fillStyle=`rgba(45,212,191,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("↩️",h.x,GROUND_Y-24-k*40);
     } else if (h.type === "diamondShield") { // Efecto de Escudo de Diamante
-      ctx.strokeStyle=`rgba(103,232,249,${Math.max(0,h.t)})`; ctx.lineWidth=4;
+      ctx.strokeStyle="var(--diamond-shield)"; ctx.lineWidth=4;
       ctx.beginPath(); ctx.arc(h.x,GROUND_Y-30,r*0.7,0,7); ctx.stroke();
-      ctx.fillStyle=`rgba(103,232,249,${Math.max(0,h.t)*0.9})`; ctx.font="bold 20px sans-serif";
+      ctx.fillStyle="var(--diamond-shield)"; ctx.font="bold 20px sans-serif";
       ctx.textAlign="center"; ctx.fillText("💎",h.x,GROUND_Y-24-k*40);
     }
     else { // Efecto de curación por defecto
