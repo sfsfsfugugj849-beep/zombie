@@ -575,7 +575,7 @@ function checkAchievements(){
 let peer=null, myId=null, isHost=false, roomCode=null, myName="Jugador";
 const conns={};        // host: id -> DataConnection
 let hostConn=null;     // cliente: conexión al host
-let inputState={left:false,right:false,action:false,shop:false}; // Añadido 'shop'
+let inputState={left:false,right:false,action:false}; // MODIFICADO: Eliminado 'shop' de inputState
 let abilityQueued=false;   // se activa una vez al pulsar habilidad
 let lastSentInput="";
 let latestState=null;  // último estado recibido (cliente) o local (host)
@@ -801,7 +801,7 @@ function makePlayer(id,name,color,classId){
     baseAbKind:null, baseAbMax:0, baseAbCd:0, baseWarnBonus:0, // MODIFICADO: para guardar la habilidad base
     rayos:0,            // puntos de rayos sobrevividos en esta partida (para estadísticas)
     walk:0,             // fase de animación al caminar
-    input:{left:false,right:false,action:false,shop:false}, // MODIFICADO: input de tienda
+    input:{left:false,right:false,action:false}, // MODIFICADO: Eliminado 'shop' de input
     busy:null,          // "repair" | "revive" | "attack" | null (para animación)
     facing:1,
     ready:false,options:[],
@@ -866,7 +866,7 @@ function onHostData(conn,d){
     conn.send({t:"welcome",id:d.id,host:GAME.hostId});
     renderLobby();
   } else if(d.t==="input"){
-    const p=GAME.players[conn._pid]; if(p){p.input.left=d.left;p.input.right=d.right;p.input.action=d.action;p.input.shop=d.shop;} // Añadido 'shop'
+    const p=GAME.players[conn._pid]; if(p){p.input.left=d.left;p.input.right=d.right;p.input.action=d.action;} // MODIFICADO: Eliminado 'shop'
   } else if(d.t==="ability"){
     const p=GAME.players[conn._pid]; if(p) p.abReq=true;
   } else if(d.t==="pick"){
@@ -1036,16 +1036,11 @@ function simulate(dt){
     players.forEach(p => {
       if (p.state === "alive" && Math.abs(p.x - shopNPC.x) < 80) { // Rango de interacción
         playerNearShop = true;
-        if (p.input.shop) { // Si el jugador presiona el botón de tienda
-          if (!GAME.inGameShopOpen) { // Solo abre si no está abierta
-            GAME.inGameShopOpen = true;
-            GAME.shopNPC.active = true; // Activa el NPC
-          }
-          p.input.shop = false; // Consumir el input para evitar spam
-        }
+        // MODIFICADO: Eliminada la lógica de `p.input.shop` aquí, ya que el toggle se maneja por evento.
       }
     });
 
+    // MODIFICADO: La lógica del hint ahora solo depende de la proximidad y si la tienda está cerrada.
     if (playerNearShop && !GAME.inGameShopOpen) {
       GAME.shopHintTimer = 1; // Mostrar hint
     } else {
@@ -1873,15 +1868,11 @@ function openInGameShop(s){
 function closeInGameShop(){
   $("inGameShopOverlay").classList.remove("show");
   $("inGameShopGrid")._lastRenderedItems = null; // Reset para forzar re-render en la próxima apertura
-  if(!isHost && hostConn && hostConn.open && inputState.shop){ // Si el cliente cierra la tienda, notifica al host
-    inputState.shop = false;
-    hostConn.send({t:"toggleShop"});
-  }
+  // MODIFICADO: Eliminada la lógica redundante de `inputState.shop` aquí.
 }
 
 $("btnInGameShopClose").onclick = () => {
-  if(isHost){ GAME.inGameShopOpen = false; }
-  else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
+  toggleInGameShop(); // MODIFICADO: Llama a la función centralizada
 };
 
 
@@ -1931,7 +1922,7 @@ window.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight"||e.key==="d"||e.key==="D") inputState.right=true;
   if(e.key===" "||e.key==="e"||e.key==="E"||e.key==="ArrowUp"||e.key==="w"||e.key==="W"){inputState.action=true;e.preventDefault();}
   if(e.key==="q"||e.key==="Q"||e.key==="Shift"||e.key==="f"||e.key==="F"){ triggerAbility(); e.preventDefault(); }
-  if(e.key==="b"||e.key==="B"){ inputState.shop=true; e.preventDefault(); } // Tecla para la tienda en partida
+  if(e.key==="b"||e.key==="B"){ toggleInGameShop(); e.preventDefault(); } // MODIFICADO: Llama a la función centralizada
   if(isHost) syncHostInput();
 });
 
@@ -1943,7 +1934,7 @@ window.addEventListener("keyup",e=>{
   if(e.key==="ArrowLeft"||e.key==="a"||e.key==="A") inputState.left=false;
   if(e.key==="ArrowRight"||e.key==="d"||e.key==="D") inputState.right=false;
   if(e.key===" "||e.key==="e"||e.key==="E"||e.key==="ArrowUp"||e.key==="w"||e.key==="W") inputState.action=false;
-  if(e.key==="b"||e.key==="B") inputState.shop=false; // Resetear input de tienda
+  // MODIFICADO: Eliminado el manejo de 'B' en keyup, ya no es necesario para inputState.shop
   if(isHost) syncHostInput();
 });
 function syncHostInput(){ const p=GAME.players[myId]; if(p) p.input={...inputState}; }
@@ -1967,7 +1958,7 @@ bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"
 // Botón de tienda móvil
 (function(){
   const el=$("tShop");
-  const fire=e=>{e.preventDefault(); toggleInGameShop();};
+  const fire=e=>{e.preventDefault(); toggleInGameShop();}; // MODIFICADO: Llama a la función centralizada
   el.addEventListener("touchstart",fire,{passive:false});
   el.addEventListener("mousedown",fire);
 })();
@@ -1976,7 +1967,6 @@ function toggleInGameShop(){
   // MODIFICADO: El cliente solo envía la intención al host
   if(isHost){ GAME.inGameShopOpen = !GAME.inGameShopOpen; }
   else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
-  // inputState.shop se maneja en keydown/keyup para que el host reciba el estado
 }
 
 // =====================================================
