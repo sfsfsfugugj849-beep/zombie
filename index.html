@@ -91,8 +91,9 @@
   #tAbility{right:140px;bottom:44px;width:74px;height:74px;background:var(--blue-ability);border-color:var(--blue-ability);color:var(--blue-ability-ink);font-size:12px;text-align:center;line-height:1.1;display:none}
   #tAbility.show{display:flex}
   #tAbility.cool{background:rgba(30,43,66,.7);border-color:var(--border);color:var(--muted)}
-  #tShop{left:22px; bottom:118px; width:60px; height:60px; font-size:20px; display:none; } /* Nuevo botón de tienda */
-  #tShop.show{display:flex}
+  /* --- MODIFICADO: Botón de tienda móvil eliminado del HUD, ahora es un botón de acción --- */
+  /* #tShop{left:22px; bottom:118px; width:60px; height:60px; font-size:20px; display:none; } */
+  /* #tShop.show{display:flex} */
 
   /* ---------- Tienda de clases ---------- */
   .pts-pill{display:inline-flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--border);border-radius:30px;padding:6px 14px;font-size:13px;font-weight:700}
@@ -164,6 +165,9 @@
   .toast.show{opacity:1}
 
   /* --- NUEVO: Estilos para la tienda en partida --- */
+  #inGameShopOverlay {
+    z-index: 100; /* Asegurar que esté por encima de todo */
+  }
   #inGameShopOverlay .up-card {
     max-width: 560px; /* Ajustar tamaño para la tienda */
     background: var(--shop-dialog-bg);
@@ -288,7 +292,8 @@
       <div class="tbtn" id="tRight">▶</div>
       <div class="tbtn" id="tAbility">HABILIDAD</div>
       <div class="tbtn" id="tAct">ACCIÓN</div>
-      <div class="tbtn" id="tShop">🛒</div> <!-- Nuevo botón de tienda móvil -->
+      <!-- --- MODIFICADO: Botón de tienda móvil ahora es un botón de acción para interactuar con NPC --- -->
+      <div class="tbtn" id="tShopAction">🛒</div> 
     </div>
     <div class="ability-hint" id="abilityHint" style="display:none"></div>
     <!-- NUEVO: Hint para la tienda en partida -->
@@ -772,10 +777,11 @@ const GAME={
   inGameShopOpen: false, // Estado de la tienda en partida
   // --- NUEVO: NPC de la tienda ---
   shopNPC: {
-    x: WORLD_W / 2 + 200, // Posición del NPC de la tienda
+    x: WORLD_W - 100, // Posición del NPC de la tienda
     y: GROUND_Y,
     active: false, // Si el NPC está visible
     facing: -1, // Dirección del NPC
+    walkAnim: 0, // Para animación idle del NPC
   },
   shopHintTimer: 0, // Timer para mostrar el hint de la tienda
 };
@@ -879,8 +885,16 @@ function onHostData(conn,d){
     // MODIFICADO: Ahora el host controla el estado de la tienda
     if(GAME.phase === "playing"){
       GAME.inGameShopOpen = !GAME.inGameShopOpen;
-      // Si se cierra, el NPC también se desactiva
-      if(!GAME.inGameShopOpen) GAME.shopNPC.active = false;
+      // Si se cierra, el NPC también se desactiva si no hay jugadores cerca
+      if(!GAME.inGameShopOpen) {
+        let playerNear = false;
+        Object.values(GAME.players).forEach(p => {
+          if (p.state === "alive" && Math.abs(p.x - GAME.shopNPC.x) < 100) {
+            playerNear = true;
+          }
+        });
+        if (!playerNear) GAME.shopNPC.active = false;
+      }
     }
   }
 }
@@ -931,8 +945,8 @@ function applyClass(p){
   if(c.abKind){ p.abKind=c.abKind; p.abMax=c.cd * p.abCdMult; p.abCd=0; }
   // Guarda la habilidad base para poder cambiarla en oleadas de enemigos
   p.baseAbKind = p.abKind;
-  p.baseAbMax = p.abMax;
-  p.baseAbCd = p.abCd;
+  p.baseAbMax = c.cd * p.abCdMult; // Asegurarse de que baseAbMax se calcule con abCdMult
+  p.baseAbCd = 0;
   p.baseWarnBonus = p.warnBonus; // Guarda el warnBonus base para Oracle
 }
 
@@ -1007,7 +1021,13 @@ function showGameScreen(){
   const touch = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
   if(touch) {
     $("touch").classList.add("show");
-    $("tShop").classList.add("show"); // Mostrar botón de tienda móvil
+    // MODIFICADO: Botón de tienda móvil ahora es un botón de acción para interactuar con NPC
+    $("tShopAction").style.display = "flex"; // Mostrar el botón de acción de tienda
+    $("tShopAction").style.left = "22px"; // Posicionarlo
+    $("tShopAction").style.bottom = "118px";
+    $("tShopAction").style.width = "60px";
+    $("tShopAction").style.height = "60px";
+    $("tShopAction").style.fontSize = "20px";
   }
   // habilidad de clase
   const cls=classById(getSelected());
@@ -1030,36 +1050,66 @@ function simulate(dt){
   GAME.isEnemyWave = (GAME.wave > 0 && GAME.wave % ENEMY_WAVE_INTERVAL === 0); // Oleada de enemigos
 
   if(GAME.phase==="playing"){
-    // --- Lógica del NPC de la tienda ---
+    // --- MODIFICADO: Lógica del NPC de la tienda ---
     const shopNPC = GAME.shopNPC;
     let playerNearShop = false;
+    let closestPlayerToShop = null;
+    let minDistToShop = Infinity;
+
     players.forEach(p => {
-      if (p.state === "alive" && Math.abs(p.x - shopNPC.x) < 80) { // Rango de interacción
-        playerNearShop = true;
-        if (p.input.shop) { // Si el jugador presiona el botón de tienda
-          if (!GAME.inGameShopOpen) { // Solo abre si no está abierta
-            GAME.inGameShopOpen = true;
-            GAME.shopNPC.active = true; // Activa el NPC
+      if (p.state === "alive") {
+        const dist = Math.abs(p.x - shopNPC.x);
+        if (dist < 100) { // Rango de interacción
+          playerNearShop = true;
+          if (dist < minDistToShop) {
+            minDistToShop = dist;
+            closestPlayerToShop = p;
           }
-          p.input.shop = false; // Consumir el input para evitar spam
         }
       }
     });
 
-    if (playerNearShop && !GAME.inGameShopOpen) {
-      GAME.shopHintTimer = 1; // Mostrar hint
+    if (closestPlayerToShop) {
+      shopNPC.facing = Math.sign(closestPlayerToShop.x - shopNPC.x) || -1; // NPC faces closest player
     } else {
-      GAME.shopHintTimer = 0; // Ocultar hint
+      shopNPC.facing = -1; // Default facing
     }
 
-    // --- Manejo de la tienda en partida ---
+    if (playerNearShop && !GAME.inGameShopOpen) {
+      GAME.shopHintTimer = 1; // Show hint
+      shopNPC.active = true; // NPC is active when player is near
+    } else {
+      GAME.shopHintTimer = 0; // Hide hint
+      if (!GAME.inGameShopOpen) { // Only deactivate if shop is not open
+        shopNPC.active = false;
+      }
+    }
+
+    // NPC idle animation
+    if (shopNPC.active) {
+      shopNPC.walkAnim += dt * 2; // Slower idle animation
+    } else {
+      shopNPC.walkAnim = 0;
+    }
+
+    // Handle player input for shop
+    players.forEach(p => {
+      if (p.state === "alive" && Math.abs(p.x - shopNPC.x) < 100 && p.input.shop) {
+        if (!GAME.inGameShopOpen) {
+          GAME.inGameShopOpen = true;
+          GAME.shopNPC.active = true; // Ensure NPC is active when shop opens
+        }
+        p.input.shop = false; // Consume input
+      }
+    });
+
+    // --- MODIFICADO: Si la tienda está abierta, los jugadores no se mueven ni realizan acciones ---
     if(GAME.inGameShopOpen){
-      // Si la tienda está abierta, los jugadores no se mueven ni realizan acciones
       players.forEach(p => {
         p.input.left = false;
         p.input.right = false;
         p.input.action = false;
-        p.busy = null;
+        p.busy = null; // Clear busy state
       });
     }
 
@@ -1576,11 +1626,11 @@ function resolveStrike(st){
     }
   });
 
-  if(seg.state===0){
+  if(seg.s===0){
     // tejado intacto: puede crear agujero (armadura reduce probabilidad)
     let chance=Math.max(0.25, 0.85 - GAME.roofArmor);
     if(GAME.wave > 0 && GAME.wave % 5 === 0) chance = Math.min(0.95, chance + 0.3); // Más chance en boss wave
-    if(Math.random()<chance){ seg.state=1; seg.prog=0; }
+    if(Math.random()<chance){ seg.s=1; seg.prog=0; }
   } else {
     // agujero abierto: el rayo entra y golpea a quien esté debajo
     const cx=segCenterX(st.seg);
@@ -1771,6 +1821,7 @@ function buildStatePayload(){
       y: Math.round(GAME.shopNPC.y),
       active: GAME.shopNPC.active,
       facing: GAME.shopNPC.facing,
+      walkAnim: Math.round(GAME.shopNPC.walkAnim*10)/10, // Incluir animación idle
     },
     shopHintTimer: GAME.shopHintTimer, // Estado del hint de la tienda
   };
@@ -1789,9 +1840,12 @@ function handlePhaseUI(s){
   if(s.inGameShopOpen){ openInGameShop(s); }
   else { closeInGameShop(); }
 
-  // Manejar la visibilidad del hint de la tienda
+  // --- MODIFICADO: Manejar la visibilidad del hint de la tienda ---
   if(s.shopHintTimer > 0 && !s.inGameShopOpen){
     $("shopHint").classList.add("show");
+    // Update hint text based on input method
+    const touch = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
+    $("shopHint").textContent = touch ? "Toca 🛒 para abrir la tienda" : "Pulsa B para abrir la tienda";
   } else {
     $("shopHint").classList.remove("show");
   }
@@ -1842,13 +1896,11 @@ function openInGameShop(s){
   $("inGameShopErr").textContent = "";
 
   const grid = $("inGameShopGrid");
-  // Solo re-renderizar si el contenido ha cambiado o si es la primera vez
-  const currentItems = SHOP_ITEMS.map(item => item.id).join(',');
-  if (grid._lastRenderedItems === currentItems && grid.children.length > 0) {
-      return;
-  }
-  grid._lastRenderedItems = currentItems;
-  grid.innerHTML = "";
+  // MODIFICADO: Forzar re-render para asegurar que los botones se muestren
+  // La lógica de _lastRenderedItems puede ser problemática si el estado de "canAfford" cambia
+  // sin que cambie la lista de items en sí.
+  // Eliminamos la condición de _lastRenderedItems para asegurar que siempre se actualice.
+  grid.innerHTML = ""; // Limpiar siempre para reconstruir
 
   SHOP_ITEMS.forEach(item => {
     const el = document.createElement("div");
@@ -1873,14 +1925,24 @@ function openInGameShop(s){
 function closeInGameShop(){
   $("inGameShopOverlay").classList.remove("show");
   $("inGameShopGrid")._lastRenderedItems = null; // Reset para forzar re-render en la próxima apertura
-  if(!isHost && hostConn && hostConn.open && inputState.shop){ // Si el cliente cierra la tienda, notifica al host
-    inputState.shop = false;
+  if(!isHost && hostConn && hostConn.open){ // Si el cliente cierra la tienda, notifica al host
+    // MODIFICADO: No es necesario resetear inputState.shop aquí, ya se maneja en keyup
     hostConn.send({t:"toggleShop"});
   }
 }
 
 $("btnInGameShopClose").onclick = () => {
-  if(isHost){ GAME.inGameShopOpen = false; }
+  if(isHost){
+    GAME.inGameShopOpen = false;
+    // MODIFICADO: Solo desactiva el NPC si no hay jugadores cerca
+    let playerNear = false;
+    Object.values(GAME.players).forEach(p => {
+      if (p.state === "alive" && Math.abs(p.x - GAME.shopNPC.x) < 100) {
+        playerNear = true;
+      }
+    });
+    if (!playerNear) GAME.shopNPC.active = false;
+  }
   else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
 };
 
@@ -1964,20 +2026,31 @@ bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"
   el.addEventListener("touchstart",fire,{passive:false});
   el.addEventListener("mousedown",fire);
 })();
-// Botón de tienda móvil
+// MODIFICADO: Botón de tienda móvil ahora es un botón de acción para interactuar con NPC
 (function(){
-  const el=$("tShop");
-  const fire=e=>{e.preventDefault(); toggleInGameShop();};
+  const el=$("tShopAction");
+  const fire=e=>{e.preventDefault(); inputState.shop=true; if(isHost)syncHostInput();}; // Simula presionar 'B'
+  const release=e=>{e.preventDefault(); inputState.shop=false; if(isHost)syncHostInput();};
   el.addEventListener("touchstart",fire,{passive:false});
+  el.addEventListener("touchend",release,{passive:false});
+  el.addEventListener("touchcancel",release,{passive:false});
   el.addEventListener("mousedown",fire);
+  el.addEventListener("mouseup",release);
+  el.addEventListener("mouseleave",release);
 })();
 
+
+// MODIFICADO: toggleInGameShop ya no es llamada directamente por el cliente,
+// el input.shop es enviado al host y el host decide abrir la tienda.
+// La función toggleInGameShop ahora es solo para el host o para el cierre desde el botón X.
+/*
 function toggleInGameShop(){
   // MODIFICADO: El cliente solo envía la intención al host
   if(isHost){ GAME.inGameShopOpen = !GAME.inGameShopOpen; }
   else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
   // inputState.shop se maneja en keydown/keyup para que el host reciba el estado
 }
+*/
 
 // =====================================================
 //  RENDER
@@ -2021,7 +2094,7 @@ function drawDrone(x, y, frame) {
 
   // Propellers (simple rotation for animation)
   const propOffset = Math.sin(frame * 0.2) * 2; // Slight hover effect
-  const propSpin = (frame * 0.5) % (Math.PI * 2); // Continuous spin
+  // const propSpin = (frame * 0.5) % (Math.PI * 2); // Continuous spin - not used directly for drawing rects
 
   // Left propeller
   ctx.fillStyle = propColor;
@@ -2043,7 +2116,7 @@ function drawDrone(x, y, frame) {
 }
 // --- FIN NUEVA FUNCIÓN ---
 
-// --- NUEVA FUNCIÓN: DIBUJAR ENEMIGO ---
+// --- MODIFICADO: DIBUJAR ENEMIGO con más animaciones ---
 function drawEnemy(e, x, walk, s) {
   const y = GROUND_Y;
   const dead = e.state === "dead";
@@ -2059,7 +2132,19 @@ function drawEnemy(e, x, walk, s) {
   }
 
   const sw = Math.sin(walk)*5; // balanceo de piernas
-  const bodyTop=y-40, headY=y-48;
+  let bodyTop=y-40, headY=y-48;
+  let bodyRot = 0;
+  let armRot = sw * 0.08; // Balanceo de brazos del enemigo
+
+  if (e.attackAnim > 0) {
+    bodyRot = e.facing * 0.1; // Lunge forward
+    armRot = e.facing * 0.2; // Arm swing for attack
+  }
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(bodyRot);
+  x = 0; y = 0; // Reset local coordinates
 
   // Piernas
   ctx.fillStyle="#333";
@@ -2074,8 +2159,8 @@ function drawEnemy(e, x, walk, s) {
   ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5); // brillo
   // Brazos
   ctx.fillStyle=shade(getComputedStyle(document.documentElement).getPropertyValue('--enemy-color'),0.85);
-  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
-  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(armRot);ctx.fillRect(-4,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-armRot);ctx.fillRect(-1,0,5,17);ctx.restore();
   // Cuello + Cabeza
   ctx.fillStyle="#444"; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
   ctx.fillStyle="#333"; ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
@@ -2085,21 +2170,21 @@ function drawEnemy(e, x, walk, s) {
   // Cuchillo (con animación de ataque)
   ctx.save();
   ctx.translate(x + e.facing * 10, bodyTop + 10);
-  ctx.rotate(e.facing * (e.attackAnim > 0 ? -Math.PI/4 : 0)); // Animación de swing
+  ctx.rotate(e.facing * (e.attackAnim > 0 ? -Math.PI/3 : 0)); // Animación de swing más pronunciada
   ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--enemy-weapon-color');
   ctx.fillRect(0, 0, 3, 18); // Mango
   ctx.fillRect(3, -2, 3, 22); // Hoja
   ctx.restore();
 
-  ctx.restore();
+  ctx.restore(); // Restore body transform
 
-  // barra de vida
+  // barra de vida (estas se dibujan en coordenadas globales)
   const bw=40,pct=Math.max(0,e.hp/e.maxHp);
-  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-20,bw,6);
+  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(e.x-bw/2,y-P_H-20,bw,6);
   ctx.fillStyle= pct>0.5?"#3fce7c":pct>0.25?"#f5b942":"#e5484d";
-  ctx.fillRect(x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
+  ctx.fillRect(e.x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
 }
-// --- FIN NUEVA FUNCIÓN ---
+// --- FIN MODIFICADO: DIBUJAR ENEMIGO ---
 
 // --- NUEVO: DIBUJAR NPC DE LA TIENDA ---
 function drawShopNPC(npc, s) {
@@ -2112,7 +2197,14 @@ function drawShopNPC(npc, s) {
   // Sombra
   ctx.fillStyle="rgba(0,0,0,.32)"; ctx.beginPath();ctx.ellipse(x,y+2,17,5,0,0,7);ctx.fill();
 
-  const bodyTop = y - 40, headY = y - 48;
+  const bob = Math.sin(npc.walkAnim * 0.5) * 1; // Sutil bob para idle
+  const headTilt = Math.sin(npc.walkAnim * 0.3) * 0.03; // Sutil inclinación de cabeza
+  const bodyTop = y - 40 + bob, headY = y - 48 + bob;
+
+  ctx.save();
+  ctx.translate(x, y);
+  // No body rotation for NPC, just subtle bob/head tilt
+  x = 0; y = 0; // Reset x,y for local coordinates
 
   // Piernas
   ctx.fillStyle="#2c3345";
@@ -2124,22 +2216,27 @@ function drawShopNPC(npc, s) {
   ctx.fillStyle=bodyColor; drawRoundRect(x-13,bodyTop,26,26,7); ctx.fill();
   ctx.fillStyle=shade(bodyColor,0.8); ctx.fillRect(x-13,bodyTop+18,26,8);
   ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5);
-  // Brazos
+  // Brazos (ligeramente doblados)
   ctx.fillStyle=shade(bodyColor,0.85);
-  ctx.fillRect(x-17,bodyTop+5,5,17);
-  ctx.fillRect(x+12,bodyTop+5,5,17);
+  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(0.1);ctx.fillRect(-4,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-0.1);ctx.fillRect(-1,0,5,17);ctx.restore();
   // Cuello + Cabeza
-  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
-  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
+  ctx.save();
+  ctx.translate(x, headY);
+  ctx.rotate(headTilt); // Aplicar inclinación de cabeza
+  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(0,0,9,0,7);ctx.fill();
+  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(0,2,9,0.15,Math.PI-0.15);ctx.fill();
   // Ojos
   ctx.fillStyle="#2a2018"; const ex=npc.facing>0?2:-2;
-  ctx.beginPath();ctx.arc(x+ex-2,headY-1,1.4,0,7);ctx.arc(x+ex+3,headY-1,1.4,0,7);ctx.fill();
+  ctx.beginPath();ctx.arc(ex-2,-1,1.4,0,7);ctx.arc(ex+3,-1,1.4,0,7);ctx.fill();
   // Sombrero de mercader
   ctx.fillStyle="#6b4a2a"; ctx.beginPath();
-  ctx.moveTo(x-15, headY-5); ctx.lineTo(x+15, headY-5); ctx.lineTo(x+10, headY-15); ctx.lineTo(x-10, headY-15); ctx.closePath(); ctx.fill();
-  ctx.fillStyle="#a86b3c"; ctx.fillRect(x-10, headY-15, 20, 5);
+  ctx.moveTo(-15, -5); ctx.lineTo(15, -5); ctx.lineTo(10, -15); ctx.lineTo(-10, -15); ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#a86b3c"; ctx.fillRect(-10, -15, 20, 5);
+  ctx.restore(); // Restore head transform
 
-  ctx.restore();
+  ctx.restore(); // Restore body transform
+  ctx.restore(); // Restore global transform
 }
 // --- FIN NUEVO NPC ---
 
@@ -2415,6 +2512,7 @@ function drawHat(x,topY,classId,skin){
   }
 }
 
+// --- MODIFICADO: drawPlayer con más animaciones ---
 function drawPlayer(p,x,walk,s){
   const y=GROUND_Y;
   const down = p.state==="downed", dead=p.state==="dead";
@@ -2439,7 +2537,30 @@ function drawPlayer(p,x,walk,s){
 
   const bob = Math.sin(walk * 0.5) * 2; // Sutil bob al caminar
   const sw = Math.sin(walk)*5; // balanceo de piernas
-  const bodyTop=y-40 + bob, headY=y-48 + bob;
+  let bodyTop=y-40 + bob, headY=y-48 + bob;
+  let bodyRot = 0; // Para inclinación del cuerpo
+  let armRot = sw * 0.1; // Más balanceo de brazos
+  let headTilt = Math.sin(performance.now()/300) * 0.05; // Sutil inclinación de cabeza en idle
+
+  if (p.busy === "repair") {
+    bodyRot = p.facing * 0.1; // Inclinarse al reparar
+    bodyTop += 5; // Bajar un poco
+    armRot = p.facing * 0.2; // Brazo de reparación
+  } else if (p.busy === "revive") {
+    bodyRot = p.facing * 0.05; // Inclinarse al revivir
+    bodyTop += 3;
+    armRot = p.facing * 0.1;
+  } else if (p.attackAnim > 0) {
+    bodyRot = p.facing * 0.2; // Inclinarse al atacar
+    armRot = p.facing * 0.3; // Brazo de ataque
+  }
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(bodyRot); // Aplicar rotación del cuerpo
+  x = 0; // Reset x for local coordinates after translate
+  y = 0; // Reset y for local coordinates after translate
+
   // piernas
   ctx.fillStyle="#2c3345";
   ctx.fillRect(x-9, y-16, 7, 16+Math.min(0,sw));
@@ -2452,16 +2573,21 @@ function drawPlayer(p,x,walk,s){
   ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5); // brillo
   // brazos (balanceo opuesto)
   ctx.fillStyle=shade(p.color,0.85);
-  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
-  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(armRot);ctx.fillRect(-4,0,5,17);ctx.restore();
+  ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-armRot);ctx.fillRect(-1,0,5,17);ctx.restore();
   // cuello + cabeza
-  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
-  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
+  ctx.save();
+  ctx.translate(x, headY);
+  ctx.rotate(headTilt); // Aplicar inclinación de cabeza
+  ctx.fillStyle=skin; ctx.beginPath();ctx.arc(0,0,9,0,7);ctx.fill();
+  ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(0,2,9,0.15,Math.PI-0.15);ctx.fill();
   // ojos (según dirección)
   ctx.fillStyle="#2a2018"; const ex=p.facing>0?2:-2;
-  ctx.beginPath();ctx.arc(x+ex-2,headY-1,1.4,0,7);ctx.arc(x+ex+3,headY-1,1.4,0,7);ctx.fill();
+  ctx.beginPath();ctx.arc(ex-2,-1,1.4,0,7);ctx.arc(ex+3,-1,1.4,0,7);ctx.fill();
   // gorro/casco de clase
-  drawHat(x,headY-9,p.classId,skin);
+  drawHat(0,-9,p.classId,skin);
+  ctx.restore(); // Restore head transform
+
   // escudo
   if(p.shield>0){ ctx.strokeStyle="#4aa3ff";ctx.lineWidth=2.5;ctx.globalAlpha=dead?0.2:0.85;ctx.beginPath();ctx.arc(x,y-24,25,0,7);ctx.stroke();ctx.globalAlpha=dead?0.22:1; }
   // acción
@@ -2471,44 +2597,44 @@ function drawPlayer(p,x,walk,s){
   if(s.isEnemyWave){
     ctx.save();
     ctx.translate(x + p.facing * 10, bodyTop + 10);
-    ctx.rotate(p.facing * (p.attackAnim > 0 ? -Math.PI/4 : 0)); // Animación de swing
+    ctx.rotate(p.facing * (p.attackAnim > 0 ? -Math.PI/3 : 0)); // Animación de swing más pronunciada
     ctx.fillStyle="#8B4513"; // Color del bate
     ctx.fillRect(0, 0, 5, 25); // Bate
     ctx.restore();
   }
 
-  ctx.restore();
+  ctx.restore(); // Restore body transform
 
-  // barra de vida
+  // barra de vida (estas se dibujan en coordenadas globales, no afectadas por la rotación del cuerpo)
   const bw=40,pct=Math.max(0,p.hp/p.maxHp);
-  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-20,bw,6);
+  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(p.x-bw/2,y-P_H-20,bw,6);
   ctx.fillStyle= pct>0.5?"#3fce7c":pct>0.25?"#f5b942":"#e5484d";
-  ctx.fillRect(x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
+  ctx.fillRect(p.x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
   // enfriamiento de habilidad (sobre la barra de vida) para mí
-  if(p.id===myId && p.currentAbKind && p.abMax){ // Usar currentAbKind
+  if(p.id===myId && p.currentAbKind && p.abMax){
     const cd=p.abCd||0, ready=cd<=0;
-    ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-13,bw,4);
+    ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(p.x-bw/2,y-P_H-13,bw,4);
     ctx.fillStyle=ready?"var(--blue-ability)":"var(--muted)";
-    ctx.fillRect(x-bw/2+1,y-P_H-12,(bw-2)*(ready?1:1-cd/p.abMax),2);
+    ctx.fillRect(p.x-bw/2+1,y-P_H-12,(bw-2)*(ready?1:1-cd/p.abMax),2);
   }
   // nombre
   ctx.fillStyle= p.id===myId?"#f5b942":"#e8edf6"; ctx.font="bold 11px sans-serif";ctx.textAlign="center";
-  ctx.fillText(p.name+(p.id===myId?" (tú)":""),x,y-P_H-24);
+  ctx.fillText(p.name+(p.id===myId?" (tú)":""),p.x,y-P_H-24);
 
   // Indicador de invulnerabilidad (Coloso)
   if(p.abKind === "invuln" && s.invuln > 0){
     ctx.strokeStyle="rgba(192,132,252,0.8)"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.arc(x,y-24,30,0,7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x,y-24,30,0,7); ctx.stroke();
   }
   // Indicador de Zona Segura (Guardián Elemental)
   if(p.abKind === "safeZone" && s.safeZone > 0){
     ctx.strokeStyle="rgba(45,212,191,0.8)"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.arc(x,y-24,100,0,7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x,y-24,100,0,7); ctx.stroke();
   }
   // Indicador de Escudo de Diamante
   if(p.diamondShieldTimer > 0){
     ctx.strokeStyle="var(--diamond-shield)"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.arc(x,y-24,28,0,7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x,y-24,28,0,7); ctx.stroke();
   }
 }
 
@@ -2541,14 +2667,9 @@ function drawHUD(s){
     ${s.timeWarp>0?`<span style="color:#c084fc">⏳ Tiempo Lento ${Math.ceil(s.timeWarp)}s</span>`:""}
     ${me && me.diamondShieldTimer > 0 ? `<span style="color:var(--diamond-shield)">💎 Diamante ${Math.ceil(me.diamondShieldTimer)}s</span>`:""}
     ${me && me.predictPathTimer > 0 ? `<span style="color:var(--purple-ability)">🔮 Predicción ${Math.ceil(me.predictPathTimer)}s</span>`:""}
-    ${ab}
-    ${me && me.id === myId ? `<button class="tbtn" id="hudShopBtn" style="position:static; width:auto; height:auto; font-size:12px; padding:4px 8px; margin-left:10px; pointer-events:auto; background:var(--panel-2); border-color:var(--border); color:var(--ink);">🛒 Tienda (B)</button>` : ''}`;
+    ${ab}`;
   
-  // Bind the HUD shop button if it exists
-  const hudShopBtn = $("hudShopBtn");
-  if (hudShopBtn) {
-    hudShopBtn.onclick = toggleInGameShop;
-  }
+  // MODIFICADO: El botón de tienda del HUD ha sido eliminado.
 
   // aviso puntual (habilidades)
   if(s.toast && s.toast!==_lastToast){ _lastToast=s.toast; showToast(s.toast); }
