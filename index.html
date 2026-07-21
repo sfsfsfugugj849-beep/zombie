@@ -24,7 +24,6 @@
   button{font-family:inherit;cursor:pointer}
   #app{position:fixed;inset:0;display:flex;flex-direction:column}
 
-  /* ---------- Menú ---------- */
   .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px}
   .card{width:100%;max-width:440px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:26px 24px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
   .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px}
@@ -46,7 +45,6 @@
   .hint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.5}
   .err{color:var(--danger);font-size:13px;text-align:center;margin-top:12px;min-height:16px}
 
-  /* ---------- Lobby ---------- */
   .code-box{display:flex;align-items:center;justify-content:space-between;background:var(--panel-2);border:1px dashed var(--amber);border-radius:12px;padding:14px 16px;margin-bottom:16px}
   .code-box .code{font-size:30px;font-weight:800;letter-spacing:6px;color:var(--amber)}
   .code-box small{display:block;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase}
@@ -56,7 +54,6 @@
   .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
   .tag{margin-left:auto;font-size:10px;color:var(--amber-ink);background:var(--amber);padding:3px 8px;border-radius:20px;font-weight:700}
 
-  /* ---------- Juego ---------- */
   #game{position:absolute;inset:0;display:none}
   canvas{display:block;width:100%;height:100%;background:#0a0f19;touch-action:none}
   .hud{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
@@ -64,7 +61,6 @@
   .hud b{color:var(--amber)}
   .wave-timer{color:var(--muted)}
 
-  /* Controles móviles */
   .touch{position:absolute;bottom:0;left:0;right:0;height:170px;display:none;pointer-events:none;z-index:5}
   .touch.show{display:block}
   .tbtn{position:absolute;bottom:26px;width:78px;height:78px;border-radius:50%;background:rgba(30,43,66,.82);border:2px solid var(--border);color:var(--ink);font-size:30px;display:flex;align-items:center;justify-content:center;pointer-events:auto;user-select:none;font-weight:800}
@@ -76,7 +72,6 @@
   #tAbility.show{display:flex}
   #tAbility.cool{background:rgba(30,43,66,.7);border-color:var(--border);color:var(--muted)}
 
-  /* ---------- Tienda de clases ---------- */
   .pts-pill{display:inline-flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--border);border-radius:30px;padding:6px 14px;font-size:13px;font-weight:700}
   .pts-pill .bolt{font-size:15px}
   .pts-pill b{color:var(--amber)}
@@ -98,20 +93,17 @@
   .class .cost-tag{position:absolute;top:8px;right:8px;background:rgba(14,20,32,.85);border:1px solid var(--amber);color:var(--amber);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:800}
   .ability-hint{position:absolute;top:70px;left:50%;transform:translateX(-50%);background:rgba(30,43,66,.9);border:1px solid #4aa3ff;color:#eaf3ff;padding:6px 14px;border-radius:20px;font-size:12px;z-index:7;pointer-events:none;white-space:nowrap}
 
-  /* ---------- Salida / botón cerrar ---------- */
   .close-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border);color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
   .close-x:hover{color:var(--fg);border-color:var(--amber)}
   .card{position:relative}
   .menu-actions{display:flex;gap:10px}
   .menu-actions .btn{flex:1;margin:0}
 
-  /* ---------- Estadísticas ---------- */
   .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .stat{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center}
   .stat b{display:block;font-size:16px;color:var(--amber)}
   .stat small{font-size:10px;color:var(--muted);line-height:1.2;display:block}
 
-  /* ---------- Logros ---------- */
   .ach-grid{display:grid;grid-template-columns:1fr;gap:8px;max-height:46vh;overflow:auto;margin-bottom:12px;padding:2px}
   @media(min-width:520px){.ach-grid{grid-template-columns:1fr 1fr}}
   .achv{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
@@ -124,7 +116,6 @@
   .achv .arw{font-size:12px;font-weight:800;color:var(--amber);white-space:nowrap}
   .achv.done .arw{color:var(--health)}
 
-  /* Overlays */
   .overlay{position:absolute;inset:0;background:rgba(10,15,25,.82);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
   .overlay.show{display:flex}
   .up-card{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px}
@@ -261,34 +252,27 @@
 
 <script>
 "use strict";
-/* ============================================================
-   TORMENTA EN EQUIPO — juego de supervivencia cooperativo
-   Multijugador P2P con PeerJS (WebRTC). El anfitrión (host) es
-   autoritativo: simula el mundo y envía el estado; los clientes
-   envían sus controles.
-   ============================================================ */
 
 // ---------- Constantes del mundo ----------
 const WORLD_W = 1200, WORLD_H = 640;
-const GROUND_Y = 540;         // suelo donde caminan los jugadores
-const ROOF_Y = 150;           // línea del tejado
+const GROUND_Y = 540;
+const ROOF_Y = 150;
 const ROOF_X0 = 110, ROOF_X1 = 1090;
 const SEG_COUNT = 20;
 const SEG_W = (ROOF_X1 - ROOF_X0) / SEG_COUNT;
 const P_W = 30, P_H = 46;
-const MOVE_SPEED = 235;        // px/seg base
-const REPAIR_RATE = 0.62;      // fracción/seg base (=> ~1.6s)
-const REVIVE_RATE = 0.5;       // fracción/seg base (=> 2s)
-const BLEEDOUT = 12;           // seg antes de morir estando derribado
+const MOVE_SPEED = 235;
+const REPAIR_RATE = 0.62;
+const REVIVE_RATE = 0.5;
+const BLEEDOUT = 12;
 const STRIKE_DMG = 34;
-const WAVE_DURATION = 26;      // seg por oleada
+const WAVE_DURATION = 26;
 const MAX_PLAYERS = 10;
-const TICK = 1/30;             // paso de simulación del host
+const TICK = 1/30;
 
 const COLORS = ["#f5b942","#3fce7c","#4aa3ff","#e5484d","#c084fc","#ff8f3f","#2dd4bf","#f472b6","#a3e635","#facc15"];
 
-// ---------- Catálogo de mejoras (más de 25) ----------
-// scope: 'self' aplica al jugador; 'team' a todo el equipo; 'once' efecto inmediato.
+// ---------- Catálogo de mejoras ----------
 const UPGRADES = [
   {id:"speed",   ic:"🏃", nm:"Piernas veloces",   ds:"Caminas 20% más rápido.",                 apply:p=>p.speedMult*=1.20},
   {id:"speed2",  ic:"💨", nm:"Ráfaga",            ds:"Caminas otro 15% más rápido.",            apply:p=>p.speedMult*=1.15},
@@ -321,9 +305,7 @@ const UPGRADES = [
 ];
 const upById = id => UPGRADES.find(u=>u.id===id);
 
-// ---------- Catálogo de CLASES (tienda) ----------
-// passive: se aplica al empezar la partida. ability: habilidad activable (host).
-// abKind: identificador de la habilidad; cd: enfriamiento en segundos.
+// ---------- Catálogo de CLASES ----------
 const CLASSES = [
   {id:"survivor", ic:"🧍", nm:"Superviviente", cost:0,
    ds:"Equilibrado. Sin habilidad especial, pero sin debilidades.",
@@ -364,10 +346,14 @@ const CLASSES = [
   {id:"storm", ic:"🌩️", nm:"Señor de la tormenta", cost:35,
    ds:"Resistente y con escudo. HABILIDAD: calma la tormenta unos segundos (no caen rayos).",
    passive:p=>{p.maxHp+=40;p.hp+=40;p.resist=Math.min(.75,p.resist+.15);p.shield+=1}, abKind:"calm", cd:34},
+  // ===== NUEVA CLASE: Dueño de las Sombras =====
+  {id:"shadow", ic:"🐙", nm:"Dueño de las Sombras", cost:32,
+   ds:"HABILIDAD: invoca tentáculos negros sobre el tejado que ABSORBEN 5 rayos y luego desaparecen. Pasiva: +15% esquivar.",
+   passive:p=>{p.dodge=Math.min(.6,p.dodge+.15);p.maxHp+=20;p.hp+=20}, abKind:"tentacles", cd:28},
 ];
 const classById = id => CLASSES.find(c=>c.id===id);
 
-// ---------- Progreso persistente (puntos + clases) ----------
+// ---------- Progreso persistente ----------
 const LS_PTS="stormhouse-points", LS_OWN="stormhouse-owned", LS_SEL="stormhouse-selected";
 function getPoints(){ return parseInt(localStorage.getItem(LS_PTS)||"0",10)||0; }
 function setPoints(n){ localStorage.setItem(LS_PTS,String(Math.max(0,n))); }
@@ -376,7 +362,7 @@ function saveOwned(set){ localStorage.setItem(LS_OWN,JSON.stringify([...set].fil
 function getSelected(){ const s=localStorage.getItem(LS_SEL); return getOwned().has(s)?s:"survivor"; }
 function setSelected(id){ localStorage.setItem(LS_SEL,id); }
 
-// ---------- Sistema de guardado de rayos (estadísticas) ----------
+// ---------- Estadísticas ----------
 const LS_STATS="stormhouse-stats";
 function getStats(){
   try{ return Object.assign({totalRayos:0,bestRun:0,bestWave:0,games:0,revives:0,holes:0},JSON.parse(localStorage.getItem(LS_STATS)||"{}")); }
@@ -384,8 +370,7 @@ function getStats(){
 }
 function saveStats(s){ localStorage.setItem(LS_STATS,JSON.stringify(s)); }
 
-// ---------- LOGROS (función adictiva) ----------
-// Cada logro se cumple una vez y otorga puntos ⚡ de recompensa.
+// ---------- LOGROS ----------
 const ACHIEVEMENTS=[
   {id:"first",  ic:"⚡", nm:"Primer trueno",     ds:"Sobrevive tu primer rayo.",              rew:2,  test:s=>s.totalRayos>=1},
   {id:"r50",    ic:"🌩️", nm:"Cazatormentas",     ds:"Sobrevive 50 rayos en total.",           rew:5,  test:s=>s.totalRayos>=50},
@@ -400,7 +385,6 @@ const ACHIEVEMENTS=[
 const LS_ACH="stormhouse-ach";
 function getAch(){ try{return new Set(JSON.parse(localStorage.getItem(LS_ACH)||"[]"));}catch(e){return new Set();} }
 function saveAch(set){ localStorage.setItem(LS_ACH,JSON.stringify([...set])); }
-// Comprueba logros nuevos, otorga recompensa y devuelve los recién desbloqueados
 function checkAchievements(){
   const stats=getStats(), have=getAch(), unlocked=[];
   ACHIEVEMENTS.forEach(a=>{ if(!have.has(a.id)&&a.test(stats)){ have.add(a.id); setPoints(getPoints()+a.rew); unlocked.push(a); } });
@@ -410,13 +394,13 @@ function checkAchievements(){
 
 // ---------- Estado global de red ----------
 let peer=null, myId=null, isHost=false, roomCode=null, myName="Jugador";
-const conns={};        // host: id -> DataConnection
-let hostConn=null;     // cliente: conexión al host
+const conns={};
+let hostConn=null;
 let inputState={left:false,right:false,action:false};
-let abilityQueued=false;   // se activa una vez al pulsar habilidad
+let abilityQueued=false;
 let lastSentInput="";
-let latestState=null;  // último estado recibido (cliente) o local (host)
-let renderPlayers={};  // interpolación de posiciones
+let latestState=null;
+let renderPlayers={};
 
 // =====================================================
 //  UTILIDADES
@@ -438,7 +422,7 @@ $("btnCreate").onclick=()=>{
   peer=new Peer(PREFIX+roomCode);
   peer.on("open",()=>{ setupHost(); enterLobby(); });
   peer.on("error",e=>{
-    if(e.type==="unavailable-id"){ // reintenta con otro código
+    if(e.type==="unavailable-id"){
       roomCode=randCode(); peer.destroy(); peer=new Peer(PREFIX+roomCode);
       peer.on("open",()=>{setupHost();enterLobby()});
       peer.on("error",err=>$("menuErr").textContent="Error de conexión: "+err.type);
@@ -446,12 +430,10 @@ $("btnCreate").onclick=()=>{
   });
 };
 
-// ---------- Tienda de clases ----------
 function refreshMenuProgress(){
   $("menuPoints").textContent=getPoints();
   const c=classById(getSelected())||CLASSES[0];
   $("menuClass").textContent=c.nm;
-  // estadísticas guardadas
   const st=getStats();
   $("menuStats").innerHTML=`
     <div class="stat"><b>${st.totalRayos}</b><small>rayos totales</small></div>
@@ -465,7 +447,6 @@ $("btnShopBack").onclick=closeShop;
 $("btnShopExit").onclick=closeShop;
 $("btnShopClose").onclick=closeShop;
 
-// ---------- Logros ----------
 function closeAch(){ $("ach").style.display="none"; $("menu").style.display="flex"; refreshMenuProgress(); }
 $("btnAch").onclick=()=>{ $("menu").style.display="none"; $("ach").style.display="flex"; renderAch(); };
 $("btnAchBack").onclick=closeAch;
@@ -552,7 +533,6 @@ function showToastLobby(){const b=$("btnCopy");b.textContent="¡Copiado!";setTim
 $("btnLeave").onclick=()=>location.reload();
 $("btnAgain").onclick=()=>location.reload();
 
-// Lista de jugadores del lobby
 function renderLobby(){
   const list=$("playerList"); list.innerHTML="";
   const arr=Object.values(GAME.players);
@@ -565,27 +545,29 @@ function renderLobby(){
 }
 
 // =====================================================
-//  ESTADO DEL JUEGO (autoritativo en el host)
+//  ESTADO DEL JUEGO
 // =====================================================
 const GAME={
-  players:{},        // id -> objeto jugador
-  order:[],          // orden de ids
+  players:{},
+  order:[],
   hostId:null,
-  segments:[],       // tejado: {state:0 intacto|1 agujero, prog}
-  strikes:[],        // rayos activos: {seg,x,phase,t,dur}
+  segments:[],
+  strikes:[],
   wave:0,
-  phase:"lobby",     // lobby | playing | intermission | over
+  phase:"lobby",
   waveTimer:0,
   flash:0,
   strikeTimer:0,
-  roofArmor:0,       // reduce prob. de crear agujeros
-  stormRelief:0,     // reduce rayos próxima oleada
-  patchArmor:0,      // agujeros tapados aguantan más
+  roofArmor:0,
+  stormRelief:0,
+  patchArmor:0,
   intermTimer:0,
-  heals:[],          // efectos visuales de curación {x,t}
-  toastMsg:null,     // aviso puntual {txt,t}
-  calmTimer:0,       // segundos sin caída de rayos (Señor de la tormenta)
-  runRevives:0, runHoles:0,  // contadores de la partida actual
+  heals:[],
+  toastMsg:null,
+  calmTimer:0,
+  runRevives:0, runHoles:0,
+  // ===== TENTÁCULOS DE SOMBRAS =====
+  tentacles:null,  // {absorbed:0, max:5, x:0, timer:0, active:false}
 };
 
 function makePlayer(id,name,color,classId){
@@ -596,13 +578,13 @@ function makePlayer(id,name,color,classId){
     hp:100,maxHp:100,state:"alive",
     speedMult:1,repairMult:1,reviveMult:1,repairRange:0,
     resist:0,regen:0,dodge:0,shield:0,lives:0,warnBonus:0,repairHeal:0,
-    teamRepair:0,rallyTimer:0,   // aura de capitán / impulso temporal
+    teamRepair:0,rallyTimer:0,
     bleedout:BLEEDOUT,
-    abKind:null,abCd:0,abMax:0,abReq:false, // habilidad de clase
-    rayos:0,            // rayos sobrevividos (para puntos)
-    walk:0,             // fase de animación al caminar
+    abKind:null,abCd:0,abMax:0,abReq:false,
+    rayos:0,
+    walk:0,
     input:{left:false,right:false,action:false},
-    busy:null,          // "repair" | "revive" | null (para animación)
+    busy:null,
     facing:1,
     ready:false,options:[],
   };
@@ -654,24 +636,25 @@ function onClientData(d){
   if(d.t==="welcome"){ myId=d.id; GAME.hostId=d.host; }
   else if(d.t==="full"){ $("menuErr").textContent="La sala está llena (10/10)."; location.hash=""; }
   else if(d.t==="started"){ $("menuErr").textContent="La partida ya empezó."; }
-  else if(d.t==="lobby"){ // sincroniza lobby
+  else if(d.t==="lobby"){
     GAME.players={}; GAME.hostId=d.hostId;
     d.players.forEach(p=>GAME.players[p.id]={name:p.name,color:p.color,id:p.id});
     renderLobby();
   }
   else if(d.t==="state"){ latestState=d; if(!gameRunning) startClientGame(); handlePhaseUI(d); }
-  else if(d.t==="over"){ latestState=d.snapshot||latestState; showGameOver(d.wave); }
+  else if(d.t==="over"){
+    // ===== FIX: usar el snapshot del mensaje over para guardar rayos =====
+    latestState=d.snapshot||latestState;
+    showGameOver(d.wave, d.snapshot);
+  }
 }
 
-// Host: difunde a todos
 function broadcast(obj){ for(const id in conns){ try{conns[id].send(obj)}catch(e){} } }
 
 function pushLobby(){
   if(!isHost) return;
   broadcast({t:"lobby",hostId:GAME.hostId,players:GAME.order.map(id=>{const p=GAME.players[id];return{id:p.id,name:p.name,color:p.color}})});
 }
-// refresca lobby de clientes cuando cambia
-const _origRenderLobby=renderLobby;
 setInterval(()=>{ if(isHost&&GAME.phase==="lobby") pushLobby(); },700);
 
 // =====================================================
@@ -698,19 +681,20 @@ function startWaveSystem(){
   GAME.phase="playing"; GAME.wave=1; GAME.waveTimer=WAVE_DURATION;
   GAME.strikes=[]; GAME.flash=0; GAME.strikeTimer=1.2;
   GAME.runRevives=0; GAME.runHoles=0; GAME.calmTimer=0;
+  GAME.tentacles=null; // reset tentáculos
   initRoof();
   for(const id in GAME.players){
     const p=GAME.players[id];
     applyClass(p);
     p.hp=p.maxHp; p.state="alive"; p.bleedout=BLEEDOUT;
+    p.rayos=0; // ===== FIX: reset rayos al inicio =====
   }
-  // Aura de equipo del Capitán: bonus de reparación a todos
   let aura=0; for(const id in GAME.players) aura+=GAME.players[id].teamRepair||0;
   if(aura>0) for(const id in GAME.players) GAME.players[id].repairMult*=(1+aura);
 }
 
 // =====================================================
-//  BUCLE DEL HOST (simulación)
+//  BUCLE DEL HOST
 // =====================================================
 let hostLoop=null, gameRunning=false;
 
@@ -742,7 +726,6 @@ function showGameScreen(){
   resizeCanvas();
   const touch = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
   if(touch) $("touch").classList.add("show");
-  // habilidad de clase
   const cls=classById(getSelected());
   if(cls&&cls.abKind){
     if(touch) $("tAbility").classList.add("show");
@@ -753,7 +736,7 @@ function showGameScreen(){
   }
 }
 
-// ---------- Simulación (solo host) ----------
+// ---------- Simulación ----------
 function segCenterX(i){ return ROOF_X0 + SEG_W*i + SEG_W/2; }
 function playerSegIndex(p){ const rel=(p.x-ROOF_X0)/SEG_W; return Math.max(0,Math.min(SEG_COUNT-1,Math.floor(rel))); }
 
@@ -761,7 +744,6 @@ function simulate(dt){
   const players=Object.values(GAME.players);
 
   if(GAME.phase==="playing"){
-    // --- Movimiento y acciones ---
     players.forEach(p=>{
       if(p.state==="dead"){p.busy=null;p.abReq=false;return;}
       if(p.state==="downed"){
@@ -769,15 +751,11 @@ function simulate(dt){
         if(p.bleedout<=0){ p.state="dead"; }
         return;
       }
-      // regen
       if(p.regen>0) p.hp=Math.min(p.maxHp,p.hp+p.regen*dt);
-      // habilidad de clase (enfriamiento + activación)
       if(p.abCd>0) p.abCd=Math.max(0,p.abCd-dt);
       if(p.abReq){ p.abReq=false; if(p.abKind&&p.abCd<=0){ executeAbility(p); p.abCd=p.abMax; } }
-      // impulso temporal del Capitán (rally)
       if(p.rallyTimer>0) p.rallyTimer=Math.max(0,p.rallyTimer-dt);
       const spd = p.speedMult * (p.rallyTimer>0?1.6:1);
-      // mover
       let vx=0;
       if(p.input.left) vx-=1;
       if(p.input.right) vx+=1;
@@ -785,9 +763,7 @@ function simulate(dt){
       p.x += vx*MOVE_SPEED*spd*dt;
       p.x=Math.max(ROOF_X0+10,Math.min(ROOF_X1-10,p.x));
       p.busy=null;
-      // acción: revivir o reparar
       if(p.input.action){
-        // ¿aliado derribado cerca?
         let target=null,bestD=70;
         players.forEach(q=>{
           if(q!==p&&q.state==="downed"){const d=Math.abs(q.x-p.x);if(d<bestD){bestD=d;target=q;}}
@@ -797,7 +773,6 @@ function simulate(dt){
           target._rev=(target._rev||0)+REVIVE_RATE*p.reviveMult*dt;
           if(target._rev>=1){ target.state="alive"; target.hp=target.maxHp*0.5; target.bleedout=BLEEDOUT; target._rev=0; GAME.runRevives=(GAME.runRevives||0)+1; }
         } else {
-          // reparar agujero (segmento sobre el jugador, +rango)
           const idx=playerSegIndex(p);
           let repaired=false;
           for(let off=0;off<=p.repairRange&&!repaired;off++){
@@ -814,7 +789,6 @@ function simulate(dt){
           }
         }
       } else {
-        // reinicia progreso de revivir si nadie ayuda
         players.forEach(q=>{ if(q.state==="downed"&&q._rev){ q._rev=Math.max(0,q._rev-dt*0.5);} });
       }
     });
@@ -824,6 +798,16 @@ function simulate(dt){
     for(let i=GAME.heals.length-1;i>=0;i--){ GAME.heals[i].t-=dt; if(GAME.heals[i].t<=0) GAME.heals.splice(i,1); }
     if(GAME.toastMsg){ GAME.toastMsg.t-=dt; if(GAME.toastMsg.t<=0) GAME.toastMsg=null; }
     if(GAME.calmTimer>0) GAME.calmTimer=Math.max(0,GAME.calmTimer-dt);
+
+    // ===== TENTÁCULOS: timer de duración =====
+    if(GAME.tentacles && GAME.tentacles.active){
+      GAME.tentacles.timer-=dt;
+      if(GAME.tentacles.timer<=0 || GAME.tentacles.absorbed>=GAME.tentacles.max){
+        GAME.tentacles.active=false;
+        GAME.toastMsg={txt:"Los tentáculos de sombra se desvanecen… 🐙",t:2};
+      }
+    }
+
     const relief=1-Math.min(0.5,GAME.stormRelief);
     const baseInterval=Math.max(0.55, 2.5 - GAME.wave*0.16) * relief;
     GAME.strikeTimer-=dt;
@@ -832,18 +816,15 @@ function simulate(dt){
       GAME.strikeTimer=baseInterval*(0.6+Math.random()*0.8);
       spawnStrike();
     }
-    // avanzar rayos
     for(let i=GAME.strikes.length-1;i>=0;i--){
       const st=GAME.strikes[i]; st.t-=dt;
       if(st.phase==="warn" && st.t<=0){ resolveStrike(st); st.phase="hit"; st.t=0.18; }
       else if(st.phase==="hit" && st.t<=0){ GAME.strikes.splice(i,1); }
     }
 
-    // --- Fin de oleada ---
     GAME.waveTimer-=dt;
     if(GAME.waveTimer<=0){ startIntermission(); }
 
-    // --- Derrota: todos muertos ---
     if(players.length>0 && players.every(p=>p.state==="dead")){ triggerGameOver(); }
   }
   else if(GAME.phase==="intermission"){
@@ -854,7 +835,6 @@ function simulate(dt){
 }
 
 function spawnStrike(){
-  // Preferimos a veces golpear agujeros existentes para presionar al equipo
   const holes=[]; for(let i=0;i<SEG_COUNT;i++) if(GAME.segments[i].state===1) holes.push(i);
   let seg;
   if(holes.length && Math.random()<0.45) seg=holes[Math.floor(Math.random()*holes.length)];
@@ -867,7 +847,6 @@ function spawnStrike(){
 function executeAbility(p){
   const seg=playerSegIndex(p);
   if(p.abKind==="bless"){
-    // rayo bendito: cae sobre la posición del jugador
     GAME.strikes.push({seg,x:segCenterX(seg),phase:"warn",t:0.5,dur:0.5,kind:"bless",owner:p.id});
     GAME.toastMsg={txt:`${p.name} invocó un rayo bendito ⚡`,t:2};
   } else if(p.abKind==="heal"){
@@ -890,14 +869,12 @@ function executeAbility(p){
     GAME.heals.push({x:p.x,t:0.6});
     GAME.toastMsg={txt:`${p.name} reparó todo el tejado ⚙️`,t:2};
   } else if(p.abKind==="dash"){
-    // Parpadeo: repara todos los agujeros entre la posición actual y el destino
     const dir=p.facing||1, dest=Math.max(ROOF_X0+20,Math.min(ROOF_X1-20,p.x+dir*260));
     const a=Math.min(p.x,dest), b=Math.max(p.x,dest);
     GAME.segments.forEach((s,i)=>{ const cx=segCenterX(i); if(cx>=a-SEG_W&&cx<=b+SEG_W){ s.state=0; s.prog=0; } });
     p.x=dest; GAME.heals.push({x:dest,t:0.5});
     GAME.toastMsg={txt:`${p.name} cruzó el tejado 🥷`,t:2};
   } else if(p.abKind==="drain"){
-    // Roba vida de la tormenta y reparte a los heridos
     let n=0;
     Object.values(GAME.players).forEach(q=>{
       if(q.state==="dead") return;
@@ -907,7 +884,6 @@ function executeAbility(p){
     GAME.heals.push({x:p.x,t:0.6});
     GAME.toastMsg={txt:`${p.name} drenó la tormenta 🧛 (${n})`,t:2};
   } else if(p.abKind==="rally"){
-    // Grito: acelera a todo el equipo unos segundos
     Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead"){ q.rallyTimer=4; } });
     GAME.heals.push({x:p.x,t:0.5});
     GAME.toastMsg={txt:`${p.name} dio la orden: ¡todos más rápido! 🎖️`,t:2};
@@ -923,11 +899,40 @@ function executeAbility(p){
     GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless");
     GAME.toastMsg={txt:`${p.name} calmó la tormenta 🌩️ (5s)`,t:2.5};
   }
+  // ===== NUEVA HABILIDAD: TENTÁCULOS DE SOMBRAS =====
+  else if(p.abKind==="tentacles"){
+    GAME.tentacles={
+      active:true,
+      absorbed:0,
+      max:5,
+      x:p.x,
+      timer:12, // duran 12 segundos máximo
+      owner:p.id
+    };
+    GAME.heals.push({x:p.x,t:0.7});
+    GAME.toastMsg={txt:`${p.name} invocó tentáculos de sombra 🐙 (absorben 5 rayos)`,t:2.5};
+  }
 }
 
 function resolveStrike(st){
   const seg=GAME.segments[st.seg];
-  // --- Rayo bendito (Domador de rayos): repara y cura, no daña ---
+
+  // ===== TENTÁCULOS ABSORBEN RAYOS =====
+  if(st.kind==="storm" && GAME.tentacles && GAME.tentacles.active){
+    // Los tentáculos absorben el rayo
+    GAME.tentacles.absorbed++;
+    GAME.flash=0.5;
+    GAME.heals.push({x:st.x,t:0.5});
+    // Contar como rayo sobrevivido para todos los vivos
+    Object.values(GAME.players).forEach(p=>{ if(p.state==="alive") p.rayos++; });
+    if(GAME.tentacles.absorbed>=GAME.tentacles.max){
+      GAME.tentacles.active=false;
+      GAME.toastMsg={txt:"¡Los tentáculos absorbieron 5 rayos y desaparecen! 🐙💨",t:2.5};
+    }
+    return; // El rayo es absorbido, no hace daño
+  }
+
+  // Rayo bendito
   if(st.kind==="bless"){
     GAME.flash=0.8;
     const cx=segCenterX(st.seg);
@@ -942,22 +947,20 @@ function resolveStrike(st){
     });
     return;
   }
+
   GAME.flash=1;
-  // rayo sobrevivido => +1 punto para cada jugador vivo
+  // ===== FIX: rayos sobrevividos se cuentan correctamente =====
   Object.values(GAME.players).forEach(p=>{ if(p.state==="alive") p.rayos++; });
+
   if(seg.state===0){
-    // tejado intacto: puede crear agujero (armadura reduce probabilidad)
     const chance=Math.max(0.25, 0.85 - GAME.roofArmor);
     if(Math.random()<chance){ seg.state=1; seg.prog=0; }
   } else {
-    // agujero abierto: el rayo entra y golpea a quien esté debajo
     const cx=segCenterX(st.seg);
     Object.values(GAME.players).forEach(p=>{
       if(p.state==="dead"||p.state==="downed") return;
       if(Math.abs(p.x-cx) < SEG_W*0.75){
-        // esquivar
         if(Math.random()<p.dodge) return;
-        // escudo
         if(p.shield>0){ p.shield--; return; }
         const dmg=STRIKE_DMG*(1-p.resist);
         p.hp-=dmg;
@@ -967,18 +970,15 @@ function resolveStrike(st){
         }
       }
     });
-    // el agujero puede empezar a "cerrarse" un poco si tiene patchArmor... lo dejamos abierto
   }
 }
 
 function startIntermission(){
   GAME.phase="intermission"; GAME.intermTimer=30; GAME.strikes=[];
-  // resucita a los muertos con media vida para volver a jugar; limpia derribados
   Object.values(GAME.players).forEach(p=>{
     if(p.state==="dead"){ p.state="alive"; p.hp=p.maxHp*0.5; }
     if(p.state==="downed"){ p.state="alive"; p.hp=Math.max(p.hp,p.maxHp*0.4); }
     p.bleedout=BLEEDOUT; p.ready=false;
-    // genera 3 opciones aleatorias
     p.options=pick3();
   });
 }
@@ -1002,15 +1002,17 @@ function nextWave(){
   GAME.phase="playing";
   GAME.waveTimer=WAVE_DURATION;
   GAME.strikeTimer=1.0;
-  GAME.stormRelief=0; // el alivio solo dura una oleada
+  GAME.stormRelief=0;
   Object.values(GAME.players).forEach(p=>{p.ready=false;p.options=[];});
 }
 
+// ===== FIX: triggerGameOver construye el snapshot ANTES de mostrar =====
 function triggerGameOver(){
   GAME.phase="over";
   const snap=buildStatePayload();
+  latestState=snap; // actualizar latestState con el estado final
   broadcast({t:"over",wave:GAME.wave,snapshot:snap});
-  showGameOver(GAME.wave);
+  showGameOver(GAME.wave, snap);
   clearInterval(hostLoop);
 }
 
@@ -1035,12 +1037,14 @@ function buildStatePayload(){
     toast:GAME.toastMsg?GAME.toastMsg.txt:null,
     calm:GAME.calmTimer>0?Math.round(GAME.calmTimer*10)/10:0,
     revives:GAME.runRevives||0, holes:GAME.runHoles||0,
+    // ===== TENTÁCULOS en el estado =====
+    tentacles:GAME.tentacles?{active:GAME.tentacles.active,absorbed:GAME.tentacles.absorbed,max:GAME.tentacles.max,x:GAME.tentacles.x,timer:Math.round(GAME.tentacles.timer*10)/10}:null,
   };
 }
 function broadcastState(){ const p=buildStatePayload(); latestState=p; broadcast(p); handlePhaseUI(p); }
 
 // =====================================================
-//  UI DE FASES (mejoras / game over) — común host y cliente
+//  UI DE FASES
 // =====================================================
 let currentOverlay=null;
 function handlePhaseUI(s){
@@ -1054,7 +1058,7 @@ function showUpgrades(s){
   const me=myPlayerState(s);
   $("upOverlay").classList.add("show");
   $("upTitle").textContent=`Oleada ${s.wave} superada`;
-  const list=$("upList"); 
+  const list=$("upList");
   if(!me){ list.innerHTML=""; return; }
   if(me.ready || me.state==="dead"){
     list.innerHTML="";
@@ -1064,7 +1068,6 @@ function showUpgrades(s){
     return;
   }
   $("upWaiting").textContent="";
-  // sólo re-render si cambian las opciones
   const sig=me.options.join(",");
   if(list._sig===sig && list.children.length) return;
   list._sig=sig; list.innerHTML="";
@@ -1084,26 +1087,35 @@ function pickUpgrade(id){
   $("upList").innerHTML=""; $("upWaiting").textContent="Elegido. Esperando al equipo…";
 }
 
-function showGameOver(wave){
+// ===== FIX: showGameOver recibe el snapshot directamente =====
+function showGameOver(wave, snapshot){
   $("goOverlay").classList.add("show");
   gameRunning=false;
-  if(GAME._awarded) return; // evita duplicar al recibir más estados
+  if(GAME._awarded) return;
   GAME._awarded=true;
-  const me = latestState && latestState.players ? latestState.players.find(p=>p.id===myId) : null;
+
+  // Usar el snapshot pasado o latestState como fallback
+  const stateData = snapshot || latestState;
+  const me = stateData && stateData.players ? stateData.players.find(p=>p.id===myId) : null;
   const earned = me ? (me.rayos||0) : 0;
-  const revives = latestState ? (latestState.revives||0) : 0;
-  const holes = latestState ? (latestState.holes||0) : 0;
-  // Guardado de rayos y estadísticas persistentes
+  const revives = stateData ? (stateData.revives||0) : 0;
+  const holes = stateData ? (stateData.holes||0) : 0;
+
+  // Guardar estadísticas
   const st=getStats();
   st.totalRayos+=earned;
   st.bestRun=Math.max(st.bestRun,earned);
   st.bestWave=Math.max(st.bestWave,wave);
   st.games+=1; st.revives+=revives; st.holes+=holes;
   saveStats(st);
+
+  // Guardar puntos
   if(earned>0) setPoints(getPoints()+earned);
-  // Logros (recompensas extra) tras guardar stats
+
+  // Logros
   const newAch=checkAchievements();
   const bonus=newAch.reduce((a,x)=>a+x.rew,0);
+
   $("goBadge").textContent=`Sobrevivieron ${wave} oleada${wave===1?"":"s"}  ·  +${earned} ⚡`;
   let sub = earned>0
     ? `Ganaste ${earned} puntos. Récord de partida: ${st.bestRun} rayos · Mejor oleada: ${st.bestWave}.`
@@ -1116,7 +1128,7 @@ function showGameOver(wave){
 function endToMenu(msg){ alert(msg); location.reload(); }
 
 // =====================================================
-//  ENTRADAS (teclado + táctil)
+//  ENTRADAS
 // =====================================================
 window.addEventListener("keydown",e=>{
   if(e.repeat) return;
@@ -1148,7 +1160,6 @@ function bindTouch(el,key){
   el.addEventListener("mousedown",on); el.addEventListener("mouseup",off); el.addEventListener("mouseleave",off);
 }
 bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"),"action");
-// Botón de habilidad: dispara una sola vez al pulsar
 (function(){
   const el=$("tAbility");
   const fire=e=>{e.preventDefault(); triggerAbility();};
@@ -1182,9 +1193,83 @@ function renderLoop(){
 
 function drawRoundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 
+// ===== DIBUJAR TENTÁCULOS DE SOMBRA =====
+function drawTentacles(s){
+  if(!s.tentacles || !s.tentacles.active) return;
+  const t=s.tentacles;
+  const cx=t.x;
+  const time=performance.now()/1000;
+  const remaining=t.max-t.absorbed;
+  const alpha=Math.min(1, t.timer/2); // se desvanecen al final
+
+  ctx.save();
+  ctx.globalAlpha=alpha*0.9;
+
+  // Dibujar 6 tentáculos ondulantes sobre el tejado
+  const tentCount=6;
+  const spread=SEG_W*4; // ancho total de los tentáculos
+  for(let i=0;i<tentCount;i++){
+    const baseX=cx - spread/2 + (spread/(tentCount-1))*i;
+    const baseY=ROOF_Y-5;
+    const tentLen=60+Math.sin(time*2+i*1.3)*15;
+
+    ctx.strokeStyle=`rgba(20,5,30,${0.85*alpha})`;
+    ctx.lineWidth=6-i*0.3;
+    ctx.lineCap="round";
+    ctx.beginPath();
+    ctx.moveTo(baseX, baseY);
+
+    // Curva ondulante del tentáculo
+    const segments=8;
+    for(let j=1;j<=segments;j++){
+      const prog=j/segments;
+      const ty=baseY - tentLen*prog;
+      const wave=Math.sin(time*3+i*0.8+prog*4)*12*prog;
+      const tx=baseX+wave;
+      ctx.lineTo(tx,ty);
+    }
+    ctx.stroke();
+
+    // Punta del tentáculo (más gruesa, con brillo púrpura)
+    const tipX=baseX+Math.sin(time*3+i*0.8+4)*12;
+    const tipY=baseY-tentLen;
+    ctx.fillStyle=`rgba(80,20,120,${0.9*alpha})`;
+    ctx.beginPath();
+    ctx.arc(tipX,tipY,4+Math.sin(time*4+i)*1.5,0,Math.PI*2);
+    ctx.fill();
+
+    // Brillo púrpura en la punta
+    ctx.fillStyle=`rgba(160,60,220,${0.5*alpha})`;
+    ctx.beginPath();
+    ctx.arc(tipX,tipY,2,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // Base oscura (sombra en el tejado)
+  ctx.fillStyle=`rgba(10,0,20,${0.4*alpha})`;
+  ctx.beginPath();
+  ctx.ellipse(cx, ROOF_Y, spread/2+10, 12, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Contador de absorciones
+  ctx.globalAlpha=alpha;
+  ctx.fillStyle="#c084fc";
+  ctx.font="bold 13px sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText(`🐙 ${remaining}/${t.max}`, cx, ROOF_Y-75);
+
+  // Barra de absorción
+  const barW=60, barH=5;
+  ctx.fillStyle="rgba(0,0,0,.6)";
+  ctx.fillRect(cx-barW/2, ROOF_Y-70, barW, barH);
+  ctx.fillStyle="#c084fc";
+  ctx.fillRect(cx-barW/2, ROOF_Y-70, barW*(t.absorbed/t.max), barH);
+
+  ctx.restore();
+}
+
 function drawWorld(s){
   ctx.setTransform(1,0,0,1,0,0);
-  // Fondo tormenta
   ctx.fillStyle="#080c14"; ctx.fillRect(0,0,cv.width,cv.height);
   ctx.save();
   ctx.translate(offX,offY); ctx.scale(scale,scale);
@@ -1204,28 +1289,23 @@ function drawWorld(s){
   const wallTop=ROOF_Y+26, wallH=GROUND_Y-wallTop;
   const wx0=ROOF_X0-14, wx1=ROOF_X1+14;
 
-  // Suelo (tierra + césped)
+  // Suelo
   ctx.fillStyle="#241a10"; ctx.fillRect(0,GROUND_Y,WORLD_W,WORLD_H-GROUND_Y);
   ctx.fillStyle="#3f6b2e"; ctx.fillRect(0,GROUND_Y,WORLD_W,7);
   ctx.fillStyle="#2f5222"; ctx.fillRect(0,GROUND_Y+7,WORLD_W,3);
 
-  // ---- Casa ----
-  // interior
+  // Casa
   ctx.fillStyle="#241d16"; ctx.fillRect(wx0,wallTop,wx1-wx0,wallH);
-  // pared con tablones verticales
   for(let x=wx0;x<wx1;x+=26){
     ctx.fillStyle=((x/26)|0)%2===0?"#5d4327":"#553c22";
     ctx.fillRect(x,wallTop,25,wallH);
     ctx.fillStyle="rgba(0,0,0,.18)"; ctx.fillRect(x+23,wallTop,2,wallH);
   }
-  // rodapié
   ctx.fillStyle="#3a2a18"; ctx.fillRect(wx0,GROUND_Y-14,wx1-wx0,14);
-  // puerta
   const doorW=70,doorX=WORLD_W/2-doorW/2;
   ctx.fillStyle="#3a2614"; ctx.fillRect(doorX,GROUND_Y-118,doorW,118);
   ctx.fillStyle="#4b3319"; ctx.fillRect(doorX+6,GROUND_Y-112,doorW-12,112);
   ctx.fillStyle="#f5b942"; ctx.beginPath();ctx.arc(doorX+doorW-16,GROUND_Y-58,4,0,7);ctx.fill();
-  // ventanas con luz cálida
   [wx0+70, wx1-70-56].forEach(vx=>{
     ctx.fillStyle="#2a1d10"; ctx.fillRect(vx-4,wallTop+40,64,64);
     ctx.fillStyle="#f6d38a"; ctx.fillRect(vx,wallTop+44,56,56);
@@ -1233,22 +1313,17 @@ function drawWorld(s){
     ctx.beginPath();ctx.moveTo(vx+28,wallTop+44);ctx.lineTo(vx+28,wallTop+100);
     ctx.moveTo(vx,wallTop+72);ctx.lineTo(vx+56,wallTop+72);ctx.stroke();
   });
-  // vigas laterales
   ctx.fillStyle="#41301c"; ctx.fillRect(wx0-4,wallTop,6,wallH); ctx.fillRect(wx1-2,wallTop,6,wallH);
 
-  // ---- Tejado (segmentos / tejas) ----
+  // Tejado
   for(let i=0;i<SEG_COUNT;i++){
     const seg=s.segments[i]; const x=ROOF_X0+SEG_W*i;
     if(seg.s===0){
-      // teja base
       ctx.fillStyle=(i%2===0)?"#8a5a30":"#794d27";
       ctx.fillRect(x,ROOF_Y,SEG_W-1.5,26);
-      // borde inferior de teja
       ctx.fillStyle="rgba(0,0,0,.25)"; ctx.fillRect(x,ROOF_Y+21,SEG_W-1.5,5);
-      // brillo superior
       ctx.fillStyle="rgba(255,255,255,.09)"; ctx.fillRect(x,ROOF_Y,SEG_W-1.5,5);
     } else {
-      // agujero irregular oscuro
       ctx.fillStyle="#080c14"; ctx.fillRect(x,ROOF_Y,SEG_W-1.5,26);
       ctx.fillStyle="#1a120a";
       ctx.beginPath();ctx.moveTo(x+2,ROOF_Y+3);ctx.lineTo(x+SEG_W*0.5,ROOF_Y+1);ctx.lineTo(x+SEG_W-3,ROOF_Y+5);
@@ -1258,28 +1333,27 @@ function drawWorld(s){
       if(seg.p>0){ ctx.fillStyle="#3fce7c"; ctx.fillRect(x+2,ROOF_Y+20,(SEG_W-5)*seg.p,4); }
     }
   }
-  // canaleta / viga inferior del tejado
   ctx.fillStyle="#4a3218"; ctx.fillRect(ROOF_X0-8,ROOF_Y+24,ROOF_X1-ROOF_X0+16,6);
-  // caballete / viga superior con alero
   ctx.fillStyle="#5a3c22"; ctx.fillRect(ROOF_X0-14,ROOF_Y-8,ROOF_X1-ROOF_X0+28,9);
   ctx.fillStyle="rgba(255,255,255,.08)"; ctx.fillRect(ROOF_X0-14,ROOF_Y-8,ROOF_X1-ROOF_X0+28,3);
 
-  // Rayos (aviso + impacto)
+  // ===== DIBUJAR TENTÁCULOS (sobre el tejado) =====
+  drawTentacles(s);
+
+  // Rayos
   s.strikes.forEach(st=>{
     const cx=st.x;
     const bless=st.kind==="bless";
     const col = bless ? "63,206,124" : "245,185,66";
     if(st.phase==="warn"){
-      const a=0.25+0.55*(1-st.t); // parpadea al acercarse
+      const a=0.25+0.55*(1-st.t);
       ctx.fillStyle=`rgba(${col},${0.10+0.14*(1-st.t)})`;
       ctx.fillRect(cx-SEG_W/2,0,SEG_W,GROUND_Y);
       ctx.strokeStyle=`rgba(${col},${a})`; ctx.lineWidth=3; ctx.setLineDash([8,8]);
       ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,ROOF_Y); ctx.stroke(); ctx.setLineDash([]);
-      // triángulo de aviso
       ctx.fillStyle=`rgba(${col},${0.5+0.5*(1-st.t)})`;
       ctx.beginPath(); ctx.moveTo(cx,26);ctx.lineTo(cx-9,10);ctx.lineTo(cx+9,10);ctx.closePath();ctx.fill();
     } else {
-      // impacto: bolt
       const seg=s.segments[st.seg];
       const bottom = (bless || (seg && seg.s===1)) ? GROUND_Y : ROOF_Y;
       ctx.strokeStyle= bless ? "#daffe9" : "#fff7dd"; ctx.lineWidth=5;
@@ -1290,7 +1364,7 @@ function drawWorld(s){
     }
   });
 
-  // Efectos de curación (anillos verdes que se expanden)
+  // Curaciones
   (s.heals||[]).forEach(h=>{
     const k=1-h.t/0.7, r=20+k*90;
     ctx.strokeStyle=`rgba(63,206,124,${Math.max(0,h.t)})`; ctx.lineWidth=4;
@@ -1301,7 +1375,6 @@ function drawWorld(s){
 
   // Jugadores
   s.players.forEach(p=>{
-    // interpolación suave de x + animación de caminar
     if(!renderPlayers[p.id]) renderPlayers[p.id]={x:p.x,walk:0};
     const rp=renderPlayers[p.id];
     const prev=rp.x;
@@ -1313,14 +1386,11 @@ function drawWorld(s){
 
   ctx.restore();
 
-  // Flash de rayo (pantalla)
   if(s.flash>0){ ctx.fillStyle=`rgba(255,255,255,${s.flash*0.35})`; ctx.fillRect(0,0,cv.width,cv.height); }
 
-  // HUD
   drawHUD(s);
 }
 
-// Sombras/tonos derivados del color de la clase
 function shade(hex,f){
   const n=parseInt(hex.slice(1),16), r=(n>>16)&255,g=(n>>8)&255,b=n&255;
   const c=v=>Math.max(0,Math.min(255,Math.round(v*f)));
@@ -1346,6 +1416,19 @@ function drawHat(x,topY,classId,skin){
       ctx.fillStyle="#f5b942"; ctx.beginPath();
       ctx.moveTo(x-11,topY+2);ctx.lineTo(x-11,topY-8);ctx.lineTo(x-5,topY-2);ctx.lineTo(x,topY-11);
       ctx.lineTo(x+5,topY-2);ctx.lineTo(x+11,topY-8);ctx.lineTo(x+11,topY+2);ctx.closePath();ctx.fill(); break;
+    // ===== SOMBRERO DEL DUEÑO DE LAS SOMBRAS =====
+    case "shadow":
+      ctx.fillStyle="#1a0a2e";
+      ctx.beginPath();ctx.arc(x,topY+2,11,Math.PI,0);ctx.fill();
+      ctx.fillRect(x-11,topY+1,22,4);
+      // Cuernos oscuros
+      ctx.fillStyle="#2d1050";
+      ctx.beginPath();ctx.moveTo(x-9,topY-2);ctx.lineTo(x-12,topY-14);ctx.lineTo(x-6,topY-2);ctx.closePath();ctx.fill();
+      ctx.beginPath();ctx.moveTo(x+9,topY-2);ctx.lineTo(x+12,topY-14);ctx.lineTo(x+6,topY-2);ctx.closePath();ctx.fill();
+      // Ojos brillantes púrpura
+      ctx.fillStyle="#c084fc";
+      ctx.beginPath();ctx.arc(x-3,topY+1,1.5,0,7);ctx.arc(x+3,topY+1,1.5,0,7);ctx.fill();
+      break;
     default:
       ctx.fillStyle="#6b4a2a"; ctx.beginPath();ctx.arc(x,topY+1,10,Math.PI,0);ctx.fill();
   }
@@ -1358,11 +1441,9 @@ function drawPlayer(p,x,walk){
   ctx.save();
   ctx.globalAlpha = dead?0.22:1;
 
-  // sombra
   ctx.fillStyle="rgba(0,0,0,.32)"; ctx.beginPath();ctx.ellipse(x,y+2,17,5,0,0,7);ctx.fill();
 
   if(down){
-    // tumbado (cuerpo horizontal)
     ctx.save(); ctx.translate(x,y-8); ctx.rotate(-Math.PI/2*0.92);
     ctx.fillStyle=p.color; drawRoundRect(-P_H/2+6,-P_W/2,P_H-6,P_W,7); ctx.fill();
     ctx.fillStyle=skin; ctx.beginPath();ctx.arc(P_H/2-2,0,9,0,7);ctx.fill();
@@ -1373,50 +1454,38 @@ function drawPlayer(p,x,walk){
     return;
   }
 
-  const sw = Math.sin(walk)*5; // balanceo de piernas
+  const sw = Math.sin(walk)*5;
   const bodyTop=y-40, headY=y-48;
-  // piernas
   ctx.fillStyle="#2c3345";
   ctx.fillRect(x-9, y-16, 7, 16+Math.min(0,sw));
   ctx.fillRect(x+2, y-16, 7, 16+Math.min(0,-sw));
-  // pies
   ctx.fillStyle="#1b2130"; ctx.fillRect(x-11,y-3,10,3); ctx.fillRect(x+2,y-3,10,3);
-  // torso (color de clase)
   ctx.fillStyle=p.color; drawRoundRect(x-13,bodyTop,26,26,7); ctx.fill();
-  ctx.fillStyle=shade(p.color,0.8); ctx.fillRect(x-13,bodyTop+18,26,8); // sombra inferior
-  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5); // brillo
-  // brazos (balanceo opuesto)
+  ctx.fillStyle=shade(p.color,0.8); ctx.fillRect(x-13,bodyTop+18,26,8);
+  ctx.fillStyle="rgba(255,255,255,.12)"; ctx.fillRect(x-13,bodyTop,26,5);
   ctx.fillStyle=shade(p.color,0.85);
   ctx.save();ctx.translate(x-13,bodyTop+5);ctx.rotate(sw*0.05);ctx.fillRect(-4,0,5,17);ctx.restore();
   ctx.save();ctx.translate(x+13,bodyTop+5);ctx.rotate(-sw*0.05);ctx.fillRect(-1,0,5,17);ctx.restore();
-  // cuello + cabeza
   ctx.fillStyle=skin; ctx.beginPath();ctx.arc(x,headY,9,0,7);ctx.fill();
   ctx.fillStyle=shade(skin,0.9); ctx.beginPath();ctx.arc(x,headY+2,9,0.15,Math.PI-0.15);ctx.fill();
-  // ojos (según dirección)
   ctx.fillStyle="#2a2018"; const ex=p.facing>0?2:-2;
   ctx.beginPath();ctx.arc(x+ex-2,headY-1,1.4,0,7);ctx.arc(x+ex+3,headY-1,1.4,0,7);ctx.fill();
-  // gorro/casco de clase
   drawHat(x,headY-9,p.classId,skin);
-  // escudo
   if(p.shield>0){ ctx.strokeStyle="#4aa3ff";ctx.lineWidth=2.5;ctx.globalAlpha=dead?0.2:0.85;ctx.beginPath();ctx.arc(x,y-24,25,0,7);ctx.stroke();ctx.globalAlpha=dead?0.22:1; }
-  // acción
   if(p.busy==="repair"){ ctx.font="15px sans-serif";ctx.textAlign="center";ctx.fillText("🔧",x+(p.facing>0?18:-18),bodyTop+8); }
   if(p.busy==="revive"){ ctx.font="15px sans-serif";ctx.textAlign="center";ctx.fillText("➕",x,headY-18); }
   ctx.restore();
 
-  // barra de vida
   const bw=40,pct=Math.max(0,p.hp/p.maxHp);
   ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-20,bw,6);
   ctx.fillStyle= pct>0.5?"#3fce7c":pct>0.25?"#f5b942":"#e5484d";
   ctx.fillRect(x-bw/2+1,y-P_H-19,(bw-2)*pct,4);
-  // enfriamiento de habilidad (sobre la barra de vida) para mí
   if(p.id===myId && p.abKind && p.abMax){
     const cd=p.abCd||0, ready=cd<=0;
     ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(x-bw/2,y-P_H-13,bw,4);
     ctx.fillStyle=ready?"#4aa3ff":"#5a6b86";
     ctx.fillRect(x-bw/2+1,y-P_H-12,(bw-2)*(ready?1:1-cd/p.abMax),2);
   }
-  // nombre
   ctx.fillStyle= p.id===myId?"#f5b942":"#e8edf6"; ctx.font="bold 11px sans-serif";ctx.textAlign="center";
   ctx.fillText(p.name+(p.id===myId?" (tú)":""),x,y-P_H-24);
 }
@@ -1433,6 +1502,11 @@ function drawHUD(s){
     const ready=(me.abCd||0)<=0;
     ab=`<span style="color:${ready?'#4aa3ff':'var(--muted)'}">${ready?'⚡ Habilidad lista':'⏳ '+Math.ceil(me.abCd)+'s'}</span>`;
   }
+  // ===== Mostrar estado de tentáculos en HUD =====
+  let tentHud="";
+  if(s.tentacles && s.tentacles.active){
+    tentHud=`<span style="color:#c084fc">🐙 ${s.tentacles.max-s.tentacles.absorbed} rayos</span>`;
+  }
   hud.innerHTML=`<span>Oleada <b>${s.wave}</b></span>
     <span class="wave-timer">${mid}</span>
     <span>👥 ${alive}/${s.players.length}</span>
@@ -1440,13 +1514,12 @@ function drawHUD(s){
     ${me?`<span>❤️ <b style="color:${me.hp/me.maxHp>0.3?'#3fce7c':'#e5484d'}">${me.hp}</b></span>`:""}
     ${me?`<span title="Rayos sobrevividos">⚡ <b>${me.rayos||0}</b></span>`:""}
     ${s.calm>0?`<span style="color:#4aa3ff">🌩️ Calma ${Math.ceil(s.calm)}s</span>`:""}
+    ${tentHud}
     ${ab}`;
-  // aviso puntual (habilidades)
   if(s.toast && s.toast!==_lastToast){ _lastToast=s.toast; showToast(s.toast); }
   if(!s.toast) _lastToast=null;
 }
 
-// Ajuste inicial del nombre y progreso
 $("name").value = "Jugador"+Math.floor(Math.random()*90+10);
 refreshMenuProgress();
 </script>
