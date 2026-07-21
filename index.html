@@ -98,6 +98,32 @@
   .class .cost-tag{position:absolute;top:8px;right:8px;background:rgba(14,20,32,.85);border:1px solid var(--amber);color:var(--amber);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:800}
   .ability-hint{position:absolute;top:70px;left:50%;transform:translateX(-50%);background:rgba(30,43,66,.9);border:1px solid #4aa3ff;color:#eaf3ff;padding:6px 14px;border-radius:20px;font-size:12px;z-index:7;pointer-events:none;white-space:nowrap}
 
+  /* ---------- Salida / botón cerrar ---------- */
+  .close-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border);color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .close-x:hover{color:var(--fg);border-color:var(--amber)}
+  .card{position:relative}
+  .menu-actions{display:flex;gap:10px}
+  .menu-actions .btn{flex:1;margin:0}
+
+  /* ---------- Estadísticas ---------- */
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center}
+  .stat b{display:block;font-size:16px;color:var(--amber)}
+  .stat small{font-size:10px;color:var(--muted);line-height:1.2;display:block}
+
+  /* ---------- Logros ---------- */
+  .ach-grid{display:grid;grid-template-columns:1fr;gap:8px;max-height:46vh;overflow:auto;margin-bottom:12px;padding:2px}
+  @media(min-width:520px){.ach-grid{grid-template-columns:1fr 1fr}}
+  .achv{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  .achv.done{border-color:var(--health)}
+  .achv .aic{font-size:26px;filter:grayscale(1);opacity:.5}
+  .achv.done .aic{filter:none;opacity:1}
+  .achv .atx{flex:1;text-align:left}
+  .achv .anm{font-weight:800;font-size:13px}
+  .achv .ads{font-size:11px;color:var(--muted);line-height:1.35}
+  .achv .arw{font-size:12px;font-weight:800;color:var(--amber);white-space:nowrap}
+  .achv.done .arw{color:var(--health)}
+
   /* Overlays */
   .overlay{position:absolute;inset:0;background:rgba(10,15,25,.82);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
   .overlay.show{display:flex}
@@ -132,9 +158,13 @@
         <span class="pts-pill"><span class="bolt">⚡</span> Puntos: <b id="menuPoints">0</b></span>
         <span style="font-size:12px;color:var(--muted)">Clase: <b id="menuClass" style="color:var(--amber)">Superviviente</b></span>
       </div>
+      <div class="stat-row" id="menuStats"></div>
       <label for="name">Tu nombre</label>
       <input id="name" maxlength="12" placeholder="Jugador" />
-      <button class="btn btn-ghost" id="btnShop">🛒 Tienda de clases</button>
+      <div class="menu-actions">
+        <button class="btn btn-ghost" id="btnShop">🛒 Clases</button>
+        <button class="btn btn-ghost" id="btnAch">🏆 Logros</button>
+      </div>
       <button class="btn btn-primary" id="btnCreate">Crear sala</button>
       <div class="divider">o únete a una sala</div>
       <label for="joinCode">Código de sala</label>
@@ -164,6 +194,7 @@
   <!-- ===== TIENDA DE CLASES ===== -->
   <div class="screen" id="shop" style="display:none">
     <div class="card" style="max-width:640px">
+      <button class="close-x" id="btnShopClose" aria-label="Salir de la tienda">✕</button>
       <div class="shop-head">
         <div class="logo" style="margin:0"><span class="bolt">⚡</span><b>TIENDA DE CLASES</b></div>
         <span class="pts-pill"><span class="bolt">⚡</span> <b id="shopPoints">0</b></span>
@@ -172,6 +203,22 @@
       <div class="class-grid" id="classGrid"></div>
       <div class="err" id="shopErr"></div>
       <button class="btn btn-primary" id="btnShopBack">Listo</button>
+      <button class="btn btn-ghost" id="btnShopExit">Salir al menú</button>
+    </div>
+  </div>
+
+  <!-- ===== LOGROS ===== -->
+  <div class="screen" id="ach" style="display:none">
+    <div class="card" style="max-width:640px">
+      <button class="close-x" id="btnAchClose" aria-label="Salir de logros">✕</button>
+      <div class="shop-head">
+        <div class="logo" style="margin:0"><span class="bolt">🏆</span><b>LOGROS</b></div>
+        <span class="pts-pill"><span class="bolt">⚡</span> <b id="achPoints">0</b></span>
+      </div>
+      <p class="sub" style="margin-bottom:14px">Completa desafíos para ganar puntos ⚡ extra. ¡Sube tus récords y desbloquéalos todos!</p>
+      <div class="stat-row" id="achStats" style="margin-bottom:12px"></div>
+      <div class="ach-grid" id="achGrid"></div>
+      <button class="btn btn-primary" id="btnAchBack">Volver</button>
     </div>
   </div>
 
@@ -302,6 +349,21 @@ const CLASSES = [
   {id:"engineer", ic:"⚙️", nm:"Ingeniera", cost:16,
    ds:"HABILIDAD: repara al instante TODOS los agujeros del tejado.",
    passive:p=>{p.repairMult*=1.15}, abKind:"fixAll", cd:26},
+  {id:"ninja", ic:"🥷", nm:"Ninja", cost:18,
+   ds:"Muy veloz y esquiva muchos rayos. HABILIDAD: parpadea (dash) tapando todos los agujeros que cruza.",
+   passive:p=>{p.speedMult*=1.25;p.dodge=Math.min(.6,p.dodge+.25)}, abKind:"dash", cd:12},
+  {id:"vampire", ic:"🧛", nm:"Vampiro", cost:20,
+   ds:"Cada reparación te cura. HABILIDAD: roba vida de la tormenta y la reparte al equipo herido.",
+   passive:p=>{p.repairHeal+=8;p.regen+=1}, abKind:"drain", cd:18},
+  {id:"captain", ic:"🎖️", nm:"Capitán", cost:22,
+   ds:"Aura de equipo: todos reparan más rápido. HABILIDAD: grito que acelera a todo el equipo un momento.",
+   passive:p=>{p.maxHp+=30;p.hp+=30;p.teamRepair=(p.teamRepair||0)+.15}, abKind:"rally", cd:22},
+  {id:"phoenix", ic:"🐦‍🔥", nm:"Fénix", cost:28,
+   ds:"Revives solo una vez al caer. HABILIDAD: explosión de fuego que revive a TODOS los aliados caídos.",
+   passive:p=>{p.lives+=1;p.regen+=2}, abKind:"reviveAll", cd:30},
+  {id:"storm", ic:"🌩️", nm:"Señor de la tormenta", cost:35,
+   ds:"Resistente y con escudo. HABILIDAD: calma la tormenta unos segundos (no caen rayos).",
+   passive:p=>{p.maxHp+=40;p.hp+=40;p.resist=Math.min(.75,p.resist+.15);p.shield+=1}, abKind:"calm", cd:34},
 ];
 const classById = id => CLASSES.find(c=>c.id===id);
 
@@ -313,6 +375,38 @@ function getOwned(){ try{const a=JSON.parse(localStorage.getItem(LS_OWN)||"[]");
 function saveOwned(set){ localStorage.setItem(LS_OWN,JSON.stringify([...set].filter(x=>x!=="survivor"))); }
 function getSelected(){ const s=localStorage.getItem(LS_SEL); return getOwned().has(s)?s:"survivor"; }
 function setSelected(id){ localStorage.setItem(LS_SEL,id); }
+
+// ---------- Sistema de guardado de rayos (estadísticas) ----------
+const LS_STATS="stormhouse-stats";
+function getStats(){
+  try{ return Object.assign({totalRayos:0,bestRun:0,bestWave:0,games:0,revives:0,holes:0},JSON.parse(localStorage.getItem(LS_STATS)||"{}")); }
+  catch(e){ return {totalRayos:0,bestRun:0,bestWave:0,games:0,revives:0,holes:0}; }
+}
+function saveStats(s){ localStorage.setItem(LS_STATS,JSON.stringify(s)); }
+
+// ---------- LOGROS (función adictiva) ----------
+// Cada logro se cumple una vez y otorga puntos ⚡ de recompensa.
+const ACHIEVEMENTS=[
+  {id:"first",  ic:"⚡", nm:"Primer trueno",     ds:"Sobrevive tu primer rayo.",              rew:2,  test:s=>s.totalRayos>=1},
+  {id:"r50",    ic:"🌩️", nm:"Cazatormentas",     ds:"Sobrevive 50 rayos en total.",           rew:5,  test:s=>s.totalRayos>=50},
+  {id:"r250",   ic:"🌪️", nm:"Domador del cielo",  ds:"Sobrevive 250 rayos en total.",          rew:15, test:s=>s.totalRayos>=250},
+  {id:"wave5",  ic:"🏠", nm:"Casa firme",         ds:"Llega a la oleada 5.",                   rew:6,  test:s=>s.bestWave>=5},
+  {id:"wave10", ic:"🏰", nm:"Fortaleza",          ds:"Llega a la oleada 10.",                  rew:20, test:s=>s.bestWave>=10},
+  {id:"run20",  ic:"🔥", nm:"Racha eléctrica",    ds:"Aguanta 20 rayos en una sola partida.",  rew:10, test:s=>s.bestRun>=20},
+  {id:"rev10",  ic:"🤝", nm:"Buen compañero",     ds:"Revive a 10 aliados en total.",          rew:8,  test:s=>s.revives>=10},
+  {id:"fix100", ic:"🔧", nm:"Manitas",            ds:"Tapa 100 agujeros en total.",            rew:8,  test:s=>s.holes>=100},
+  {id:"games10",ic:"🎮", nm:"Habitual",           ds:"Juega 10 partidas.",                     rew:10, test:s=>s.games>=10},
+];
+const LS_ACH="stormhouse-ach";
+function getAch(){ try{return new Set(JSON.parse(localStorage.getItem(LS_ACH)||"[]"));}catch(e){return new Set();} }
+function saveAch(set){ localStorage.setItem(LS_ACH,JSON.stringify([...set])); }
+// Comprueba logros nuevos, otorga recompensa y devuelve los recién desbloqueados
+function checkAchievements(){
+  const stats=getStats(), have=getAch(), unlocked=[];
+  ACHIEVEMENTS.forEach(a=>{ if(!have.has(a.id)&&a.test(stats)){ have.add(a.id); setPoints(getPoints()+a.rew); unlocked.push(a); } });
+  if(unlocked.length){ saveAch(have); }
+  return unlocked;
+}
 
 // ---------- Estado global de red ----------
 let peer=null, myId=null, isHost=false, roomCode=null, myName="Jugador";
@@ -357,9 +451,45 @@ function refreshMenuProgress(){
   $("menuPoints").textContent=getPoints();
   const c=classById(getSelected())||CLASSES[0];
   $("menuClass").textContent=c.nm;
+  // estadísticas guardadas
+  const st=getStats();
+  $("menuStats").innerHTML=`
+    <div class="stat"><b>${st.totalRayos}</b><small>rayos totales</small></div>
+    <div class="stat"><b>${st.bestRun}</b><small>récord partida</small></div>
+    <div class="stat"><b>${st.bestWave}</b><small>mejor oleada</small></div>
+    <div class="stat"><b>${st.games}</b><small>partidas</small></div>`;
 }
+function closeShop(){ $("shop").style.display="none"; $("menu").style.display="flex"; refreshMenuProgress(); }
 $("btnShop").onclick=()=>{ $("menu").style.display="none"; $("shop").style.display="flex"; renderShop(); };
-$("btnShopBack").onclick=()=>{ $("shop").style.display="none"; $("menu").style.display="flex"; refreshMenuProgress(); };
+$("btnShopBack").onclick=closeShop;
+$("btnShopExit").onclick=closeShop;
+$("btnShopClose").onclick=closeShop;
+
+// ---------- Logros ----------
+function closeAch(){ $("ach").style.display="none"; $("menu").style.display="flex"; refreshMenuProgress(); }
+$("btnAch").onclick=()=>{ $("menu").style.display="none"; $("ach").style.display="flex"; renderAch(); };
+$("btnAchBack").onclick=closeAch;
+$("btnAchClose").onclick=closeAch;
+function renderAch(){
+  $("achPoints").textContent=getPoints();
+  const st=getStats(), have=getAch();
+  const done=ACHIEVEMENTS.filter(a=>have.has(a.id)).length;
+  $("achStats").innerHTML=`
+    <div class="stat"><b>${done}/${ACHIEVEMENTS.length}</b><small>logros</small></div>
+    <div class="stat"><b>${st.totalRayos}</b><small>rayos</small></div>
+    <div class="stat"><b>${st.revives}</b><small>revividos</small></div>
+    <div class="stat"><b>${st.holes}</b><small>agujeros</small></div>`;
+  const grid=$("achGrid"); grid.innerHTML="";
+  ACHIEVEMENTS.forEach(a=>{
+    const ok=have.has(a.id);
+    const el=document.createElement("div");
+    el.className="achv"+(ok?" done":"");
+    el.innerHTML=`<span class="aic">${a.ic}</span>
+      <div class="atx"><div class="anm">${a.nm}</div><div class="ads">${a.ds}</div></div>
+      <span class="arw">${ok?"✓ +"+a.rew:"+"+a.rew+" ⚡"}</span>`;
+    grid.appendChild(el);
+  });
+}
 
 function renderShop(){
   $("shopPoints").textContent=getPoints();
@@ -454,6 +584,8 @@ const GAME={
   intermTimer:0,
   heals:[],          // efectos visuales de curación {x,t}
   toastMsg:null,     // aviso puntual {txt,t}
+  calmTimer:0,       // segundos sin caída de rayos (Señor de la tormenta)
+  runRevives:0, runHoles:0,  // contadores de la partida actual
 };
 
 function makePlayer(id,name,color,classId){
@@ -464,6 +596,7 @@ function makePlayer(id,name,color,classId){
     hp:100,maxHp:100,state:"alive",
     speedMult:1,repairMult:1,reviveMult:1,repairRange:0,
     resist:0,regen:0,dodge:0,shield:0,lives:0,warnBonus:0,repairHeal:0,
+    teamRepair:0,rallyTimer:0,   // aura de capitán / impulso temporal
     bleedout:BLEEDOUT,
     abKind:null,abCd:0,abMax:0,abReq:false, // habilidad de clase
     rayos:0,            // rayos sobrevividos (para puntos)
@@ -564,12 +697,16 @@ function applyClass(p){
 function startWaveSystem(){
   GAME.phase="playing"; GAME.wave=1; GAME.waveTimer=WAVE_DURATION;
   GAME.strikes=[]; GAME.flash=0; GAME.strikeTimer=1.2;
+  GAME.runRevives=0; GAME.runHoles=0; GAME.calmTimer=0;
   initRoof();
   for(const id in GAME.players){
     const p=GAME.players[id];
     applyClass(p);
     p.hp=p.maxHp; p.state="alive"; p.bleedout=BLEEDOUT;
   }
+  // Aura de equipo del Capitán: bonus de reparación a todos
+  let aura=0; for(const id in GAME.players) aura+=GAME.players[id].teamRepair||0;
+  if(aura>0) for(const id in GAME.players) GAME.players[id].repairMult*=(1+aura);
 }
 
 // =====================================================
@@ -601,7 +738,7 @@ function startClientInputSender(){
 }
 
 function showGameScreen(){
-  $("menu").style.display="none"; $("lobby").style.display="none"; $("shop").style.display="none"; $("game").style.display="block";
+  $("menu").style.display="none"; $("lobby").style.display="none"; $("shop").style.display="none"; $("ach").style.display="none"; $("game").style.display="block";
   resizeCanvas();
   const touch = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
   if(touch) $("touch").classList.add("show");
@@ -637,12 +774,15 @@ function simulate(dt){
       // habilidad de clase (enfriamiento + activación)
       if(p.abCd>0) p.abCd=Math.max(0,p.abCd-dt);
       if(p.abReq){ p.abReq=false; if(p.abKind&&p.abCd<=0){ executeAbility(p); p.abCd=p.abMax; } }
+      // impulso temporal del Capitán (rally)
+      if(p.rallyTimer>0) p.rallyTimer=Math.max(0,p.rallyTimer-dt);
+      const spd = p.speedMult * (p.rallyTimer>0?1.6:1);
       // mover
       let vx=0;
       if(p.input.left) vx-=1;
       if(p.input.right) vx+=1;
       if(vx!==0){p.facing=vx;}
-      p.x += vx*MOVE_SPEED*p.speedMult*dt;
+      p.x += vx*MOVE_SPEED*spd*dt;
       p.x=Math.max(ROOF_X0+10,Math.min(ROOF_X1-10,p.x));
       p.busy=null;
       // acción: revivir o reparar
@@ -655,7 +795,7 @@ function simulate(dt){
         if(target){
           p.busy="revive";
           target._rev=(target._rev||0)+REVIVE_RATE*p.reviveMult*dt;
-          if(target._rev>=1){ target.state="alive"; target.hp=target.maxHp*0.5; target.bleedout=BLEEDOUT; target._rev=0; }
+          if(target._rev>=1){ target.state="alive"; target.hp=target.maxHp*0.5; target.bleedout=BLEEDOUT; target._rev=0; GAME.runRevives=(GAME.runRevives||0)+1; }
         } else {
           // reparar agujero (segmento sobre el jugador, +rango)
           const idx=playerSegIndex(p);
@@ -667,7 +807,7 @@ function simulate(dt){
               if(seg.state===1){
                 p.busy="repair";
                 seg.prog+=REPAIR_RATE*p.repairMult*dt;
-                if(seg.prog>=1){ seg.state=0; seg.prog=0; if(p.repairHeal>0)p.hp=Math.min(p.maxHp,p.hp+p.repairHeal); }
+                if(seg.prog>=1){ seg.state=0; seg.prog=0; if(p.repairHeal>0)p.hp=Math.min(p.maxHp,p.hp+p.repairHeal); GAME.runHoles=(GAME.runHoles||0)+1; }
                 repaired=true; break;
               }
             }
@@ -683,11 +823,12 @@ function simulate(dt){
     GAME.flash=Math.max(0,GAME.flash-dt*3);
     for(let i=GAME.heals.length-1;i>=0;i--){ GAME.heals[i].t-=dt; if(GAME.heals[i].t<=0) GAME.heals.splice(i,1); }
     if(GAME.toastMsg){ GAME.toastMsg.t-=dt; if(GAME.toastMsg.t<=0) GAME.toastMsg=null; }
+    if(GAME.calmTimer>0) GAME.calmTimer=Math.max(0,GAME.calmTimer-dt);
     const relief=1-Math.min(0.5,GAME.stormRelief);
     const baseInterval=Math.max(0.55, 2.5 - GAME.wave*0.16) * relief;
     GAME.strikeTimer-=dt;
     const maxConcurrent=1+Math.floor(GAME.wave/3);
-    if(GAME.strikeTimer<=0 && GAME.strikes.length<maxConcurrent){
+    if(GAME.calmTimer<=0 && GAME.strikeTimer<=0 && GAME.strikes.length<maxConcurrent){
       GAME.strikeTimer=baseInterval*(0.6+Math.random()*0.8);
       spawnStrike();
     }
@@ -748,6 +889,39 @@ function executeAbility(p){
     GAME.segments.forEach(s=>{ s.state=0; s.prog=0; });
     GAME.heals.push({x:p.x,t:0.6});
     GAME.toastMsg={txt:`${p.name} reparó todo el tejado ⚙️`,t:2};
+  } else if(p.abKind==="dash"){
+    // Parpadeo: repara todos los agujeros entre la posición actual y el destino
+    const dir=p.facing||1, dest=Math.max(ROOF_X0+20,Math.min(ROOF_X1-20,p.x+dir*260));
+    const a=Math.min(p.x,dest), b=Math.max(p.x,dest);
+    GAME.segments.forEach((s,i)=>{ const cx=segCenterX(i); if(cx>=a-SEG_W&&cx<=b+SEG_W){ s.state=0; s.prog=0; } });
+    p.x=dest; GAME.heals.push({x:dest,t:0.5});
+    GAME.toastMsg={txt:`${p.name} cruzó el tejado 🥷`,t:2};
+  } else if(p.abKind==="drain"){
+    // Roba vida de la tormenta y reparte a los heridos
+    let n=0;
+    Object.values(GAME.players).forEach(q=>{
+      if(q.state==="dead") return;
+      if(q.state==="downed"){ q.state="alive"; q.hp=q.maxHp*0.5; q.bleedout=BLEEDOUT; q._rev=0; n++; }
+      else if(q.hp<q.maxHp){ q.hp=Math.min(q.maxHp,q.hp+35); n++; }
+    });
+    GAME.heals.push({x:p.x,t:0.6});
+    GAME.toastMsg={txt:`${p.name} drenó la tormenta 🧛 (${n})`,t:2};
+  } else if(p.abKind==="rally"){
+    // Grito: acelera a todo el equipo unos segundos
+    Object.values(GAME.players).forEach(q=>{ if(q.state!=="dead"){ q.rallyTimer=4; } });
+    GAME.heals.push({x:p.x,t:0.5});
+    GAME.toastMsg={txt:`${p.name} dio la orden: ¡todos más rápido! 🎖️`,t:2};
+  } else if(p.abKind==="reviveAll"){
+    let n=0;
+    Object.values(GAME.players).forEach(q=>{
+      if(q.state==="downed"||q.state==="dead"){ q.state="alive"; q.hp=q.maxHp*0.6; q.bleedout=BLEEDOUT; q._rev=0; n++; }
+    });
+    GAME.heals.push({x:p.x,t:0.8});
+    GAME.toastMsg={txt:`${p.name} renació de las cenizas y revivió al equipo 🐦‍🔥 (${n})`,t:2.5};
+  } else if(p.abKind==="calm"){
+    GAME.calmTimer=Math.max(GAME.calmTimer||0,5);
+    GAME.strikes=GAME.strikes.filter(s=>s.phase!=="warn"||s.kind==="bless");
+    GAME.toastMsg={txt:`${p.name} calmó la tormenta 🌩️ (5s)`,t:2.5};
   }
 }
 
@@ -859,6 +1033,8 @@ function buildStatePayload(){
     strikes:GAME.strikes.map(s=>({seg:s.seg,x:s.x,phase:s.phase,kind:s.kind||"storm",t:Math.round((s.t/(s.dur||1))*100)/100})),
     heals:GAME.heals.map(h=>({x:h.x,t:Math.round(h.t*100)/100})),
     toast:GAME.toastMsg?GAME.toastMsg.txt:null,
+    calm:GAME.calmTimer>0?Math.round(GAME.calmTimer*10)/10:0,
+    revives:GAME.runRevives||0, holes:GAME.runHoles||0,
   };
 }
 function broadcastState(){ const p=buildStatePayload(); latestState=p; broadcast(p); handlePhaseUI(p); }
@@ -911,14 +1087,31 @@ function pickUpgrade(id){
 function showGameOver(wave){
   $("goOverlay").classList.add("show");
   gameRunning=false;
-  let earned=0;
+  if(GAME._awarded) return; // evita duplicar al recibir más estados
+  GAME._awarded=true;
   const me = latestState && latestState.players ? latestState.players.find(p=>p.id===myId) : null;
-  if(me) earned=me.rayos||0;
-  if(earned>0 && !GAME._awarded){ GAME._awarded=true; setPoints(getPoints()+earned); }
-  $("goBadge").textContent=`Sobrevivieron ${wave} oleada${wave===1?"":"s"}  ·  +${earned} ⚡ ganados`;
-  $("goSub").textContent = earned>0
-    ? `Ganaste ${earned} puntos. Gástalos en la tienda de clases antes de la próxima partida.`
+  const earned = me ? (me.rayos||0) : 0;
+  const revives = latestState ? (latestState.revives||0) : 0;
+  const holes = latestState ? (latestState.holes||0) : 0;
+  // Guardado de rayos y estadísticas persistentes
+  const st=getStats();
+  st.totalRayos+=earned;
+  st.bestRun=Math.max(st.bestRun,earned);
+  st.bestWave=Math.max(st.bestWave,wave);
+  st.games+=1; st.revives+=revives; st.holes+=holes;
+  saveStats(st);
+  if(earned>0) setPoints(getPoints()+earned);
+  // Logros (recompensas extra) tras guardar stats
+  const newAch=checkAchievements();
+  const bonus=newAch.reduce((a,x)=>a+x.rew,0);
+  $("goBadge").textContent=`Sobrevivieron ${wave} oleada${wave===1?"":"s"}  ·  +${earned} ⚡`;
+  let sub = earned>0
+    ? `Ganaste ${earned} puntos. Récord de partida: ${st.bestRun} rayos · Mejor oleada: ${st.bestWave}.`
     : "Todo el equipo fue derribado por la tormenta.";
+  if(newAch.length){
+    sub += `<br><span style="color:var(--amber)">🏆 ${newAch.length} logro${newAch.length===1?"":"s"} desbloqueado${newAch.length===1?"":"s"} (+${bonus} ⚡): ${newAch.map(a=>a.ic+" "+a.nm).join(", ")}</span>`;
+  }
+  $("goSub").innerHTML=sub;
 }
 function endToMenu(msg){ alert(msg); location.reload(); }
 
@@ -1246,6 +1439,7 @@ function drawHUD(s){
     <span>🕳️ ${holes}</span>
     ${me?`<span>❤️ <b style="color:${me.hp/me.maxHp>0.3?'#3fce7c':'#e5484d'}">${me.hp}</b></span>`:""}
     ${me?`<span title="Rayos sobrevividos">⚡ <b>${me.rayos||0}</b></span>`:""}
+    ${s.calm>0?`<span style="color:#4aa3ff">🌩️ Calma ${Math.ceil(s.calm)}s</span>`:""}
     ${ab}`;
   // aviso puntual (habilidades)
   if(s.toast && s.toast!==_lastToast){ _lastToast=s.toast; showToast(s.toast); }
