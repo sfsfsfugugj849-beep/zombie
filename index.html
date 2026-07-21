@@ -875,12 +875,19 @@ function onHostData(conn,d){
     if(p&&GAME.phase==="intermission"&&!p.ready) applyUpgrade(p,d.id);
   } else if(d.t==="buyShopItem"){ // Nuevo: comprar ítem de la tienda en partida
     const p=GAME.players[conn._pid];
-    if(p && GAME.inGameShopOpen){ buyInGameShopItem(p, d.itemId); }
+    if(p && GAME.inGameShopOpen){
+      console.log(`Host: Jugador ${p.name} (${p.id}) intenta comprar ${d.itemId}. Rayos: ${p.rayos}`); // DEBUG
+      buyInGameShopItem(p, d.itemId);
+    } else {
+      console.log(`Host: Compra fallida. Tienda no abierta o jugador no válido. Jugador: ${p?.name}, Tienda abierta: ${GAME.inGameShopOpen}`); // DEBUG
+    }
   } else if(d.t==="toggleShop"){ // Nuevo: abrir/cerrar tienda en partida
     if(GAME.phase === "playing"){
       GAME.inGameShopOpen = !GAME.inGameShopOpen;
-      // Si se cierra, el NPC también se desactiva
-      if(!GAME.inGameShopOpen) GAME.shopNPC.active = false;
+      console.log(`Host: Tienda en partida toggled a ${GAME.inGameShopOpen}`); // DEBUG
+      // La lógica del NPC se actualiza en el simulate loop
+    } else {
+      console.log(`Host: Intento de toggleShop fuera de fase 'playing'.`); // DEBUG
     }
   }
 }
@@ -895,7 +902,17 @@ function onClientData(d){
     d.players.forEach(p=>GAME.players[p.id]={name:p.name,color:p.color,id:p.id});
     renderLobby();
   }
-  else if(d.t==="state"){ latestState=d; if(!gameRunning) startClientGame(); handlePhaseUI(d); }
+  else if(d.t==="state"){
+    latestState=d;
+    if(!gameRunning) startClientGame();
+    handlePhaseUI(d);
+    // DEBUG: Verificar el estado de la tienda en el cliente
+    if (d.inGameShopOpen) {
+      console.log(`Client: Recibido estado con inGameShopOpen: true`);
+    } else {
+      console.log(`Client: Recibido estado con inGameShopOpen: false`);
+    }
+  }
   else if(d.t==="over"){ latestState=d.snapshot||latestState; showGameOver(d.wave); }
 }
 
@@ -1039,13 +1056,16 @@ function simulate(dt){
       }
     });
 
-    // MODIFICADO: La lógica del hint ahora solo depende de la proximidad y si la tienda está cerrada.
-    if (playerNearShop && !GAME.inGameShopOpen) {
+    // Lógica para activar el NPC y el hint de la tienda
+    if (GAME.inGameShopOpen) {
+      shopNPC.active = true; // El NPC siempre está activo si la tienda está abierta
+      GAME.shopHintTimer = 0; // No mostrar hint si la tienda ya está abierta
+    } else if (playerNearShop) {
+      shopNPC.active = true; // Activar NPC si un jugador está cerca y la tienda no está abierta
       GAME.shopHintTimer = 1; // Mostrar hint
-      shopNPC.active = true; // Activar NPC
     } else {
+      shopNPC.active = false; // Desactivar NPC si no hay jugadores cerca y la tienda no está abierta
       GAME.shopHintTimer = 0; // Ocultar hint
-      shopNPC.active = false; // Desactivar NPC
     }
 
     // --- Manejo de la tienda en partida ---
@@ -1443,7 +1463,7 @@ function executeAbility(p){
       const pointsToAdd = 15;
       // No se añaden puntos directamente al jugador local, sino al total de la partida
       GAME.runPointsEarned += pointsToAdd;
-      setPoints(getPoints() + pointsToAdd); // Añade a los puntos globales
+      setPoints(getPoints() + pointsToAdd); // Añade a los puntos globales inmediatamente
       GAME.heals.push({x:p.x,t:0.6, type:"transmute"}); // Nuevo efecto visual
       GAME.toastMsg={txt:`${p.name} transmutó 30 de vida en ${pointsToAdd} ⚡ para el equipo.`,t:2.5};
     } else {
@@ -1709,9 +1729,11 @@ function buyInGameShopItem(player, itemId){
   if(player.rayos >= item.cost){
     player.rayos -= item.cost;
     item.apply(player, GAME); // Aplica el efecto del ítem
+    console.log(`Host: ${player.name} compró ${item.nm}. Rayos restantes: ${player.rayos}`); // DEBUG
   } else {
     // Podríamos enviar un mensaje al cliente para mostrar un error de "no tienes suficientes puntos"
     GAME.toastMsg={txt:`${player.name} no tiene suficientes ⚡ para ${item.nm}.`,t:2};
+    console.log(`Host: ${player.name} no tiene suficientes rayos para ${item.nm}.`); // DEBUG
   }
 }
 
@@ -1832,6 +1854,7 @@ function pickUpgrade(id){
 function openInGameShop(s){
   const me = myPlayerState(s);
   if(!me) return;
+  console.log(`Client: Abriendo tienda en partida. Jugador: ${me.name}, Rayos: ${me.rayos}`); // DEBUG
   $("inGameShopOverlay").classList.add("show");
   $("inGameShopPoints").textContent = me.rayos;
   $("inGameShopErr").textContent = "";
@@ -1840,6 +1863,7 @@ function openInGameShop(s){
   // Solo re-renderizar si el contenido ha cambiado o si es la primera vez
   const currentItems = SHOP_ITEMS.map(item => item.id).join(',');
   if (grid._lastRenderedItems === currentItems && grid.children.length > 0) {
+      console.log(`Client: Tienda ya renderizada, saltando re-render.`); // DEBUG
       return;
   }
   grid._lastRenderedItems = currentItems;
@@ -1855,10 +1879,12 @@ function openInGameShop(s){
       <div class="cds">${item.ds}</div><div class="cfoot">${foot}</div>`;
     el.onclick = () => {
       if(canAfford){
+        console.log(`Client: Intentando comprar ${item.nm}.`); // DEBUG
         if(isHost){ buyInGameShopItem(me, item.id); }
         else if(hostConn && hostConn.open){ hostConn.send({t:"buyShopItem", itemId:item.id}); }
       } else {
         $("inGameShopErr").textContent = `Te faltan ${item.cost - me.rayos} puntos para "${item.nm}".`;
+        console.log(`Client: No tiene suficientes rayos para ${item.nm}.`); // DEBUG
       }
     };
     grid.appendChild(el);
@@ -1866,6 +1892,7 @@ function openInGameShop(s){
 }
 
 function closeInGameShop(){
+  console.log(`Client: Cerrando tienda en partida.`); // DEBUG
   $("inGameShopOverlay").classList.remove("show");
   $("inGameShopGrid")._lastRenderedItems = null; // Reset para forzar re-render en la próxima apertura
 }
@@ -1962,7 +1989,11 @@ bindTouch($("tLeft"),"left"); bindTouch($("tRight"),"right"); bindTouch($("tAct"
 })();
 
 function toggleInGameShop(){
-  if(isHost){ GAME.inGameShopOpen = !GAME.inGameShopOpen; }
+  console.log(`Client: Botón de tienda pulsado. Enviando toggleShop.`); // DEBUG
+  if(isHost){
+    GAME.inGameShopOpen = !GAME.inGameShopOpen;
+    console.log(`Host (self-toggle): Tienda en partida toggled a ${GAME.inGameShopOpen}`); // DEBUG
+  }
   else if(hostConn && hostConn.open){ hostConn.send({t:"toggleShop"}); }
 }
 
