@@ -1,8 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Pelea Anime</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jujutsu Kaisen Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0d0817;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
 
@@ -189,7 +198,7 @@ function sim(){
   if(p.mf>0&&--p.mf==0){p.an=0;p.ad=[]}
   if(p.pn>0){p.pn--;if(p.pn%8==0){hurt(p.x,p.y,85,c.dm*1.5,k);fx('y',p.x,p.y,c.c)}}
   if(p.pc>0&&--p.pc==0){G.j.push({x:p.x,y:p.y,vx:Math.cos(p.a)*14,vy:Math.sin(p.a)*14,r:60,d:700,l:70,o:0,pi:1,col:'#b060ff',hs:[],k,ml:0,nl:0,pp:1});fx('s',p.x,p.y,'#b060ff',200)}
-  if(p.rk>0){p.rk--;let t=null,m=300;G.e.concat(G.b?[G.b]:[]).forEach(e=>{const q=hyp(e.x-p.x,e.y-p.y);if(q<m){m=q;t=e}});
+  if(p.rk>0){p.rk--;let t=null,m=300;G.e.concat(G.b?[G.b]:[]).forEach(e=>{const q=hyp(e.x-p.x,e.y-p.y);if(q<m){m=q;t=e});
    p.rx+=((t?t.x:p.x-40)-p.rx)*.1;p.ry+=((t?t.y:p.y)-p.ry)*.1;
    if(p.rk%15==0){hurt(p.rx,p.ry,75,c.dm*2.5,k);fx('y',p.rx,p.ry,'#fff')}}
   if(i.f&&p.cd<=0&&!(p.pc>0)){const mh=p.mf>0,m=c.m||mh;p.cd=mh?14:c.cd;fx('w',p.x,p.y,mh?'#ffd84a':c.c,p.a);const s=m?9:11;
@@ -305,7 +314,7 @@ function draw(x){
  if(p0.hp<p0.mh*.3&&!p0.dead){const v=x.createRadialGradient(W/2,H/2,200,W/2,H/2,520);v.addColorStop(0,'rgba(200,0,0,0)');v.addColorStop(1,'rgba(200,0,20,'+(.35+.2*Math.sin(T*.25))+')');x.fillStyle=v;x.fillRect(0,0,W,H)}
  if(fl>.02){x.globalAlpha=Math.min(.7,fl);x.fillStyle=fc;x.fillRect(0,0,W,H);x.globalAlpha=1}
  x.textAlign='left';x.font='16px Georgia';x.fillStyle='#fff';
- x.fillText((b?'Boss':'Oleada '+G.w)+'   🪙 '+(p0.c|0),12,22);
+ x.fillText((b?'Boss':'Oleada '+G.w)+'    🪙 '+(p0.c|0),12,22);
  x.fillText(C[p0.ch].sk+': '+(p0.sc>0?Math.ceil(p0.sc/60)+'s':'listo (Espacio / clic der.)'),12,H-12);
  x.textAlign='center';
  if(T<300)x.fillText('WASD mover · clic izq. atacar · Espacio o clic der. especial',W/2,H-34);
